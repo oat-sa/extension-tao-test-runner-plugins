@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE structures SYSTEM "../../tao/doc/structures.dtd">
+<structures>
+    <structure id="delivery" name="Deliveries" level="4" group="main">
+        <description />
+        <sections>
+            <section id="manage_delivery_assembly" name="Deliveries" url="/taoDeliveryRdf/DeliveryMgmt/index">
+                <actions>
+                    <action id="delivery-plugins" name="Plugins" url="/taoTestRunnerPlugins/Delivery/index" group="tree" context="resource">
+                        <icon id="icon-extension"/>
+                    </action>
+                </actions>
+            </section>
+        </sections>
+    </structure>
+</structures>
