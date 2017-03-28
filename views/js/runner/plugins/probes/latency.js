@@ -84,11 +84,8 @@ define([
 
             /**
              * Send latency data
-             * @param e
              */
-            function sendVariables(e) {
-                var done = e.done();
-
+            function sendVariables() {
                 probeOverseer.flush().then(function(data){
                     var traceData = {};
                     //we reformat the time set into a trace variables
@@ -103,8 +100,7 @@ define([
                         });
                         //and send them
                         return testRunner.getProxy()
-                            .sendVariables(traceData)
-                            .then(done);
+                            .sendVariables(traceData);
                     }
                 });
             }
@@ -132,15 +128,15 @@ define([
                     capture : captureShortcut
                 })
                 .add({
-                     name : 'pause-on-disconnect',
-                     events : 'disconnectpause',
-                     capture : captureAll
-                 })
+                    name : 'pause-on-disconnect',
+                    events : 'disconnectpause',
+                    capture : captureAll
+                })
                 .add({
-                     name : 'pause',
-                     events : 'pause',
-                     capture : captureAll
-                 })
+                    name : 'pause',
+                    events : 'pause',
+                    capture : captureAll
+                })
                 .add({
                     name : 'session-latency',
                     latency : true,
@@ -212,12 +208,12 @@ define([
             testRunner.on('plugin-removetimer.timer', function(timerPlugin, type) {
                 timers[type] = false;
             });
-            testRunner.before('unloaditem', function(e) {
-                sendVariables(e);
+            testRunner.before('unloaditem', function() {
+                return sendVariables();
             });
-            testRunner.before('exit', function(e) {
+            testRunner.before('exit', function() {
                 testRunner.trigger('endsession');
-                sendVariables(e);
+                return sendVariables();
             });
         }
     });
