@@ -24,9 +24,8 @@
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 define([
-    'lodash',
-    'taoTests/runner/plugin'
-], function (_, pluginFactory){
+    'lodash'
+], function (_){
     'use strict';
 
     var timers = {};
@@ -69,18 +68,15 @@ define([
         };
     }
 
-    /**
-     * Returns the configured plugin
-     */
-    return pluginFactory({
-        name : 'latency',
 
+    return {
         /**
-         * Initialize the plugin (called during runner's init)
+         * @param {Object} testRunner - a testRunner instance
+         * @param {Object} probesConfig - the probes to register in a Json format
+         * Register the probes and add test runner listeners
          */
-        init : function init(){
-            var testRunner = this.getTestRunner(),
-                probeOverseer = testRunner.getProbeOverseer();
+        init : function init(testRunner, probesConfig){
+            var probeOverseer = testRunner.getProbeOverseer();
 
             /**
              * Send latency data
@@ -106,101 +102,23 @@ define([
             }
 
             //register the probes
-            probeOverseer
-                .add({
-                    name : 'leave-fullscreen-prohibited',
-                    events : 'leavefullscreen',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'unsecured-launch-prohibited',
-                    events : 'unsecured-launch',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'focus-loss-prohibited',
-                    events : 'blur',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'shortcut-prohibited',
-                    events : 'prohibited-key',
-                    capture : captureShortcut
-                })
-                .add({
-                    name : 'pause-on-disconnect',
-                    events : 'disconnectpause',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'pause',
-                    events : 'pause',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'session-latency',
-                    latency : true,
-                    startEvents : 'init',
-                    stopEvents : ['endsession'],
-                    capture : captureTest
-                })
-                .add({
-                    name : 'item-latency',
-                    latency : true,
-                    startEvents : ['renderitem', 'resumeitem'],
-                    stopEvents : ['move', 'skip', 'timeout', 'plugin-exitend.exit', 'pause'],
-                    capture : captureAll
-                })
-                .add({
-                    name : 'help-panel-latency',
-                    latency : true,
-                    startEvents : 'plugin-panelshow.help',
-                    stopEvents : 'plugin-panelhide.help',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'formula-panel-latency',
-                    latency : true,
-                    startEvents : 'plugin-panelshow.formula',
-                    stopEvents : 'plugin-panelhide.formula',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'exit-dialog-latency',
-                    latency : true,
-                    startEvents : 'plugin-exitstart.exit',
-                    stopEvents : 'plugin-exitend.exit',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'scratchpad-latency',
-                    latency : true,
-                    startEvents : 'plugin-open.scratchpad',
-                    stopEvents : 'plugin-close.scratchpad',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'calculator-latency',
-                    latency : true,
-                    startEvents : 'plugin-open.calculator',
-                    stopEvents : 'plugin-close.calculator',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'highlighter-latency',
-                    latency : true,
-                    startEvents : 'plugin-start.highlighter',
-                    stopEvents : 'plugin-end.highlighter',
-                    capture : captureAll
-                })
-                .add({
-                    name : 'lineReader-latency',
-                    latency : true,
-                    startEvents : 'plugin-start.line-reader',
-                    stopEvents : 'plugin-end.line-reader',
-                    capture : captureAll
-                });
+            probesConfig.forEach(function(probe) {
+                var captureFn;
 
+                switch(probe.capture) {
+                    case 'captureAll':      captureFn = captureAll;         break;
+                    case 'captureShortcut': captureFn = captureShortcut;    break;
+                    case 'captureTest':     captureFn = captureTest;        break;
+                }
+                probeOverseer.add({
+                    name: probe.name,
+                    events: probe.events,
+                    latency: probe.latency,
+                    startEvents: probe.startEvents,
+                    stopEvents: probe.stopEvents,
+                    capture: captureFn
+                });
+            });
 
             testRunner.on('plugin-addtimer.timer', function(timerPlugin, type, timer) {
                 timers[type] = timer;
@@ -216,5 +134,5 @@ define([
                 return sendVariables();
             });
         }
-    });
+    };
 });
