@@ -17,8 +17,40 @@
  */
 
 /**
- * Test Runner Probes Plugin : latency
+ * Register some probes in the test runner.
+ * This has to be wrapped in a proper test runner plugin with a per-instance configuration.
+ * Configuration should be in a Json file and look something like:
  *
+ [{
+   "name": "leave-fullscreen-prohibited",
+   "events": "leavefullscreen",
+   "capture": "captureAll"
+ },
+ {
+   "name": "session-latency",
+   "latency": true,
+   "startEvents": "init",
+   "stopEvents": [
+     "endsession"
+   ],
+   "capture": "captureTest"
+ },
+ {
+   "name": "item-latency",
+   "latency": true,
+   "startEvents": [
+     "renderitem",
+     "resumeitem"
+   ],
+   "stopEvents": [
+     "move",
+     "skip",
+     "timeout",
+     "plugin-exitend.exit",
+     "pause"
+   ],
+   "capture": "captureAll"
+ }]
  *
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
