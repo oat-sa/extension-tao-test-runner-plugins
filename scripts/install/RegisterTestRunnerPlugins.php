@@ -36,17 +36,6 @@ use oat\taoTests\models\runner\plugins\TestPlugin;
 class RegisterTestRunnerPlugins extends InstallAction
 {
     public static $plugins = [
-        'probes' => [
-            [
-                'id' => 'latency',
-                'name' => 'Latency',
-                'module' => 'taoTestRunnerPlugins/runner/plugins/probes/latency',
-                'description' => 'Register metrics',
-                'category' => 'probes',
-                'active' => false,
-                'tags' => [ ]
-            ]
-        ],
         'security' => [
             [
                 'id' => 'autoPause',
