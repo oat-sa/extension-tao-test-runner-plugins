@@ -46,18 +46,23 @@ define([
          */
         init: function init() {
             var self = this;
+
             var testRunner = this.getTestRunner();
 
             //to know if the focus is given to inner element or the main window
             var mainFocus = true;
             var innerFocus = false;
 
+            var bluring = false;
             var doPause = function doPause() {
                 var context = testRunner.getTestContext();
                 var states = testRunner.getTestData().states;
-                if (context.state <= states.interacting && !testRunner.getState('finish')) {
+                if (!bluring && context.state <= states.interacting && !testRunner.getState('finish')) {
+                    bluring = true;
                     testRunner.trigger('blur')
-                              .trigger('pause', {reason: lostFocusMessage});
+                              .trigger('pause', {
+                                  message: lostFocusMessage
+                              });
                 }
             };
 
@@ -79,9 +84,9 @@ define([
                                 }
                             });
                         });
-
-                    //in case of iframe with a different origin we can't access the contentWindow
-                    } catch(permissionError) {}
+                    } catch(permissionError) {
+                        //in case of iframe with a different origin we can't access the contentWindow
+                    }
                 });
             };
 
@@ -107,8 +112,8 @@ define([
                 .on('plugin-loaded.scratchpad', handleIframesFocus)
                 .on('renderitem', handleIframesFocus)
                 .on('unloaditem', function(){
-                innerFocus = false;
-            });
+                    innerFocus = false;
+                });
         }
     });
 });
