@@ -61,7 +61,11 @@ define([
                     bluring = true;
                     testRunner.trigger('blur')
                               .trigger('pause', {
-                                  message: lostFocusMessage
+                                  message: lostFocusMessage,
+                                  reasons : {
+                                      category : __('examinee'),
+                                      subCategory : __('behaviour')
+                                  }
                               });
                 }
             };
