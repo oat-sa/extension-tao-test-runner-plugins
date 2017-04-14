@@ -48,7 +48,13 @@ define([
                         paused = true;
                         testRunner
                             .trigger('disconnectpause')
-                            .trigger('pause', {message: pauseMessage});
+                            .trigger('pause', {
+                                reasons : {
+                                    category : __('technical'),
+                                    subCategory : __('network')
+                                },
+                                message: pauseMessage
+                            });
                     }
                 });
         }
