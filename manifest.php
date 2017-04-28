@@ -22,10 +22,10 @@ return array(
     'label' => 'Manage test runner plugins',
     'description' =>  "Manage test runner's plugins",
     'license' => 'GPL-2.0',
-    'version' => '0.3.2',
+    'version' => '1.0.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=8.0.0',
+        'tao' => '>=9.0.0',
         'taoDelivery' =>  '>=4.2.0',
         'taoDeliveryRdf' =>  '>=1.6.0',
         'taoQtiTest' =>  '>=4.3.0',
@@ -52,9 +52,6 @@ return array(
 
         #BASE URL (usually the domain root)
         'BASE_URL' => ROOT_URL . 'taoTestRunnerPlugins/',
-
-        #BASE WWW required by JS
-        'BASE_WWW' => ROOT_URL . 'taoTestRunnerPlugins/views/'
     ),
     'extra' => array(
         'structures' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml',
