@@ -19,8 +19,10 @@
 
 namespace oat\taoTestRunnerPlugins\scripts\update;
 
-use common_ext_ExtensionsManager;
 use common_ext_ExtensionUpdater;
+use common_ext_ExtensionsManager;
+use oat\taoTests\models\runner\plugins\PluginRegistry;
+use oat\taoTests\models\runner\plugins\TestPlugin;
 
 /**
  * Class Updater
@@ -35,5 +37,16 @@ class Updater extends common_ext_ExtensionUpdater
     public function update($initialVersion)
     {
         $this->skip('0.1.0', '1.0.0');
+
+        if($this->isVersion('1.0.0')){
+            $registry = PluginRegistry::getRegistry();
+            foreach($registry->getMap() as $module => $plugin){
+                if(preg_match("/^taoTestRunnerPlugins/", $module) && is_null($plugin['bundle'])){
+                    $plugin['bundle'] = 'taoTestRunnerPlugins/loader/testPlugins.min';
+                    $registry->register(TestPlugin::fromArray($plugin));
+                }
+            }
+            $this->setVersion('1.1.0');
+        }
     }
 }

@@ -41,6 +41,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'id' => 'autoPause',
                 'name' => 'Auto Pause',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/autoPause',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Persist the pause state',
                 'category' => 'security',
                 'active' => false,
@@ -49,6 +50,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'id' => 'blurPause',
                 'name' => 'Blur Pause',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurPause',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Pause the test when leaving the test window',
                 'category' => 'security',
                 'active' => false,
@@ -57,6 +59,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'id' => 'disableCommands',
                 'name' => 'Disable Commands',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/disableCommands',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Disable and report some forbidden shortcuts',
                 'category' => 'security',
                 'active' => false,
@@ -65,6 +68,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'id' => 'preventCopy',
                 'name' => 'Prevent Copy',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventCopy',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Prevent copying from CTRL-C/X/V shortcuts',
                 'category' => 'security',
                 'active' => false,
@@ -73,6 +77,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'id' => 'fullscreen',
                 'name' => 'Full Screen',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/fullScreen',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Force the test in full screen mode',
                 'category' => 'security',
                 'active' => false,
@@ -90,7 +95,7 @@ class RegisterTestRunnerPlugins extends InstallAction
         $registry = PluginRegistry::getRegistry();
         $count = 0;
 
-        foreach(self::$plugins as $category => $categoryPlugins) {
+        foreach(self::$plugins as $categoryPlugins) {
             foreach($categoryPlugins as $pluginData){
                 if( $registry->register(TestPlugin::fromArray($pluginData)) ) {
                     $count++;
