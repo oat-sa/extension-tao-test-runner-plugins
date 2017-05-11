@@ -72,10 +72,11 @@ define([
             else if (platform === 'win') {
                 $(window)
                 .on('keyup' + '.' + this.name, function (e) {
-                    if (e.keyCode === 44) {
+                    if (e.key === 'PrintScreen') {
                         testRunner
+                        .trigger('prohibited-key', 'PrintScreen')
                         .trigger('pause', {
-                            message: __('The assessment has been paused due to an attempt to print the screen. Please contact your proctor or administrator to resume your assessment.'),
+                            message: __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.'),
                             reasons: {
                                 category: __('examinee'),
                                 subCategory: __('behaviour')
