@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
  */
 
 define([
@@ -30,8 +30,8 @@ define([
     var platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
 
     /**
-     * Creates the preventCopy plugin.
-     * Prevents the user to copy any content.
+     * Creates the plugin.
+     * Prevents screenshots (mac) and pauses assessment on print screen (win)
      */
     return pluginFactory({
 
@@ -54,14 +54,14 @@ define([
             // For mac - blur on Cmd+Shift
             if (platform === 'mac') {
                 $(window)
-                .on('keydown', function (e) {
+                .on('keydown' + '.' + this.name, function (e) {
                     if (e.metaKey && e.shiftKey) {
                         $('body').css('filter', 'blur(20px)');
                     }
                 })
                 // Note - When user hits Cmd+Shift+4, they must press any key
                 // to remove blur (that is not Cmd+Shift)
-                .on('keyup', function (e) {
+                .on('keyup' + '.' + this.name, function (e) {
                     if (!e.metaKey || !e.shiftKey) {
                         $('body').css('filter', '');
                     }
@@ -71,7 +71,7 @@ define([
             // Windows - pause on PrtScn
             else if (platform === 'win') {
                 $(window)
-                .on('keyup', function (e) {
+                .on('keyup' + '.' + this.name, function (e) {
                     if (e.keyCode === 44) {
                         testRunner
                         .trigger('pause', {
@@ -86,7 +86,7 @@ define([
             }
 
             testRunner.on('destroy', function () {
-                $(window).off('keydown keyup');
+                $(window).off('.' + this.name);
             });
         }
     });
