@@ -116,15 +116,15 @@ define([
                     if (e.key === 'PrintScreen') {
                         triggerCopyEvent();
 
-                        // testRunner
-                        // .trigger('prohibited-key', 'PrintScreen')
-                        // .trigger('pause', {
-                        //     message: __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.'),
-                        //     reasons: {
-                        //         category: __('examinee'),
-                        //         subCategory: __('behaviour')
-                        //     }
-                        // });
+                        testRunner
+                        .trigger('prohibited-key', 'PrintScreen')
+                        .trigger('pause', {
+                            message: __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.'),
+                            reasons: {
+                                category: __('examinee'),
+                                subCategory: __('behaviour')
+                            }
+                        });
                     }
                 });
             }
