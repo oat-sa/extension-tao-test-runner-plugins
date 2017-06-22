@@ -20,7 +20,6 @@
 namespace oat\taoTestRunnerPlugins\scripts\update;
 
 use common_ext_ExtensionUpdater;
-use common_ext_ExtensionsManager;
 use oat\taoTests\models\runner\plugins\PluginRegistry;
 use oat\taoTests\models\runner\plugins\TestPlugin;
 
@@ -49,6 +48,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.1.0');
         }
 
-        $this->skip('1.1.0', '1.2.0');
+        $this->skip('1.1.0', '1.3.0');
     }
 }

@@ -38,6 +38,16 @@ class RegisterTestRunnerPlugins extends InstallAction
     public static $plugins = [
         'security' => [
             [
+                'id' => 'sectionPause',
+                'name' => 'Section Pause',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/security/sectionPause',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Pause delivery execution when the section changed',
+                'category' => 'tools',
+                'active' => false,
+                'tags' => [ ]
+            ],
+            [
                 'id' => 'autoPause',
                 'name' => 'Auto Pause',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/autoPause',
