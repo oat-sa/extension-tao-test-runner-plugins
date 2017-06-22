@@ -31,23 +31,22 @@ define([
 
     /**
      * Sniff Internet Explorer which is the only browser to implement window.clipboardData
-     * @type {boolean}
+     * @type {Boolean}
      */
     var isIe = typeof window.clipboardData !== 'undefined';
 
     /**
-     * On windows, this is what we will attempt to put in the clipboard on a PrintScreen event
+     * On windows, this is what we will attempt to put in the clipboard on a copy event
+     * @type {String}
      */
     var overrideContent = ' ';
 
+
     function triggerCopyEvent() {
-        console.log('about to trigger copy event');
         if (isIe) {
-            console.log('setting design mode');
-            document.designMode = 'on'; // required by IE to actually trigger the 'copy' event
+            document.designMode = 'on'; // IE won't actually trigger the 'copy' event without this
         }
-        if (document.queryCommandSupported('copy')) {
-            console.log('triggering copy event');
+        if (document.execCommand && document.queryCommandSupported('copy')) {
             document.execCommand('copy');
         }
         if (isIe) {
@@ -56,27 +55,15 @@ define([
     }
 
     function handleCopyEvent(event) {
-        console.log('handling copy event');
         overrideClipboard(event.clipboardData);
         event.preventDefault();
     }
 
     function overrideClipboard(clipboardData) {
-        // var now = new Date(),
-        //     formattedDate = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds();
-        console.log('overidding clipboard');
-        // IE specific
         if (isIe) {
-            console.log('overriding in IE');
             window.clipboardData.setData('Text', overrideContent);
-
-        // Normal browsers behavior
         } else {
-            console.log('overriding in a normal browser');
-
             clipboardData.setData('text/plain', overrideContent);
-            // clipboardData.setData('text/html', 'overriden html at ' + formattedDate); // todo: remove me?
-            // console.log(clipboardData.getData('text/plain'));
         }
     }
 
@@ -93,20 +80,6 @@ define([
          */
         init: function init() {
             // this function is mandatory
-            var testRunner = this.getTestRunner(),
-                areaBroker = testRunner.getAreaBroker(),
-                $toolbox = areaBroker.getToolboxArea(),
-                $trigger = $('<div>', {
-                    text: 'trigger for cut/paste'
-                });
-
-            // $toolbox.append($trigger);
-
-            // $trigger.on('click', function() {
-            //     fireCopy();
-            // });
-
-
         },
 
         /**
@@ -135,19 +108,13 @@ define([
 
             // Windows - pause on PrtScn
             else if (platform === 'win') {
-                // try overriding any successful screenshot
-                console.log('listening to copy event');
-                // document.addEventListener('copy', handleCopyEvent);
-                document.addEventListener('copy', function(e) {
-                    console.log('COPY TRIGGERED !');
-                    e.preventDefault();
-                });
+                // will override, if possible, anything put into the clipboard after a copy event (whether manually or automatically triggered)
+                document.addEventListener('copy', handleCopyEvent);
 
                 $(window)
                 .on('keyup' + '.' + this.getName(), function (e) {
                     if (e.key === 'PrintScreen') {
                         triggerCopyEvent();
-                        console.log('PrintScreen');
 
                         // testRunner
                         // .trigger('prohibited-key', 'PrintScreen')
