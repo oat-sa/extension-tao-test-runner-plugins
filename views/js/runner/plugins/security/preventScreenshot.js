@@ -30,6 +30,44 @@ define([
     var platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
 
     /**
+     * Sniff Internet Explorer which is the only browser to implement window.clipboardData
+     * @type {Boolean}
+     */
+    var isIe = typeof window.clipboardData !== 'undefined';
+
+    /**
+     * On windows, this is what we will attempt to put in the clipboard on a copy event
+     * @type {String}
+     */
+    var overrideContent = ' ';
+
+
+    function triggerCopyEvent() {
+        if (isIe) {
+            document.designMode = 'on'; // IE won't actually trigger the 'copy' event without this
+        }
+        if (document.execCommand && document.queryCommandSupported('copy')) {
+            document.execCommand('copy');
+        }
+        if (isIe) {
+            document.designMode = 'off';
+        }
+    }
+
+    function handleCopyEvent(event) {
+        overrideClipboard(event.clipboardData);
+        event.preventDefault();
+    }
+
+    function overrideClipboard(clipboardData) {
+        if (isIe) {
+            window.clipboardData.setData('Text', overrideContent);
+        } else {
+            clipboardData.setData('text/plain', overrideContent);
+        }
+    }
+
+    /**
      * Creates the plugin.
      * Prevents screenshots (mac) and pauses assessment on print screen (win)
      */
@@ -54,14 +92,14 @@ define([
             // For mac - blur on Cmd+Shift
             if (platform === 'mac') {
                 $(window)
-                .on('keydown' + '.' + this.name, function (e) {
+                .on('keydown' + '.' + this.getName(), function (e) {
                     if (e.metaKey && e.shiftKey) {
                         $('body').css('filter', 'blur(20px)');
                     }
                 })
                 // Note - When user hits Cmd+Shift+4, they must press any key
                 // to remove blur (that is not Cmd+Shift)
-                .on('keyup' + '.' + this.name, function (e) {
+                .on('keyup' + '.' + this.getName(), function (e) {
                     if (!e.metaKey || !e.shiftKey) {
                         $('body').css('filter', '');
                     }
@@ -70,9 +108,14 @@ define([
 
             // Windows - pause on PrtScn
             else if (platform === 'win') {
+                // will override, if possible, anything put into the clipboard after a copy event (whether manually or automatically triggered)
+                document.addEventListener('copy', handleCopyEvent);
+
                 $(window)
-                .on('keyup' + '.' + this.name, function (e) {
+                .on('keyup' + '.' + this.getName(), function (e) {
                     if (e.key === 'PrintScreen') {
+                        triggerCopyEvent();
+
                         testRunner
                         .trigger('prohibited-key', 'PrintScreen')
                         .trigger('pause', {
@@ -85,10 +128,13 @@ define([
                     }
                 });
             }
+        },
 
-            testRunner.on('destroy', function () {
-                $(window).off('.' + this.name);
-            });
+        destroy: function destroy() {
+            $(window).off('.' + this.getName());
+            if (platform === 'win') {
+                document.removeEventListener('copy', handleCopyEvent);
+            }
         }
     });
 });
