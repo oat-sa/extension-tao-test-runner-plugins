@@ -132,7 +132,9 @@ define([
 
         destroy: function destroy() {
             $(window).off('.' + this.getName());
-            document.removeEventListener('copy', handleCopyEvent);
+            if (platform === 'win') {
+                document.removeEventListener('copy', handleCopyEvent);
+            }
         }
     });
 });
