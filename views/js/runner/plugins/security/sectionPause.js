@@ -42,13 +42,14 @@ define([
             var testRunner = this.getTestRunner();
             var prevSection = null;
 
-            testRunner.on('renderitem', function () {
+            testRunner.before('renderitem', function () {
 
                 var context = testRunner.getTestContext();
                 var map     = testRunner.getTestMap();
                 var section = mapHelper.getSection(map, context.sectionId);
 
                 if (prevSection && section && prevSection.id !== section.id && context.sectionPause) {
+                    testRunner.getAreaBroker().getContainer().hide();
                     testRunner
                         .trigger('beforesectionpause')
                         .trigger('pause', {
