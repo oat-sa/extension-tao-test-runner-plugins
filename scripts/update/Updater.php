@@ -20,7 +20,6 @@
 namespace oat\taoTestRunnerPlugins\scripts\update;
 
 use common_ext_ExtensionUpdater;
-use common_ext_ExtensionsManager;
 use oat\taoTests\models\runner\plugins\PluginRegistry;
 use oat\taoTests\models\runner\plugins\TestPlugin;
 
