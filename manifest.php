@@ -22,13 +22,13 @@ return array(
     'label' => 'Manage test runner plugins',
     'description' =>  "Manage test runner's plugins",
     'license' => 'GPL-2.0',
-    'version' => '1.2.0',
+    'version' => '1.4.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=10.0.0',
         'taoDelivery' =>  '>=4.2.0',
         'taoDeliveryRdf' =>  '>=1.6.0',
-        'taoQtiTest' =>  '>=9.2.0',
+        'taoQtiTest' =>  '>=9.18.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoTestRunnerPluginsManager',
     'acl' => array(

@@ -7,12 +7,13 @@ module.exports = function(grunt) {
     var out         = 'output';
 
     var testPlugins = ext.getExtensionSources('taoTestRunnerPlugins', [
-        'views/js/runner/plugins/**/*.js',
+        'views/js/runner/plugins/**/*.js'
     ], true);
 
     var paths = {
         'taoTestRunnerPlugins' : root + '/taoTestRunnerPlugins/views/js',
-        'taoTests' : root + '/taoTests/views/js'
+        'taoTests' : root + '/taoTests/views/js',
+        'taoQtiTest' : root + '/taoQtiTest/views/js'
     };
 
     grunt.config.merge({
