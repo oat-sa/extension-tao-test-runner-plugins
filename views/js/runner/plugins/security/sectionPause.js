@@ -42,7 +42,7 @@ define([
             var testRunner = this.getTestRunner();
             var prevSection = null;
 
-            testRunner.before('renderitem', function () {
+            testRunner.after('loaditem', function () {
 
                 var context = testRunner.getTestContext();
                 var map     = testRunner.getTestMap();
