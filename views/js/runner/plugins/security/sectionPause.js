@@ -29,7 +29,7 @@ define([
 ], function(_, __, pluginFactory, mapHelper) {
     'use strict';
 
-    var pauseMessage = __('Awaiting for the proctor authorization.');
+    var pauseMessage = __('All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section.');
 
     return pluginFactory({
 
