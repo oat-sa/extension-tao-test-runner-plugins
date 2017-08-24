@@ -27,7 +27,6 @@ return array(
     'requires' => array(
         'tao' => '>=10.0.0',
         'taoDelivery' =>  '>=4.2.0',
-        'taoDeliveryRdf' =>  '>=1.6.0',
         'taoQtiTest' =>  '>=9.18.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoTestRunnerPluginsManager',
