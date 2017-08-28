@@ -69,7 +69,7 @@ define([
 
     /**
      * Creates the plugin.
-     * Prevents screenshots (mac) and pauses assessment on print screen (win)
+     * Prevents screenshots (mac) and warnings assessment on print screen (win)
      */
     return pluginFactory({
 
@@ -106,7 +106,7 @@ define([
                         });
                 }
 
-                // Windows - pause on PrtScn
+                // Windows - warning on PrtScn
                 else if (platform === 'win') {
                     // will override, if possible, anything put into the clipboard after a copy event (whether manually or automatically triggered)
                     document.addEventListener('copy', handleCopyEvent);
