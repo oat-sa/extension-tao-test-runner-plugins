@@ -118,7 +118,10 @@ define([
 
                                 testRunner
                                     .trigger('prohibited-key', 'PrintScreen')
-                                    .trigger('log', __('Attempt to print screen. Please contact your proctor or administrator to resume your assessment.'));
+                                    .trigger('log', {
+                                        type: 'Security log',
+                                        message: __('Attempt to print screen. Please contact your proctor or administrator to resume your assessment.')
+                                    });
                             }
                         });
                 }

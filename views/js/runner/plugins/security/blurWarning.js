@@ -61,7 +61,10 @@ define([
                     if (!bluring && context.state <= states.interacting && !testRunner.getState('finish')) {
                         bluring = true;
                         testRunner.trigger('blur')
-                            .trigger('log', lostFocusMessage);
+                            .trigger('log', {
+                                type: 'Security log',
+                                message: lostFocusMessage
+                            });
                     }
                 };
 
