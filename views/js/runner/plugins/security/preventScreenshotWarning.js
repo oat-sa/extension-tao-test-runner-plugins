@@ -115,13 +115,13 @@ define([
                         .on('keyup' + '.' + this.getName(), function (e) {
                             if (e.key === 'PrintScreen') {
                                 triggerCopyEvent();
-
+                                var message = __('Attempt to print screen. Please contact your proctor or administrator to resume your assessment.');
                                 testRunner
                                     .trigger('prohibited-key', 'PrintScreen')
                                     .trigger('log', {
                                         type: 'Security log',
-                                        message: __('Attempt to print screen. Please contact your proctor or administrator to resume your assessment.')
-                                    });
+                                        message: message
+                                    }).trigger('warning', message);
                             }
                         });
                 }

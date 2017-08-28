@@ -64,7 +64,8 @@ define([
                             .trigger('log', {
                                 type: 'Security log',
                                 message: lostFocusMessage
-                            });
+                            })
+                            .trigger('warning', lostFocusMessage);
                     }
                 };
 
