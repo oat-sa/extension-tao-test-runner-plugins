@@ -20,6 +20,7 @@
 namespace oat\taoTestRunnerPlugins\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use oat\taoTestRunnerPlugins\model\delivery\DeliveryContainerService;
 use oat\taoTests\models\runner\plugins\PluginRegistry;
 use oat\taoTests\models\runner\plugins\TestPlugin;
 
@@ -48,6 +49,106 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.1.0');
         }
 
-        $this->skip('1.1.0', '1.5.0');
+        $this->skip('1.1.0', '1.4.2');
+
+        if ($this->isVersion('1.4.2')) {
+            $serviceManager = $this->getServiceManager();
+
+            $deliveryContainerService = new DeliveryContainerService();
+            $deliveryContainerService->setServiceManager($serviceManager);
+
+            $serviceManager->register(DeliveryContainerService::SERVICE_ID, $deliveryContainerService);
+
+            $plugins = [
+                'security' => [
+                    [
+                        'id' => 'blurPause',
+                        'name' => 'Blur Pause',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurPause',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Pause the test when leaving the test window',
+                        'category' => 'security',
+                        'active' => true,
+                        'tags' => [ 'taoProctoring' ]
+                    ],
+                    [
+                        'id' => 'preventScreenshot',
+                        'name' => 'Prevent Screenshot',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventScreenshot',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
+                        'category' => 'security',
+                        'active' => true,
+                        'tags' => [ 'taoProctoring' ]
+                    ],
+                    [
+                        'id' => 'blurWarning',
+                        'name' => 'Blur Warning',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurWarning',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Warning message when leaving the test window',
+                        'category' => 'security',
+                        'active' => true,
+                        'tags' => [ 'taoDelivery' ]
+                    ],
+                    [
+                        'id' => 'disableCommands',
+                        'name' => 'Disable Commands',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/disableCommands',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Disable and report some forbidden shortcuts',
+                        'category' => 'security',
+                        'active' => true,
+                        'tags' => [ 'taoDelivery', 'taoProctoring' ]
+                    ], [
+                        'id' => 'preventCopy',
+                        'name' => 'Prevent Copy',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventCopy',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Prevent copying from CTRL-C/X/V shortcuts',
+                        'category' => 'security',
+                        'active' => true,
+                        'tags' => [ 'taoDelivery', 'taoProctoring' ]
+                    ], [
+                        'id' => 'preventScreenshotWarning',
+                        'name' => 'Prevent Screenshot',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventScreenshotWarning',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
+                        'category' => 'security',
+                        'active' => true,
+                        'tags' => [ 'taoDelivery' ]
+                    ], [
+                        'id' => 'fullscreen',
+                        'name' => 'Full Screen',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/fullScreen',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Force the test in full screen mode',
+                        'category' => 'security',
+                        'active' => true,
+                        'tags' => [ 'taoDelivery', 'taoProctoring' ]
+                    ], [
+                        'id' => 'collapser',
+                        'name' => 'Collapser',
+                        'module' => 'taoQtiTest/runner/plugins/content/responsiveness/collapser',
+                        'bundle' => 'taoQtiTest/loader/testPlugins.min',
+                        'description' => 'Reduce the size of the tools when the available space is not enough',
+                        'category' => 'content',
+                        'active' => true,
+                        'tags' => [ 'taoDelivery', 'taoProctoring' ]
+                    ]
+                ]
+            ];
+
+            $registry = PluginRegistry::getRegistry();
+
+            foreach($plugins as $categoryPlugins) {
+                foreach($categoryPlugins as $pluginData){
+                    $registry->register(TestPlugin::fromArray($pluginData));
+                }
+            }
+
+            $this->setVersion('1.5.0');
+        }
     }
 }
