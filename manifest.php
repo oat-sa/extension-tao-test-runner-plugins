@@ -36,7 +36,13 @@ return array(
     ),
     'update' => 'oat\\taoTestRunnerPlugins\\scripts\\update\\Updater',
     'install' => [
+        'rdf' => array(
+            __DIR__.DIRECTORY_SEPARATOR."install".DIRECTORY_SEPARATOR.'ontology'.DIRECTORY_SEPARATOR.'taodelivery.rdf'
+        ),
         'php' => [
+            \oat\taoTestRunnerPlugins\scripts\install\RegisterDeliveryContainerService::class,
+            \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins::class,
+            \oat\taoQtiTest\scripts\install\SetNewTestRunner::class
         ]
     ],
     'uninstall' => [
