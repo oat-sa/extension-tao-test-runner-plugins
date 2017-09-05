@@ -29,6 +29,8 @@ define([
      */
     var platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
 
+    var printScreenPauseMessage = __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.');
+    var printScreenMessage = __('Attempt to print screen.');
     /**
      * Sniff Internet Explorer which is the only browser to implement window.clipboardData
      * @type {Boolean}
@@ -115,16 +117,22 @@ define([
                 .on('keyup' + '.' + this.getName(), function (e) {
                     if (e.key === 'PrintScreen') {
                         triggerCopyEvent();
-
+                        var context = testRunner.getTestContext();
                         testRunner
-                        .trigger('prohibited-key', 'PrintScreen')
-                        .trigger('pause', {
-                            message: __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.'),
-                            reasons: {
-                                category: __('examinee'),
-                                subCategory: __('behaviour')
-                            }
-                        });
+                            .trigger('prohibited-key', 'PrintScreen');
+                        if (context.securePauseStateRequired) {
+                            testRunner.trigger('pause', {
+                                    message: printScreenPauseMessage,
+                                    reasons: {
+                                        category: __('examinee'),
+                                        subCategory: __('behaviour')
+                                    }
+                                });
+                        } else {
+                            testRunner.trigger('traceLog', {
+                                    'Security log': printScreenMessage
+                                }).trigger('warning', printScreenMessage);
+                        }
                     }
                 });
             }

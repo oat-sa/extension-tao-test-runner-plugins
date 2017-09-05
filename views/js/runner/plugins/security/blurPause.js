@@ -29,7 +29,8 @@ define([
 ], function (_, __, pageStatus, pluginFactory) {
     'use strict';
 
-    var lostFocusMessage = __('The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.');
+    var lostFocusPauseMessage = __('The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.');
+    var lostFocusMessage = __('Attempt to navigate to another window or tab.');
 
     /**
      * Creates the blurPause plugin
@@ -59,14 +60,20 @@ define([
                 var states = testRunner.getTestData().states;
                 if (!bluring && context.state <= states.interacting && !testRunner.getState('finish')) {
                     bluring = true;
-                    testRunner.trigger('blur')
-                              .trigger('pause', {
-                                  message: lostFocusMessage,
-                                  reasons : {
-                                      category : __('examinee'),
-                                      subCategory : __('behaviour')
-                                  }
-                              });
+                    testRunner.trigger('blur');
+                    if (context.securePauseStateRequired) {
+                        testRunner.trigger('pause', {
+                            message: lostFocusPauseMessage,
+                            reasons : {
+                                category : __('examinee'),
+                                subCategory : __('behaviour')
+                            }
+                        });
+                    } else {
+                        testRunner.trigger('traceLog', {
+                            'Security log': lostFocusMessage
+                        }).trigger('warning', lostFocusMessage);
+                    }
                 }
             };
 

@@ -43,7 +43,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Pause the test when leaving the test window',
                 'category' => 'security',
                 'active' => true,
-                'tags' => [ 'taoProctoring' ]
+                'tags' => [ ]
             ],
             [
                 'id' => 'preventScreenshot',
@@ -53,17 +53,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
                 'category' => 'security',
                 'active' => true,
-                'tags' => [ 'taoProctoring' ]
-            ],
-            [
-                'id' => 'blurWarning',
-                'name' => 'Blur Warning',
-                'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurWarning',
-                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
-                'description' => 'Warning message when leaving the test window',
-                'category' => 'security',
-                'active' => true,
-                'tags' => [ 'taoDelivery' ]
+                'tags' => [ ]
             ],
             [
                 'id' => 'disableCommands',
@@ -73,7 +63,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Disable and report some forbidden shortcuts',
                 'category' => 'security',
                 'active' => true,
-                'tags' => [ 'taoDelivery', 'taoProctoring' ]
+                'tags' => [  ]
             ], [
                 'id' => 'preventCopy',
                 'name' => 'Prevent Copy',
@@ -82,16 +72,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Prevent copying from CTRL-C/X/V shortcuts',
                 'category' => 'security',
                 'active' => true,
-                'tags' => [ 'taoDelivery', 'taoProctoring' ]
-            ], [
-                'id' => 'preventScreenshotWarning',
-                'name' => 'Prevent Screenshot',
-                'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventScreenshotWarning',
-                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
-                'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
-                'category' => 'security',
-                'active' => true,
-                'tags' => [ 'taoDelivery' ]
+                'tags' => [  ]
             ], [
                 'id' => 'fullscreen',
                 'name' => 'Full Screen',
@@ -100,7 +81,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Force the test in full screen mode',
                 'category' => 'security',
                 'active' => true,
-                'tags' => [ 'taoDelivery', 'taoProctoring' ]
+                'tags' => [ ]
             ], [
                 'id' => 'collapser',
                 'name' => 'Collapser',
@@ -109,7 +90,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Reduce the size of the tools when the available space is not enough',
                 'category' => 'content',
                 'active' => true,
-                'tags' => [ 'taoDelivery', 'taoProctoring' ]
+                'tags' => [ ]
             ]
         ]
     ];

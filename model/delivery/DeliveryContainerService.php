@@ -22,7 +22,6 @@ namespace oat\taoTestRunnerPlugins\model\delivery;
 use core_kernel_classes_Resource;
 use oat\generis\model\OntologyAwareTrait;
 use oat\tao\model\plugins\PluginModule;
-use oat\taoDelivery\model\DeliveryPluginInterface;
 use oat\taoDeliveryRdf\model\DeliveryContainerService as DeliveryRdfContainerService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 
@@ -49,18 +48,10 @@ class DeliveryContainerService extends DeliveryRdfContainerService
     {
         $plugins = parent::getPlugins($deliveryExecution);
 
-        /** @var DeliveryPluginInterface $deliveryPluginService */
-        $deliveryPluginService = $this->getServiceManager()->get(DeliveryPluginInterface::SERVICE_ID);
-
         $delivery = $deliveryExecution->getDelivery();
 
         if ($this->isSecureDelivery($delivery)) {
-            return array_filter($plugins, function(PluginModule $plugin) use ($delivery, $deliveryPluginService){
-                if ($plugin->getCategory() == 'security') {
-                    return $deliveryPluginService->checkPlugin($plugin, $delivery);
-                }
-                return true;
-            });
+            return $plugins;
         }
 
         //otherwise filter the security plugins
