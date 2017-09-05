@@ -20,6 +20,7 @@
 namespace oat\taoTestRunnerPlugins\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoTestRunnerPlugins\model\delivery\DeliveryContainerService;
 use oat\taoTests\models\runner\plugins\PluginRegistry;
 use oat\taoTests\models\runner\plugins\TestPlugin;
@@ -52,6 +53,9 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('1.1.0', '1.4.2');
 
         if ($this->isVersion('1.4.2')) {
+
+            OntologyUpdater::syncModels();
+
             $serviceManager = $this->getServiceManager();
 
             $deliveryContainerService = new DeliveryContainerService();
