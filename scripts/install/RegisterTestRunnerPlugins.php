@@ -36,8 +36,8 @@ class RegisterTestRunnerPlugins extends InstallAction
     public static $plugins = [
         'probes' => [
             [
-                'id' => 'latency',
-                'name' => 'Latency',
+                'id' => 'latencyEvents',
+                'name' => 'Latency Events',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/probes/latencyEvents',
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Register metrics',

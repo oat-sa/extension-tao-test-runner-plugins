@@ -66,14 +66,14 @@ class Updater extends common_ext_ExtensionUpdater
             $plugins = [
                 'probes' => [
                     [
-                        'id' => 'latency',
-                        'name' => 'Latency',
+                        'id' => 'latencyEvents',
+                        'name' => 'Latency Events',
                         'module' => 'taoTestRunnerPlugins/runner/plugins/probes/latencyEvents',
                         'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                         'description' => 'Register metrics',
                         'category' => 'probes',
                         'active' => true,
-                        'tags' => [ 'technical' ]
+                        'tags' => [  ]
                     ]
                 ],
                 'security' => [
