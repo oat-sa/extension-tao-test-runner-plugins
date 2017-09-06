@@ -41,8 +41,7 @@ return array(
         ),
         'php' => [
             \oat\taoTestRunnerPlugins\scripts\install\RegisterDeliveryContainerService::class,
-            \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins::class,
-            \oat\taoQtiTest\scripts\install\SetNewTestRunner::class
+            \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins::class
         ]
     ],
     'uninstall' => [
