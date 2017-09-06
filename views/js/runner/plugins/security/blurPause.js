@@ -60,9 +60,8 @@ define([
                 var states = testRunner.getTestData().states;
                 if (!bluring && context.state <= states.interacting && !testRunner.getState('finish')) {
                     bluring = true;
-                    testRunner.trigger('blur');
                     if (context.securePauseStateRequired) {
-                        testRunner.trigger('pause', {
+                        testRunner.trigger('blur').trigger('pause', {
                             message: lostFocusPauseMessage,
                             reasons : {
                                 category : __('examinee'),
@@ -70,9 +69,8 @@ define([
                             }
                         });
                     } else {
-                        testRunner.trigger('traceLog', {
-                            'Security log': lostFocusMessage
-                        }).trigger('warning', lostFocusMessage);
+                        testRunner.trigger('blur').trigger('warning', lostFocusMessage);
+                        bluring = false;
                     }
                 }
             };

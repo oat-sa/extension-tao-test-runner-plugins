@@ -115,9 +115,10 @@ define([
 
                 $(window)
                 .on('keyup' + '.' + this.getName(), function (e) {
+                    var context;
                     if (e.key === 'PrintScreen') {
                         triggerCopyEvent();
-                        var context = testRunner.getTestContext();
+                        context = testRunner.getTestContext();
                         testRunner
                             .trigger('prohibited-key', 'PrintScreen');
                         if (context.securePauseStateRequired) {
@@ -129,9 +130,7 @@ define([
                                     }
                                 });
                         } else {
-                            testRunner.trigger('traceLog', {
-                                    'Security log': printScreenMessage
-                                }).trigger('warning', printScreenMessage);
+                            testRunner.trigger('warning', printScreenMessage);
                         }
                     }
                 });

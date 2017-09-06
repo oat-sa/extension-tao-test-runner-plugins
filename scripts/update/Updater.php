@@ -64,7 +64,39 @@ class Updater extends common_ext_ExtensionUpdater
             $serviceManager->register(DeliveryContainerService::SERVICE_ID, $deliveryContainerService);
 
             $plugins = [
+                'probes' => [
+                    [
+                        'id' => 'latency',
+                        'name' => 'Latency',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/probes/latencyEvents',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Register metrics',
+                        'category' => 'probes',
+                        'active' => true,
+                        'tags' => [ 'technical' ]
+                    ]
+                ],
                 'security' => [
+                    [
+                        'id' => 'sectionPause',
+                        'name' => 'Section Pause',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/sectionPause',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Pause delivery execution when the section changed',
+                        'category' => 'tools',
+                        'active' => false,
+                        'tags' => [ ]
+                    ],
+                    [
+                        'id' => 'autoPause',
+                        'name' => 'Auto Pause',
+                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/autoPause',
+                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                        'description' => 'Persist the pause state',
+                        'category' => 'security',
+                        'active' => false,
+                        'tags' => [ ]
+                    ],
                     [
                         'id' => 'blurPause',
                         'name' => 'Blur Pause',

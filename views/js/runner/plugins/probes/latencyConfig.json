@@ -1,0 +1,66 @@
+[
+  {
+    "name": "leave-fullscreen-prohibited",
+    "events": "leavefullscreen",
+    "capture": "captureAll"
+  },
+  {
+    "name": "focus-loss-prohibited",
+    "events": "blur",
+    "capture": "captureAll"
+  },
+  {
+    "name": "shortcut-prohibited",
+    "events": "prohibited-key",
+    "capture": "captureShortcut"
+  },
+  {
+    "name": "pause-on-disconnect",
+    "events": "disconnectpause",
+    "capture": "captureAll"
+  },
+  {
+    "name": "pause",
+    "events": "pause",
+    "capture": "captureAll"
+  },
+  {
+    "name": "session-latency",
+    "latency": true,
+    "startEvents": "init",
+    "stopEvents": [
+      "endsession"
+    ],
+    "capture": "captureTest"
+  },
+  {
+    "name": "item-latency",
+    "latency": true,
+    "startEvents": [
+      "renderitem",
+      "resumeitem"
+    ],
+    "stopEvents": [
+      "move",
+      "skip",
+      "timeout",
+      "plugin-exitend.exit",
+      "pause"
+    ],
+    "capture": "captureAll"
+  },
+  {
+    "name": "exit-dialog-latency",
+    "latency": true,
+    "startEvents": "plugin-exitstart.exit",
+    "stopEvents": "plugin-exitend.exit",
+    "capture": "captureAll"
+  },
+  {
+    "name": "highlighter-latency",
+    "latency": true,
+    "startEvents": "plugin-start.highlighter",
+    "stopEvents": "plugin-end.highlighter",
+    "capture": "captureAll"
+  }
+]
