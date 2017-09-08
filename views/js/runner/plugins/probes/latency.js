@@ -80,7 +80,6 @@ define([
             testPartId : context.testPartId,
             sectionId : context.sectionId,
             itemId : context.itemIdentifier,
-            itemUri : context.itemUri,
             sectionTimer : sectionTimer,
             attempt : context.attempt
         };
@@ -94,7 +93,6 @@ define([
             testPartId : context.testPartId,
             sectionId : context.sectionId,
             itemId : context.itemIdentifier,
-            itemUri : context.itemUri,
             attempt : context.attempt,
             shortcut : shortcut
         };
