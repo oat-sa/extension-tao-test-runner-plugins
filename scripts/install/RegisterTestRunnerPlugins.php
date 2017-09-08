@@ -28,14 +28,24 @@ use oat\taoTests\models\runner\plugins\TestPlugin;
 
 /**
  * Install action that registers the test runner plugins
- * !!! Do not reference this action directly in the manifest,
- * but use a client extension to enable/disable plugins for a specific instance
  *
  * @author Bertrand Chevrier <bertrand@taotesting.com>
  */
 class RegisterTestRunnerPlugins extends InstallAction
 {
     public static $plugins = [
+        'probes' => [
+            [
+                'id' => 'latencyEvents',
+                'name' => 'Latency Events',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/probes/latencyEvents',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Register metrics',
+                'category' => 'probes',
+                'active' => true,
+                'tags' => [ 'technical' ]
+            ]
+        ],
         'security' => [
             [
                 'id' => 'sectionPause',
@@ -56,23 +66,35 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'category' => 'security',
                 'active' => false,
                 'tags' => [ ]
-            ], [
+            ],
+            [
                 'id' => 'blurPause',
                 'name' => 'Blur Pause',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurPause',
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Pause the test when leaving the test window',
                 'category' => 'security',
-                'active' => false,
-                'tags' => [  ]
-            ], [
+                'active' => true,
+                'tags' => [ ]
+            ],
+            [
+                'id' => 'preventScreenshot',
+                'name' => 'Prevent Screenshot',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventScreenshot',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
+                'category' => 'security',
+                'active' => true,
+                'tags' => [ ]
+            ],
+            [
                 'id' => 'disableCommands',
                 'name' => 'Disable Commands',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/disableCommands',
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Disable and report some forbidden shortcuts',
                 'category' => 'security',
-                'active' => false,
+                'active' => true,
                 'tags' => [  ]
             ], [
                 'id' => 'preventCopy',
@@ -81,7 +103,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Prevent copying from CTRL-C/X/V shortcuts',
                 'category' => 'security',
-                'active' => false,
+                'active' => true,
                 'tags' => [  ]
             ], [
                 'id' => 'fullscreen',
@@ -90,8 +112,17 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Force the test in full screen mode',
                 'category' => 'security',
-                'active' => false,
-                'tags' => [  ]
+                'active' => true,
+                'tags' => [ ]
+            ], [
+                'id' => 'collapser',
+                'name' => 'Collapser',
+                'module' => 'taoQtiTest/runner/plugins/content/responsiveness/collapser',
+                'bundle' => 'taoQtiTest/loader/testPlugins.min',
+                'description' => 'Reduce the size of the tools when the available space is not enough',
+                'category' => 'content',
+                'active' => true,
+                'tags' => [ ]
             ]
         ]
     ];
