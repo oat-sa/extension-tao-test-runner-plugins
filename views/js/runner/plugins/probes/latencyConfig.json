@@ -1,0 +1,22 @@
+[
+  {
+    "name": "leave-fullscreen-prohibited",
+    "events": "leavefullscreen",
+    "capture": "captureAll"
+  },
+  {
+    "name": "focus-loss-prohibited",
+    "events": "blur",
+    "capture": "captureAll"
+  },
+  {
+    "name": "shortcut-prohibited",
+    "events": "prohibited-key",
+    "capture": "captureShortcut"
+  },
+  {
+    "name": "pause",
+    "events": "pause",
+    "capture": "captureAll"
+  }
+]
