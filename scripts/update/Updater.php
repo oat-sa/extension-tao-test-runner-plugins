@@ -78,26 +78,6 @@ class Updater extends common_ext_ExtensionUpdater
                 ],
                 'security' => [
                     [
-                        'id' => 'sectionPause',
-                        'name' => 'Section Pause',
-                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/sectionPause',
-                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
-                        'description' => 'Pause delivery execution when the section changed',
-                        'category' => 'tools',
-                        'active' => false,
-                        'tags' => [ ]
-                    ],
-                    [
-                        'id' => 'autoPause',
-                        'name' => 'Auto Pause',
-                        'module' => 'taoTestRunnerPlugins/runner/plugins/security/autoPause',
-                        'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
-                        'description' => 'Persist the pause state',
-                        'category' => 'security',
-                        'active' => false,
-                        'tags' => [ ]
-                    ],
-                    [
                         'id' => 'blurPause',
                         'name' => 'Blur Pause',
                         'module' => 'taoTestRunnerPlugins/runner/plugins/security/blurPause',
@@ -158,5 +138,6 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('1.5.0');
         }
+        $this->skip('1.5.0', '1.5.1');
     }
 }
