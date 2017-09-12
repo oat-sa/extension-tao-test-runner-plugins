@@ -89,12 +89,16 @@ define([
     function captureShortcut(testRunner, eventName, shortcut){
         var data = testRunner.getTestData();
         var context = testRunner.getTestContext();
+        var sectionTimer = typeof timers["assessmentSection"] === "object" ?
+            parseInt(timers["assessmentSection"].val(), 10) : null;
+
         return {
             testId : data.identifier,
             testPartId : context.testPartId,
             sectionId : context.sectionId,
             itemId : context.itemIdentifier,
             itemUri : context.itemUri,
+            sectionTimer : sectionTimer,
             attempt : context.attempt,
             shortcut : shortcut
         };
