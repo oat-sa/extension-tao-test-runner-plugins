@@ -24,9 +24,10 @@
 define([
     'lodash',
     'i18n',
+    'core/promise',
     'taoTests/runner/plugin',
     'taoQtiTest/runner/helpers/map'
-], function(_, __, pluginFactory, mapHelper) {
+], function(_, __, Promise, pluginFactory, mapHelper) {
     'use strict';
 
     var pauseMessage = __('All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section.');
@@ -48,19 +49,23 @@ define([
                 var map     = testRunner.getTestMap();
                 var section = mapHelper.getSection(map, context.sectionId);
 
-                if (prevSection && section && prevSection.id !== section.id && context.sectionPause) {
-                    testRunner.getAreaBroker().getContainer().hide();
-                    testRunner
-                        .trigger('beforesectionpause')
-                        .trigger('pause', {
-                            reasons : {
-                                category : __('condition'),
-                                subCategory : __('pausedSection')
-                            },
-                            message: pauseMessage
-                        });
-                }
-                prevSection = section;
+                return new Promise(function(resolve, reject){
+                    if (prevSection && section && prevSection.id !== section.id && context.sectionPause) {
+                        testRunner
+                            .trigger('disableitem')
+                            .trigger('pause', {
+                                reasons : {
+                                    category : __('condition'),
+                                    subCategory : __('pausedSection')
+                                },
+                                message: pauseMessage
+                            });
+                        return reject();
+                    }
+
+                    prevSection = section;
+                    return resolve();
+                } );
             });
         }
     });
