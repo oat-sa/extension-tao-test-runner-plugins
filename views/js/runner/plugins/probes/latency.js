@@ -164,7 +164,6 @@ define([
                 return sendVariables();
             });
             testRunner.before('exit', function() {
-                testRunner.trigger('endsession');
                 return sendVariables();
             });
         }
