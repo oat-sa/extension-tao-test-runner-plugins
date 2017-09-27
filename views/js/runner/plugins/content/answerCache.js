@@ -66,7 +66,11 @@ define([
                         }
                     })
                     .on('unloaditem', function () {
-                        return self.storage.clear();
+                        // the store should not be cleared after a pause
+                        // otherwise the response won't be restored after resume
+                        if (!testRunner.getState('closedOrSuspended')) {
+                            return self.storage.clear();
+                        }
                     });
             });
         },
@@ -75,7 +79,7 @@ define([
          * Called during the runner's destroy phase
          */
         destroy: function destroy() {
-            if (this.storage) {
+            if (this.storage && !this.getTestRunner().getState('closedOrSuspended')) {
                 return this.storage.removeStore();
             }
         }
