@@ -138,9 +138,9 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('1.5.0');
         }
-        $this->skip('1.5.0', '1.6.0');
+        $this->skip('1.5.0', '1.7.0');
 
-        if($this->isVersion('1.6.0')){
+        if($this->isVersion('1.7.0')){
             $registry = PluginRegistry::getRegistry();
 
             $registry->register(TestPlugin::fromArray([
@@ -151,10 +151,10 @@ class Updater extends common_ext_ExtensionUpdater
                 'description' => 'Cache the answers to restore them after refresh',
                 'category' => 'content',
                 'active' => false,
-                'tags' => [] 
+                'tags' => []
             ]));
-            
-            $this->setVersion('1.7.0');
+
+            $this->setVersion('1.8.0');
         }
     }
 }
