@@ -34,6 +34,18 @@ use oat\taoTests\models\runner\plugins\TestPlugin;
 class RegisterTestRunnerPlugins extends InstallAction
 {
     public static $plugins = [
+        'content' => [
+            [
+                'id' => 'answerCache',
+                'name' => 'Answers cache',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/content/answerCache',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Cache the answers to restore them after refresh',
+                'category' => 'content',
+                'active' => false,
+                'tags' => [ ]
+            ]
+        ],
         'probes' => [
             [
                 'id' => 'latencyEvents',
