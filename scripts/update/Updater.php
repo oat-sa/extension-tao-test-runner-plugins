@@ -138,6 +138,23 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('1.5.0');
         }
-        $this->skip('1.5.0', '1.6.0');
+        $this->skip('1.5.0', '1.7.0');
+
+        if($this->isVersion('1.7.0')){
+            $registry = PluginRegistry::getRegistry();
+
+            $registry->register(TestPlugin::fromArray([
+                'id' => 'answerCache',
+                'name' => 'Answers cache',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/content/answerCache',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Cache the answers to restore them after refresh',
+                'category' => 'content',
+                'active' => false,
+                'tags' => []
+            ]));
+
+            $this->setVersion('1.8.0');
+        }
     }
 }
