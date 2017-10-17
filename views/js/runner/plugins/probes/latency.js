@@ -130,7 +130,7 @@ define([
                         });
                         //and send them
                         return testRunner.getProxy()
-                            .sendVariables(traceData);
+                            .sendVariables(traceData, true);
                     }
                 });
             }
