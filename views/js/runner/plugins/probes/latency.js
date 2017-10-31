@@ -76,6 +76,8 @@ define([
 ], function (_){
     'use strict';
 
+    var latencyProbes;
+
     var timers = {};
 
     /**
@@ -103,15 +105,12 @@ define([
         captureAll: function captureAll(testRunner){
             var data = testRunner.getTestData();
             var context = testRunner.getTestContext();
-            var sectionTimer = typeof timers["assessmentSection"] === "object" ?
-                parseInt(timers["assessmentSection"].val(), 10) : null;
-
             return {
                 testId : data.identifier,
                 testPartId : context.testPartId,
                 sectionId : context.sectionId,
                 itemId : context.itemIdentifier,
-                sectionTimer : sectionTimer,
+                sectionTimer : latencyProbes.getTimerValue('assessmentSection'),
                 attempt : context.attempt
             };
         },
@@ -130,12 +129,12 @@ define([
         }
     };
 
-    return {
+    latencyProbes = {
         /**
          * Registers the probes and add test runner listeners
          * @param {Object} testRunner - a testRunner instance
          * @param {Object} probesConfig - the probes to register in a Json format
-         * @returns {latency}
+         * @returns {latencyProbes}
          */
         init : function init(testRunner, probesConfig){
             var probeOverseer = testRunner.getProbeOverseer();
@@ -191,6 +190,15 @@ define([
         },
 
         /**
+         * Gets the current value of a timer. If it does not exist, null will be returned.
+         * @param {String} name
+         * @returns {Number|null}
+         */
+        getTimerValue: function getTimerValue(name) {
+            return typeof timers[name] === 'object' ? parseInt(timers[name].val(), 10) : null;
+        },
+
+        /**
          * Checks if a capture processors already exists
          * @param {String} name
          * @returns {Boolean}
@@ -209,7 +217,7 @@ define([
          *
          * @param {String} name
          * @param {Function} processor
-         * @returns {latency}
+         * @returns {latencyProbes}
          */
         registerCaptureProcessor: function registerCaptureProcessor(name, processor) {
             if (_.isEmpty(name) || !_.isString(name)) {
@@ -225,7 +233,7 @@ define([
         /**
          * Removes a capture processor.
          * @param {String} name
-         * @returns {latency}
+         * @returns {latencyProbes}
          */
         removeCaptureProcessor: function removeCaptureProcessor(name) {
             if (_.isEmpty(name) || !_.isString(name)) {
@@ -235,4 +243,6 @@ define([
             return this;
         }
     };
+
+    return latencyProbes;
 });

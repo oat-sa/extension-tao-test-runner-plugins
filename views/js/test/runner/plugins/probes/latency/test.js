@@ -37,6 +37,7 @@ define([
 
     QUnit.cases([
         { title : 'init' },
+        { title : 'getTimerValue' },
         { title : 'hasCaptureProcessor' },
         { title : 'registerCaptureProcessor' },
         { title : 'removeCaptureProcessor' }
@@ -49,7 +50,7 @@ define([
     QUnit.module('Method');
 
 
-    QUnit.asyncTest('init ', function(assert) {
+    QUnit.asyncTest('init', function(assert) {
         var probes = [{
             name: 'init',
             events: 'init',
@@ -97,7 +98,7 @@ define([
                     testPartId: testContext.testPartId,
                     sectionId: testContext.sectionId,
                     itemId: testContext.itemIdentifier,
-                    sectionTimer: null,
+                    sectionTimer: 10,
                     attempt: testContext.attempt,
                     shortcut: 'Ctrl+C'
                 }
@@ -195,12 +196,12 @@ define([
 
         testRunner.trigger('init');
         _.delay(function() {
-            testRunner.trigger('plugin-addtimer.timer', 'assessmentSection', {
+            testRunner.trigger('plugin-addtimer.timer', latency, 'assessmentSection', {
                 val: function() {
                     return 10;
                 }
             });
-            testRunner.trigger('plugin-addtimer.timer', 'test', {});
+            testRunner.trigger('plugin-addtimer.timer', latency, 'test', {});
             testRunner.trigger('loaditem');
 
             _.delay(function() {
@@ -208,8 +209,8 @@ define([
             }, 50);
 
             _.delay(function() {
-                testRunner.trigger('plugin-removetimer.timer', 'assessmentSection');
-                testRunner.trigger('plugin-removetimer.timer', 'test');
+                testRunner.trigger('plugin-removetimer.timer', latency, 'assessmentSection');
+                testRunner.trigger('plugin-removetimer.timer', latency, 'test');
                 testRunner.trigger('unloaditem');
 
                 _.delay(function() {
@@ -219,6 +220,72 @@ define([
                 _.delay(function() {
                     testRunner.trigger('exit');
                 }, 250);
+            }, 250);
+        }, 250);
+    });
+
+
+    QUnit.asyncTest('getTimerValue', function(assert) {
+        var testTimer = 20;
+        var sectionTimer = 10;
+        var testRunner = eventifier({
+            getProxy: function () {
+                return {
+                    sendVariables: function () {}
+                };
+            },
+            getTestData: function() {
+                return testData;
+            },
+            getTestContext: function() {
+                return testContext;
+            },
+            getProbeOverseer: function () {
+                return {
+                    add: function (probe) {},
+                    flush: function () {
+                        assert.ok(true, 'Flushing the probes data');
+                        return Promise.resolve([]);
+                    }
+                };
+            }
+        });
+
+        QUnit.expect(9);
+
+        testRunner.after('exit', function() {
+            assert.ok(true, 'Test runner exited');
+            QUnit.start();
+        });
+
+        assert.equal(latency.init(testRunner, []), latency, 'Initializing the probes');
+
+        assert.equal(latency.getTimerValue('testTimer'), null, 'Should not get any value for the test timer');
+        assert.equal(latency.getTimerValue('sectionTimer'), null, 'Should not get any value for the assessmentSection timer');
+
+        testRunner.trigger('plugin-addtimer.timer', latency, 'testTimer', {
+            val: function() {
+                return testTimer;
+            }
+        });
+        testRunner.trigger('plugin-addtimer.timer', latency, 'sectionTimer', {
+            val: function() {
+                return sectionTimer;
+            }
+        });
+
+        _.delay(function() {
+            assert.equal(latency.getTimerValue('testTimer'), testTimer, 'Should get the right test timer value');
+            assert.equal(latency.getTimerValue('sectionTimer'), sectionTimer, 'Should get the right assessmentSection timer value');
+
+            testRunner.trigger('plugin-removetimer.timer', latency, 'testTimer');
+            testRunner.trigger('plugin-removetimer.timer', latency, 'sectionTimer');
+
+            _.delay(function() {
+                assert.equal(latency.getTimerValue('testTimer'), null, 'Should not get any value for the test timer');
+                assert.equal(latency.getTimerValue('sectionTimer'), null, 'Should not get any value for the assessmentSection timer');
+
+                testRunner.trigger('exit');
             }, 250);
         }, 250);
     });
@@ -247,19 +314,19 @@ define([
 
         assert.throws(function() {
             latency.registerCaptureProcessor({}, processor);
-        }, 'Should throw a error if the name is invalid');
+        }, 'Should throw an error if the name is invalid');
 
         assert.throws(function() {
             latency.registerCaptureProcessor('', processor);
-        }, 'Should throw a error if the name is empty');
+        }, 'Should throw an error if the name is empty');
 
         assert.throws(function() {
             latency.registerCaptureProcessor(name);
-        }, 'Should throw a error if the processor is not provided');
+        }, 'Should throw an error if the processor is not provided');
 
         assert.throws(function() {
             latency.registerCaptureProcessor(name, {});
-        }, 'Should throw a error if the processor is not a function');
+        }, 'Should throw an error if the processor is not a function');
     });
 
 
@@ -277,11 +344,11 @@ define([
 
         assert.throws(function() {
             latency.removeCaptureProcessor({});
-        }, 'Should throw a error if the name is invalid');
+        }, 'Should throw an error if the name is invalid');
 
         assert.throws(function() {
             latency.removeCaptureProcessor('');
-        }, 'Should throw a error if the name is empty');
+        }, 'Should throw an error if the name is empty');
     });
 
 });
