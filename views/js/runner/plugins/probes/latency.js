@@ -62,6 +62,7 @@
  * You may want to add custom capture processors, using the dedicated API:
  * - registerCaptureProcessor(name, processor)
  * - hasCaptureProcessor(name)
+ * - applyCaptureProcessor(name)
  * - removeCaptureProcessor(name)
  *
  * Each capture processors will receive the following parameters:
@@ -123,7 +124,7 @@ define([
          * @returns {Object}
          */
         captureShortcut: function captureShortcut(testRunner, eventName, shortcut){
-            return _.assign(captureProcessors.captureAll(testRunner), {
+            return _.assign(latencyProbes.applyCaptureProcessor('captureAll', testRunner), {
                 shortcut : shortcut
             });
         }
@@ -228,6 +229,24 @@ define([
             }
             captureProcessors[name] = processor;
             return this;
+        },
+
+        /**
+         * Applies a capture processor using the provided arguments.
+         * @param {String} name
+         * @param * capture processor arguments
+         * @returns {Object}
+         */
+        applyCaptureProcessor: function applyCaptureProcessor(name) {
+            var capture;
+            if (_.isEmpty(name) || !_.isString(name)) {
+                throw new TypeError('A capture processor have a valid name');
+            }
+            capture = captureProcessors[name];
+            if (_.isFunction(capture)) {
+                return capture.apply(captureProcessors, [].slice.call(arguments, 1));
+            }
+            return null;
         },
 
         /**

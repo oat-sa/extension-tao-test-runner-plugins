@@ -40,6 +40,7 @@ define([
         { title : 'getTimerValue' },
         { title : 'hasCaptureProcessor' },
         { title : 'registerCaptureProcessor' },
+        { title : 'applyCaptureProcessor' },
         { title : 'removeCaptureProcessor' }
     ]).test('module has ', function(data, assert) {
         QUnit.expect(1);
@@ -327,6 +328,42 @@ define([
         assert.throws(function() {
             latency.registerCaptureProcessor(name, {});
         }, 'Should throw an error if the processor is not a function');
+    });
+
+
+    QUnit.test('applyCaptureProcessor', function(assert) {
+        var testRunner = {};
+        var eventName = 'foo';
+        var param = 'bar';
+        var expected = {
+            id: 123,
+            name: eventName,
+            param: param
+        };
+
+        QUnit.expect(6);
+
+        latency.registerCaptureProcessor('captureOne', function(tr, ev, other) {
+            assert.equal(tr, testRunner, 'The test runner is provided');
+            assert.equal(ev, eventName, 'The eventName is provided');
+            assert.equal(other, param, 'The additional parameter is provided');
+
+            return {
+                id: 123,
+                name: ev,
+                param: other
+            };
+        });
+
+        assert.deepEqual(latency.applyCaptureProcessor('captureOne', testRunner, eventName, param), expected, 'The capture processor is properly called');
+
+        assert.throws(function() {
+            latency.applyCaptureProcessor({});
+        }, 'Should throw an error if the name is invalid');
+
+        assert.throws(function() {
+            latency.applyCaptureProcessor('');
+        }, 'Should throw an error if the name is empty');
     });
 
 
