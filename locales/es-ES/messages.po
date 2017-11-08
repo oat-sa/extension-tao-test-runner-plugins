@@ -44,7 +44,7 @@ msgid "Test could not be launched. Test must always be launched in a full screen
 msgstr ""
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
-msgstr "La prueba se ha detenido debido a un intento de alejarse de la prueba. Por favor notifique a su supervisor para reanudar su prueba."
+msgstr "La evaluación se ha pausado debido a un intento de navegar a otra ventana o tabulador. Póngase en contacto con su Proctor o administrador para reanudar su evaluación"
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
 msgstr ""
