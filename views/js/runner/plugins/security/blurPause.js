@@ -55,23 +55,47 @@ define([
             var innerFocus = false;
 
             var bluring = false;
+
+            // Fix for TAO-4419 (Edge compatibility)
+            // We slightly delay the actual blur to give the focus a chance to come back very quickly.
+            // This allow the test taker to close the annoying full screen confirmation message displayed by Edge.
+            var focusBackTimeoutDelayMs = 200;
+            var focusBackTimeout = function focusBackTimeout() {
+                return new Promise(function(resolve, reject) {
+                    pageStatus.on('focus.focusBack', function() {
+                        pageStatus.off('.focusBack');
+                        reject(); // focus is back!
+                    });
+                    _.delay(function() {
+                        pageStatus.off('.focusBack');
+                        resolve(); // focus is lost for good
+                    }, focusBackTimeoutDelayMs);
+                });
+            };
+
             var doPause = function doPause() {
                 var context = testRunner.getTestContext();
                 var states = testRunner.getTestData().states;
                 if (!bluring && context.state <= states.interacting && !testRunner.getState('finish')) {
                     bluring = true;
-                    if (context.securePauseStateRequired) {
-                        testRunner.trigger('blur').trigger('pause', {
-                            message: lostFocusPauseMessage,
-                            reasons : {
-                                category : __('examinee'),
-                                subCategory : __('behaviour')
+                    focusBackTimeout()
+                        .then(function resolve() {
+                            if (context.securePauseStateRequired) {
+                                testRunner.trigger('blur').trigger('pause', {
+                                    message: lostFocusPauseMessage,
+                                    reasons : {
+                                        category : __('examinee'),
+                                        subCategory : __('behaviour')
+                                    }
+                                });
+                            } else {
+                                testRunner.trigger('blur').trigger('warning', lostFocusMessage);
+                                bluring = false;
                             }
+                        })
+                        .catch(function() {
+                            bluring = false;
                         });
-                    } else {
-                        testRunner.trigger('blur').trigger('warning', lostFocusMessage);
-                        bluring = false;
-                    }
                 }
             };
 

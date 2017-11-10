@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.2.0-sprint63\n"
+"PO-Revision-Date: 2017-11-07T18:01:05\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: es-ES\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: es-ES\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
+msgstr "Todos los estudiantes comenzarán la siguiente sección al mismo tiempo. Por favor Relájese tranquilamente hasta que el supervisor de la sala comience la siguiente sección."
+
+msgid "Attempt to navigate to another window or tab."
+msgstr ""
+
+msgid "Attempt to print screen."
+msgstr ""
+
+msgid "behaviour"
+msgstr ""
+
+msgid "condition"
+msgstr ""
+
+msgid "examinee"
+msgstr ""
+
+msgid "network"
+msgstr ""
+
+msgid "pausedSection"
+msgstr ""
+
+msgid "technical"
+msgstr ""
+
+msgid "Test could not be launched. Test must always be launched in a full screen mode."
+msgstr ""
+
+msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
+msgstr "La evaluación se ha pausado debido a un intento de navegar a otra ventana o tabulador. Póngase en contacto con su Proctor o administrador para reanudar su evaluación"
+
+msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
+msgstr ""
+
+msgid "This test needs to be taken in full screen mode (%s)."
+msgstr "Esta prueba debe tomarse en modo de pantalla completa (%s)."
+
+msgid "You are encountering a connectivity loss. The test has been suspended."
+msgstr "Tiene una pérdida de conectividad. La prueba ha sido suspendida."
+
