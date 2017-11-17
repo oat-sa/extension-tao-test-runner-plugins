@@ -30,6 +30,14 @@ define([
 ], function(_, __, Promise, pluginFactory, mapHelper) {
     'use strict';
 
+    /**
+     * The first time we try to load an item with this category, we trigger the section pause.
+     */
+    var sectionPauseCategory = 'x-tao-proctored-auto-pause';
+
+    /**
+     * The message is displayed just before the pause to explain why.
+     */
     var pauseMessage = __('All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section.');
 
     return pluginFactory({
@@ -40,17 +48,21 @@ define([
          * Initializes the plugin (called during runner's init)
          */
         init: function init() {
+            var previousSection;
             var testRunner = this.getTestRunner();
-            var prevSection = null;
 
             testRunner.before('loaditem', function () {
 
                 var context = testRunner.getTestContext();
                 var map     = testRunner.getTestMap();
                 var section = mapHelper.getSection(map, context.sectionId);
+                var item    = mapHelper.getItem(map, context.itemIdentifier);
 
                 return new Promise(function(resolve, reject){
-                    if (prevSection && section && prevSection.id !== section.id && context.sectionPause) {
+                    if(context.options.sectionPause &&
+                        previousSection && section && section.id !== previousSection.id &&
+                        item && _.contains(item.categories, sectionPauseCategory) ) {
+
                         testRunner
                             .trigger('disableitem')
                             .trigger('pause', {
@@ -63,7 +75,7 @@ define([
                         return reject();
                     }
 
-                    prevSection = section;
+                    previousSection = section;
                     return resolve();
                 } );
             });
