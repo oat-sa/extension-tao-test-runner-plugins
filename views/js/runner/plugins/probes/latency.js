@@ -144,22 +144,28 @@ define([
              * Send latency data
              */
             function sendVariables() {
-                probeOverseer.flush().then(function(data){
-                    var traceData = {};
-                    //we reformat the time set into a trace variables
-                    if(data && data.length){
-                        _.forEach(data, function(entry){
-                            var id = entry.type + '-' + entry.id;
+                return new Promise(function(resolve, reject){
+                    probeOverseer.flush().then(function(data){
+                        var traceData = {};
+                        //we reformat the time set into a trace variables
+                        if(data && data.length){
+                            _.forEach(data, function(entry){
+                                var id = entry.type + '-' + entry.id;
 
-                            if(entry.marker){
-                                id = entry.marker + '-' + id;
-                            }
-                            traceData[id] = entry;
-                        });
-                        //and send them
-                        return testRunner.getProxy()
-                            .sendVariables(traceData, true);
-                    }
+                                if(entry.marker){
+                                    id = entry.marker + '-' + id;
+                                }
+                                traceData[id] = entry;
+                            });
+                            //and send them
+                            testRunner.getProxy()
+                                .sendVariables(traceData, true);
+
+                        }
+                        resolve(data);
+                    }).catch(function(err){
+                        reject(err);
+                    });
                 });
             }
 
