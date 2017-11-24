@@ -144,7 +144,7 @@ define([
              * Send latency data
              */
             function sendVariables() {
-                probeOverseer.flush().then(function(data){
+                return probeOverseer.flush().then(function(data){
                     var traceData = {};
                     //we reformat the time set into a trace variables
                     if(data && data.length){
@@ -157,9 +157,10 @@ define([
                             traceData[id] = entry;
                         });
                         //and send them
-                        return testRunner.getProxy()
+                        testRunner.getProxy()
                             .sendVariables(traceData, true);
                     }
+                    return data;
                 });
             }
 
