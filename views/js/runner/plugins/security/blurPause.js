@@ -26,8 +26,10 @@ define([
     'i18n',
     'ui/pageStatus',
     'taoTests/runner/plugin'
-], function (_, __, pageStatus, pluginFactory) {
+], function (_, __, pageStatusFactory, pluginFactory) {
     'use strict';
+
+    var pageStatus = pageStatusFactory();
 
     var lostFocusPauseMessage = __('The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.');
     var lostFocusMessage = __('Attempt to navigate to another window or tab.');
@@ -124,7 +126,7 @@ define([
             };
 
             //look for status changes on the main window
-            pageStatus()
+            pageStatus
                 .on('blur hide', function handleWindowFocusLoose(){
                     mainFocus = false;
 
