@@ -64,6 +64,27 @@ define([
                         item && _.contains(item.categories, sectionPauseCategory) ) {
 
                         testRunner
+                            // when the pause has been taken into account, the runner will end the session
+                            // ensure the event is cleared to avoid unwanted triggering
+                            .on('leave.sectionPause', function() {
+                                testRunner.off('.sectionPause');
+                            })
+                            // catch connectivity error occurring while pausing
+                            .before('error.sectionPause', function() {
+                                if (testRunner.getProxy().isOffline()) {
+                                    // as the pause will be already handled by the backend with the sync mode,
+                                    // just prevent a second pause and let continue with the exit action.
+                                    testRunner
+                                        .off('.sectionPause')
+                                        .before('pause.sectionPause', function() {
+                                            testRunner.trigger('leave', {
+                                                code: testRunner.getTestData().states.suspended,
+                                                message: pauseMessage
+                                            });
+                                            return Promise.reject();
+                                        });
+                                }
+                            })
                             .trigger('disableitem')
                             .trigger('pause', {
                                 reasons : {
