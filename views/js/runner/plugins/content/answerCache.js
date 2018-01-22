@@ -23,11 +23,10 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-    'core/store',
     'util/namespace',
     'taoTests/runner/plugin',
     'taoQtiTest/runner/helpers/currentItem'
-], function (storeFactory, namespaceHelper, pluginFactory, currentItem) {
+], function (namespaceHelper, pluginFactory, currentItem) {
     'use strict';
 
     /**
@@ -44,7 +43,7 @@ define([
             var self = this;
             var testRunner = this.getTestRunner();
 
-            return storeFactory(this.getName() + '-' + testRunner.getConfig().serviceCallId).then(function (store) {
+            return testRunner.getPluginStore(this.getName()).then(function (store) {
                 self.storage = store;
 
                 testRunner
@@ -73,15 +72,6 @@ define([
                         }
                     });
             });
-        },
-
-        /**
-         * Called during the runner's destroy phase
-         */
-        destroy: function destroy() {
-            if (this.storage && !this.getTestRunner().getState('closedOrSuspended')) {
-                return this.storage.removeStore();
-            }
         }
     });
 });
