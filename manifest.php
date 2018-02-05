@@ -25,10 +25,10 @@ return array(
     'version' => '1.11.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao' => '>=15.11.0',
+        'tao' => '>=16.1.0',
         'taoDelivery' =>  '>=7.1.0',
         'taoDeliveryRdf' =>  '>=1.6.0',
-        'taoQtiTest' =>  '>=19.1.0',
+        'taoQtiTest' =>  '>=20.0.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoTestRunnerPluginsManager',
     'acl' => array(
