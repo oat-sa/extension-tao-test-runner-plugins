@@ -197,7 +197,17 @@ define([
          * @returns {Number|null}
          */
         getTimerValue: function getTimerValue(name) {
-            return typeof timers[name] === 'object' ? parseInt(timers[name].val(), 10) : null;
+            if(typeof timers[name] === 'object'){
+                if(_.isNumber(timers[name].remainingTime)){
+                    return timers[name].remainingTime;
+                }
+
+                //backward compatilbe format for timers
+                if(_.isFunction(timers[name].val)){
+                    return  parseInt(timers[name].val(), 10);
+                }
+            }
+            return null;
         },
 
         /**
