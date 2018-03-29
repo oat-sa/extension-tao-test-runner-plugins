@@ -20,6 +20,7 @@
 namespace oat\taoTestRunnerPlugins\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use oat\generis\model\OntologyAwareTrait;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoTestRunnerPlugins\model\delivery\DeliveryContainerService;
 use oat\taoTests\models\runner\plugins\PluginRegistry;
@@ -158,5 +159,10 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('1.8.0', '1.11.1');
+
+        if ($this->isVersion('1.11.1')) {
+            OntologyUpdater::syncModels();
+            $this->setVersion('1.12.0');
+        }
     }
 }

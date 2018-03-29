@@ -22,13 +22,14 @@ return array(
     'label' => 'Manage test runner plugins',
     'description' =>  "Manage test runner's plugins",
     'license' => 'GPL-2.0',
-    'version' => '1.11.1',
+    'version' => '1.12.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=16.1.0',
         'taoDelivery' =>  '>=7.1.0',
         'taoDeliveryRdf' =>  '>=1.6.0',
         'taoQtiTest' =>  '>=20.0.0',
+        'taoTests' =>  '>=7.6.0',
     ),
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoTestRunnerPluginsManager',
     'acl' => array(
@@ -37,10 +38,8 @@ return array(
     'update' => 'oat\\taoTestRunnerPlugins\\scripts\\update\\Updater',
     'install' => [
         'rdf' => array(
-            __DIR__.DIRECTORY_SEPARATOR."install".DIRECTORY_SEPARATOR.'ontology'.DIRECTORY_SEPARATOR.'taodelivery.rdf'
         ),
         'php' => [
-            \oat\taoTestRunnerPlugins\scripts\install\RegisterDeliveryContainerService::class,
             \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins::class
         ]
     ],
