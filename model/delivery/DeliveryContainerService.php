@@ -19,57 +19,14 @@
 
 namespace oat\taoTestRunnerPlugins\model\delivery;
 
-use core_kernel_classes_Resource;
-use oat\generis\model\OntologyAwareTrait;
-use oat\tao\model\plugins\PluginModule;
 use oat\taoDeliveryRdf\model\DeliveryContainerService as DeliveryRdfContainerService;
-use oat\taoDelivery\model\execution\DeliveryExecution;
 
 /**
  * Override the DeliveryContainerService in order to filter the plugin list based on the security flag.
- *
+ * @deprecated
  * @author Aleksej Tikhanovich <aleksej@taotesting.com>
  */
 class DeliveryContainerService extends DeliveryRdfContainerService
 {
-    use OntologyAwareTrait;
-
-    const DELIVERY_SECURITY_PLUGINS_PROPERTY = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliverySecurityPlugins';
-    const CHECK_MODE_ENABLED = 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled';
-
-    /**
-     * Get the execution plugins, and filter the plugins that belongs to the security category
-     * if the execution has been configured accordingly.
-     *
-     * @param DeliveryExecution $deliveryExecution
-     * @return array the list of plugins
-     */
-    public function getPlugins(DeliveryExecution $deliveryExecution)
-    {
-        $plugins = parent::getPlugins($deliveryExecution);
-
-        $delivery = $deliveryExecution->getDelivery();
-
-        if ($this->isSecureDelivery($delivery)) {
-            return $plugins;
-        }
-
-        //otherwise filter the security plugins
-        return array_filter($plugins, function(PluginModule $plugin) {
-            return $plugin->getCategory() != 'security';
-        });
-    }
-
-    /**
-     * Check whether secure plugins must be used.
-     * @param core_kernel_classes_Resource $delivery
-     * @return bool
-     */
-    private function isSecureDelivery(\core_kernel_classes_Resource $delivery)
-    {
-        $hasSecurityPlugins = $delivery->getOnePropertyValue($this->getProperty(self::DELIVERY_SECURITY_PLUGINS_PROPERTY));
-        return $hasSecurityPlugins instanceof core_kernel_classes_Resource &&
-                  $hasSecurityPlugins->getUri() == self::CHECK_MODE_ENABLED;
-    }
 
 }
