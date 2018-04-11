@@ -25,9 +25,9 @@ use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoTestRunnerPlugins\model\delivery\DeliveryContainerService;
 use oat\taoTests\models\runner\plugins\PluginRegistry;
 use oat\taoTests\models\runner\plugins\TestPlugin;
-use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
-use oat\taoDeliveryRdf\model\DeliveryContainerService as RdfDeliveryContainerService;
 use oat\taoTests\models\runner\features\SecurityFeature;
+use oat\taoTests\models\runner\features\TestRunnerFeatureService;
+use common_report_Report as Report;
 
 /**
  * Class Updater
@@ -166,27 +166,35 @@ class Updater extends common_ext_ExtensionUpdater
         $this->skip('1.8.0', '1.11.1');
 
         if ($this->isVersion('1.11.1')) {
-            $class = $this->getClass(DeliveryAssemblyService::CLASS_URI);
-            $secureProp = $this->getProperty('http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliverySecurityPlugins');
-            $featuresProp = $this->getProperty(RdfDeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY);
-            foreach ($class->getInstances(true) as $delivery) {
-                $secure = $delivery->getOnePropertyValue($secureProp);
-                $val = null;
-                if ($secure && $secure instanceof \core_kernel_classes_Resource) {
-                    $val = $secure->getUri();
-                }
-                if ($secure && $secure instanceof \core_kernel_classes_Literal) {
-                    $val = $secure->literal;
-                }
-                if ($val === 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled') {
-                    $activeTestRunnerFeaturesIds = explode(',', $delivery->getOnePropertyValue($featuresProp));
-                    $activeTestRunnerFeaturesIds[] = SecurityFeature::FEATURE_ID;
-                    $delivery->editPropertyValues($featuresProp, implode(',', $activeTestRunnerFeaturesIds));
-                }
-            }
+//            $class = $this->getClass(DeliveryAssemblyService::CLASS_URI);
+//            $secureProp = $this->getProperty('http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliverySecurityPlugins');
+//            $featuresProp = $this->getProperty(RdfDeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY);
+//            foreach ($class->getInstances(true) as $delivery) {
+//                $secure = $delivery->getOnePropertyValue($secureProp);
+//                $val = null;
+//                if ($secure && $secure instanceof \core_kernel_classes_Resource) {
+//                    $val = $secure->getUri();
+//                }
+//                if ($secure && $secure instanceof \core_kernel_classes_Literal) {
+//                    $val = $secure->literal;
+//                }
+//                if ($val === 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled') {
+//                    $activeTestRunnerFeaturesIds = explode(',', $delivery->getOnePropertyValue($featuresProp));
+//                    $activeTestRunnerFeaturesIds[] = SecurityFeature::FEATURE_ID;
+//                    $delivery->editPropertyValues($featuresProp, implode(',', $activeTestRunnerFeaturesIds));
+//                }
+//            }
             OntologyUpdater::syncModels();
             $this->setVersion('1.12.0');
         }
         $this->skip('1.12.0', '1.12.1');
+
+        if ($this->isVersion('1.12.1')) {
+            $featureService = $this->getServiceManager()->get(TestRunnerFeatureService::class);
+            $featureService->register(new SecurityFeature());
+            $this->getServiceManager()->register(TestRunnerFeatureService::SERVICE_ID, $featureService);
+            $this->addReport(new Report(Report::TYPE_WARNING, 'Run '.\oat\taoTestRunnerPlugins\scripts\migrations\DeliverySecurityFeature::class . ' script'));
+            $this->setVersion('1.13.0');
+        }
     }
 }
