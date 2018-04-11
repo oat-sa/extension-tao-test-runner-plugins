@@ -171,7 +171,14 @@ class Updater extends common_ext_ExtensionUpdater
             $featuresProp = $this->getProperty(RdfDeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY);
             foreach ($class->getInstances(true) as $delivery) {
                 $secure = $delivery->getOnePropertyValue($secureProp);
-                if ($secure && $secure->getUri() === 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled') {
+                $val = null;
+                if ($secure && $secure instanceof \core_kernel_classes_Resource) {
+                    $val = $secure->getUri();
+                }
+                if ($secure && $secure instanceof \core_kernel_classes_Literal) {
+                    $val = $secure->literal;
+                }
+                if ($val === 'http://www.tao.lu/Ontologies/TAODelivery.rdf#ComplyEnabled') {
                     $activeTestRunnerFeaturesIds = explode(',', $delivery->getOnePropertyValue($featuresProp));
                     $activeTestRunnerFeaturesIds[] = SecurityFeature::FEATURE_ID;
                     $delivery->editPropertyValues($featuresProp, implode(',', $activeTestRunnerFeaturesIds));
@@ -180,5 +187,6 @@ class Updater extends common_ext_ExtensionUpdater
             OntologyUpdater::syncModels();
             $this->setVersion('1.12.0');
         }
+        $this->skip('1.12.0', '1.12.1');
     }
 }
