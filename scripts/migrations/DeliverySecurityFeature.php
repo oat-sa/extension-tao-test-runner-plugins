@@ -22,23 +22,43 @@
 
 namespace oat\taoTestRunnerPlugins\scripts\migrations;
 
-use oat\oatbox\extension\AbstractAction;
 use common_report_Report as Report;
 use oat\generis\model\OntologyAwareTrait;
 use oat\taoDeliveryRdf\model\DeliveryAssemblyService;
 use oat\taoDeliveryRdf\model\DeliveryContainerService as RdfDeliveryContainerService;
 use oat\taoTests\models\runner\features\SecurityFeature;
+use oat\oatbox\extension\script\ScriptAction;
 
 /**
  * Class DeliverySecurityFeature
  * @package oat\taoTestRunnerPlugins\scripts\migrations
  */
-class DeliverySecurityFeature extends AbstractAction
+class DeliverySecurityFeature extends ScriptAction
 {
     use OntologyAwareTrait;
 
-    public function __invoke($params)
+    protected function provideDescription()
     {
+        return __('Migrate to use delivery features to control security plugins');
+    }
+
+    protected function provideOptions()
+    {
+        return [
+            'dryRun' => [
+                'prefix' => 'd',
+                'longPrefix' => 'dryRun',
+                'defaultValue' => 0,
+                'cast' => 'boolean',
+                'required' => true,
+                'description' => 'Run in dry run mode (0 or 1)'
+            ],
+        ];
+    }
+
+    public function run()
+    {
+        $dryRun = $this->getOption('dryRun');
         $class = $this->getClass(DeliveryAssemblyService::CLASS_URI);
         $secureProp = $this->getProperty('http://www.tao.lu/Ontologies/TAODelivery.rdf#DeliverySecurityPlugins');
         $featuresProp = $this->getProperty(RdfDeliveryContainerService::TEST_RUNNER_FEATURES_PROPERTY);
@@ -56,10 +76,16 @@ class DeliverySecurityFeature extends AbstractAction
                 $i++;
                 $activeTestRunnerFeaturesIds = explode(',', $delivery->getOnePropertyValue($featuresProp));
                 $activeTestRunnerFeaturesIds[] = SecurityFeature::FEATURE_ID;
-                $delivery->editPropertyValues($featuresProp, implode(',', $activeTestRunnerFeaturesIds));
+                if (!$dryRun) {
+                    $delivery->editPropertyValues($featuresProp, implode(',', $activeTestRunnerFeaturesIds));
+                }
             }
         }
 
-        return new Report(Report::TYPE_SUCCESS, __('%s deliveries were updated', $i));
+        if ($dryRun) {
+            return new Report(Report::TYPE_SUCCESS, __('%s deliveries will be updated', $i));
+        } else {
+            return new Report(Report::TYPE_SUCCESS, __('%s deliveries were updated', $i));
+        }
     }
 }
