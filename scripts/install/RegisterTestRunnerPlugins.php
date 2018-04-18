@@ -54,7 +54,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Register metrics',
                 'category' => 'probes',
-                'active' => true,
+                'active' => false,
                 'tags' => [ 'technical' ]
             ]
         ],
@@ -86,7 +86,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Pause the test when leaving the test window',
                 'category' => 'security',
-                'active' => true,
+                'active' => false,
                 'tags' => [ ]
             ],
             [
@@ -96,7 +96,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
                 'category' => 'security',
-                'active' => true,
+                'active' => false,
                 'tags' => [ ]
             ],
             [
@@ -106,7 +106,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Disable and report some forbidden shortcuts',
                 'category' => 'security',
-                'active' => true,
+                'active' => false,
                 'tags' => [  ]
             ], [
                 'id' => 'preventCopy',
@@ -115,7 +115,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Prevent copying from CTRL-C/X/V shortcuts',
                 'category' => 'security',
-                'active' => true,
+                'active' => false,
                 'tags' => [  ]
             ], [
                 'id' => 'fullscreen',
@@ -124,7 +124,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
                 'description' => 'Force the test in full screen mode',
                 'category' => 'security',
-                'active' => true,
+                'active' => false,
                 'tags' => [ ]
             ], [
                 'id' => 'collapser',
@@ -133,7 +133,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'bundle' => 'taoQtiTest/loader/testPlugins.min',
                 'description' => 'Reduce the size of the tools when the available space is not enough',
                 'category' => 'content',
-                'active' => true,
+                'active' => false,
                 'tags' => [ ]
             ]
         ]
