@@ -196,5 +196,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->addReport(new Report(Report::TYPE_WARNING, 'Run '.\oat\taoTestRunnerPlugins\scripts\migrations\DeliverySecurityFeature::class . ' script'));
             $this->setVersion('1.13.0');
         }
+        $this->skip('1.13.0', '1.14.0');
     }
 }
