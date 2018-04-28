@@ -82,12 +82,13 @@ define([
      * @param {Function} listener
      */
     function registerEvent(target, eventName, listener) {
+        var listenerFn = _.debounce(listener, 250);
         if (target.addEventListener) {
-            target.addEventListener(eventName, listener, false);
+            target.addEventListener(eventName, listenerFn, false);
         } else if (target.attachEvent) {
-            target.attachEvent('on' + eventName, listener);
+            target.attachEvent('on' + eventName, listenerFn);
         } else {
-            target['on' + eventName] = listener;
+            target['on' + eventName] = listenerFn;
         }
     }
 
