@@ -65,6 +65,12 @@ define([
     var enabledInInput = ['backspace'];
 
     /**
+     * The number of milliseconds to delay for debounce
+     * @type {number}
+     */
+    var debounceDelay = 250;
+
+    /**
      * Format a shortcut to be displayed with the right key names
      * @param {String} label
      * @returns {String}
@@ -83,7 +89,7 @@ define([
      * @param {Function} listener
      */
     function registerEvent(target, eventName, listener) {
-        var listenerFn = _.debounce(listener, 250);
+        var listenerFn = _.debounce(listener, debounceDelay);
         if (target.addEventListener) {
             target.addEventListener(eventName, listenerFn, false);
         } else if (target.attachEvent) {

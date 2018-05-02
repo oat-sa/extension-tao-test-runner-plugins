@@ -67,6 +67,11 @@ define([
      */
     var platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
 
+    /**
+     * The number of milliseconds to delay for debounce
+     * @type {number}
+     */
+    var debounceDelay = 250;
 
     /** Refine the list of shortcuts to only get those that are relevant with the current platform **/
     _.forEach(allShortcuts, function(shortcut) {
@@ -82,7 +87,7 @@ define([
      * @param {Function} listener
      */
     function registerEvent(target, eventName, listener) {
-        var listenerFn = _.debounce(listener, 250);
+        var listenerFn = _.debounce(listener, debounceDelay);
         if (target.addEventListener) {
             target.addEventListener(eventName, listenerFn, false);
         } else if (target.attachEvent) {
