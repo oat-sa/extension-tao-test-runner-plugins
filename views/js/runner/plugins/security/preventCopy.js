@@ -20,9 +20,10 @@
  */
 define([
     'lodash',
+    'module',
     'util/shortcut',
     'taoTests/runner/plugin'
-], function (_, shortcutHelper, pluginFactory) {
+], function (_, module, shortcutHelper, pluginFactory) {
     'use strict';
 
     /**
@@ -68,10 +69,14 @@ define([
     var platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
 
     /**
-     * The number of milliseconds to delay for debounce
-     * @type {number}
+     * The default configuration if nothing
+     * is found on the module config
      */
-    var debounceDelay = 250;
+    var defaultConfig = {
+        debounceDelay: 500
+    };
+
+    var config = _.defaults(module.config() || {}, defaultConfig);
 
     /** Refine the list of shortcuts to only get those that are relevant with the current platform **/
     _.forEach(allShortcuts, function(shortcut) {
@@ -87,7 +92,7 @@ define([
      * @param {Function} listener
      */
     function registerEvent(target, eventName, listener) {
-        var listenerFn = _.debounce(listener, debounceDelay);
+        var listenerFn = _.debounce(listener, config.debounceDelay);
         if (target.addEventListener) {
             target.addEventListener(eventName, listenerFn, false);
         } else if (target.attachEvent) {
