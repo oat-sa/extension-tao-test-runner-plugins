@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * 
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
+ * Copyright (c) 2018 (original work) Open Assessment Technologies SA (under the project TAO-PRODUCT);
  *               
  * 
  */
@@ -24,9 +24,10 @@ use oat\oatbox\extension\InstallAction;
 use oat\tao\model\ClientLibConfigRegistry;
 
 /**
- * This post-installation script creates the ContainerService
+ * Class SetDebounceDelayConfig
+ * @package oat\taoTestRunnerPlugins\scripts\install
  */
-class SetPreventCopyConfig extends InstallAction
+class SetDebounceDelayConfig extends InstallAction
 {
     /**
      * Sets the ContainerService.
@@ -41,6 +42,10 @@ class SetPreventCopyConfig extends InstallAction
             'taoTestRunnerPlugins/runner/plugins/security/preventCopy', ['debounceDelay' => 500]
         );
 
-        return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, 'The preventCopy plugin configured');
+        ClientLibConfigRegistry::getRegistry()->register(
+            'taoTestRunnerPlugins/runner/plugins/security/disableCommands', ['debounceDelay' => 500]
+        );
+
+        return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, 'The preventCopy and disableCommands plugins configured');
     }
 }

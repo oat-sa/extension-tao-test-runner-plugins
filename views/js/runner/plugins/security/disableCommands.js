@@ -21,10 +21,11 @@
 define([
     'jquery',
     'lodash',
+    'module',
     'util/shortcut',
     'json!taoTestRunnerPlugins/runner/plugins/security/commands.json',
     'taoTests/runner/plugin'
-], function ($, _, shortcutHelper, allShortcuts, pluginFactory) {
+], function ($, _, module, shortcutHelper, allShortcuts, pluginFactory) {
     'use strict';
 
     /**
@@ -65,10 +66,14 @@ define([
     var enabledInInput = ['backspace'];
 
     /**
-     * The number of milliseconds to delay for debounce
-     * @type {number}
+     * The default configuration if nothing
+     * is found on the module config
      */
-    var debounceDelay = 250;
+    var defaultConfig = {
+        debounceDelay: 500
+    };
+
+    var config = _.defaults(module.config() || {}, defaultConfig);
 
     /**
      * Format a shortcut to be displayed with the right key names
@@ -89,7 +94,7 @@ define([
      * @param {Function} listener
      */
     function registerEvent(target, eventName, listener) {
-        var listenerFn = _.debounce(listener, debounceDelay);
+        var listenerFn = _.debounce(listener, config.debounceDelay);
         if (target.addEventListener) {
             target.addEventListener(eventName, listenerFn, false);
         } else if (target.attachEvent) {
