@@ -42,7 +42,7 @@ return array(
         'php' => [
             \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins::class,
             \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerFeatureService::class,
-            \oat\taoTestRunnerPlugins\scripts\install\SetPreventCopyConfig::class
+            \oat\taoTestRunnerPlugins\scripts\install\SetDebounceDelayConfig::class
         ]
     ],
     'uninstall' => [

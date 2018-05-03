@@ -202,6 +202,9 @@ class Updater extends common_ext_ExtensionUpdater
             ClientLibConfigRegistry::getRegistry()->register(
                 'taoTestRunnerPlugins/runner/plugins/security/preventCopy', ['debounceDelay' => 500]
             );
+            ClientLibConfigRegistry::getRegistry()->register(
+                'taoTestRunnerPlugins/runner/plugins/security/disableCommands', ['debounceDelay' => 500]
+            );
             $this->setVersion('1.14.0');
         }
     }
