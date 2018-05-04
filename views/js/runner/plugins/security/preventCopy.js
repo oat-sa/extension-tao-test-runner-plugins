@@ -73,7 +73,7 @@ define([
      * is found on the module config
      */
     var defaultConfig = {
-        debounceDelay: 500
+        debounceDelay: 250
     };
 
     var config = _.defaults(module.config() || {}, defaultConfig);
