@@ -39,11 +39,11 @@ class SetDebounceDelayConfig extends InstallAction
     public function __invoke($params)
     {
         ClientLibConfigRegistry::getRegistry()->register(
-            'taoTestRunnerPlugins/runner/plugins/security/preventCopy', ['debounceDelay' => 1500]
+            'taoTestRunnerPlugins/runner/plugins/security/preventCopy', ['debounceDelay' => 500]
         );
 
         ClientLibConfigRegistry::getRegistry()->register(
-            'taoTestRunnerPlugins/runner/plugins/security/disableCommands', ['debounceDelay' => 1500]
+            'taoTestRunnerPlugins/runner/plugins/security/disableCommands', ['debounceDelay' => 500]
         );
 
         return new \common_report_Report(\common_report_Report::TYPE_SUCCESS, 'The preventCopy and disableCommands plugins configured');
