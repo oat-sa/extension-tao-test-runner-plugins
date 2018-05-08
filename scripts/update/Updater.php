@@ -207,5 +207,15 @@ class Updater extends common_ext_ExtensionUpdater
             );
             $this->setVersion('1.14.0');
         }
+
+        if ($this->isVersion('1.14.0')) {
+            ClientLibConfigRegistry::getRegistry()->register(
+                'taoTestRunnerPlugins/runner/plugins/security/preventCopy', ['debounceDelay' => 750]
+            );
+            ClientLibConfigRegistry::getRegistry()->register(
+                'taoTestRunnerPlugins/runner/plugins/security/disableCommands', ['debounceDelay' => 750]
+            );
+            $this->setVersion('1.15.0');
+        }
     }
 }
