@@ -22,7 +22,7 @@ return array(
     'label' => 'Manage test runner plugins',
     'description' =>  "Manage test runner's plugins",
     'license' => 'GPL-2.0',
-    'version' => '1.14.0',
+    'version' => '1.15.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=16.1.0',
@@ -42,6 +42,7 @@ return array(
         'php' => [
             \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins::class,
             \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerFeatureService::class,
+            \oat\taoTestRunnerPlugins\scripts\install\SetDebounceDelayConfig::class
         ]
     ],
     'uninstall' => [

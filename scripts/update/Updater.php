@@ -21,6 +21,7 @@ namespace oat\taoTestRunnerPlugins\scripts\update;
 
 use common_ext_ExtensionUpdater;
 use oat\generis\model\OntologyAwareTrait;
+use oat\tao\model\ClientLibConfigRegistry;
 use oat\tao\scripts\update\OntologyUpdater;
 use oat\taoTestRunnerPlugins\model\delivery\DeliveryContainerService;
 use oat\taoTests\models\runner\plugins\PluginRegistry;
@@ -197,6 +198,16 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.13.0');
         }
 
-        $this->skip('1.13.0', '1.14.0');
+        if ($this->isVersion('1.13.0')) {
+            ClientLibConfigRegistry::getRegistry()->register(
+                'taoTestRunnerPlugins/runner/plugins/security/preventCopy', ['debounceDelay' => 250]
+            );
+            ClientLibConfigRegistry::getRegistry()->register(
+                'taoTestRunnerPlugins/runner/plugins/security/disableCommands', ['debounceDelay' => 250]
+            );
+            $this->setVersion('1.14.0');
+        }
+
+        $this->skip('1.14.0', '1.15.0');
     }
 }
