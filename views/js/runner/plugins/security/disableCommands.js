@@ -94,13 +94,12 @@ define([
      * @param {Function} listener
      */
     function registerEvent(target, eventName, listener) {
-        var listenerFn = _.debounce(listener, config.debounceDelay);
         if (target.addEventListener) {
-            target.addEventListener(eventName, listenerFn, false);
+            target.addEventListener(eventName, listener, false);
         } else if (target.attachEvent) {
-            target.attachEvent('on' + eventName, listenerFn);
+            target.attachEvent('on' + eventName, listener);
         } else {
-            target['on' + eventName] = listenerFn;
+            target['on' + eventName] = listener;
         }
     }
 
@@ -149,6 +148,8 @@ define([
          */
         install: function install() {
             var testRunner = this.getTestRunner();
+            var prohibitedKeyFunc;
+            var prohibitedKeyDebounce;
 
             function preventContextMenu(event) {
                 event.stopPropagation();
@@ -160,12 +161,14 @@ define([
 
             _.forEach(shortcuts, function(shortcut) {
                 var inputEnabled = _.indexOf(enabledInInput, shortcut.shortcut) >= 0;
-                shortcutHelper.add(shortcut.shortcut, function(event) {
+                prohibitedKeyFunc = function(event) {
                     if (!inputEnabled || !$(event.target).closest(':input').length) {
                         event.preventDefault();
                         testRunner.trigger('prohibited-key', shortcut.label);
                     }
-                }, {prevent: false});
+                };
+                prohibitedKeyDebounce = _.debounce(prohibitedKeyFunc, config.debounceDelay, { leading : true, trailing : false});
+                shortcutHelper.add(shortcut.shortcut, prohibitedKeyDebounce, {prevent: false});
             });
 
             testRunner.on('destroy', function() {
