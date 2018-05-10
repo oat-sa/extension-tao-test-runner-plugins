@@ -196,9 +196,8 @@ class Updater extends common_ext_ExtensionUpdater
             $featureService = $this->getServiceManager()->get(TestRunnerFeatureService::class);
             $registeredFeatures = $featureService->getOption(TestRunnerFeatureService::OPTION_AVAILABLE);
             $testRunnerFeature = new SecurityFeature();
-            $featureId = $testRunnerFeature->getId();
             // if other extension has already installed this feature
-            if (!array_key_exists($featureId, $registeredFeatures)) {
+            if (!array_key_exists($testRunnerFeature->getId(), $registeredFeatures)) {
                 $featureService->register($testRunnerFeature);
                 $this->getServiceManager()->register(TestRunnerFeatureService::SERVICE_ID, $featureService);
                 $this->addReport(new Report(Report::TYPE_WARNING,
