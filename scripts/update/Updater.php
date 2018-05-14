@@ -42,7 +42,9 @@ class Updater extends common_ext_ExtensionUpdater
 
     /**
      * @param $initialVersion
-     * @return string $versionUpdatedTo
+     * @return string|void
+     * @throws \common_Exception
+     * @throws \common_exception_InconsistentData
      */
     public function update($initialVersion)
     {
@@ -194,9 +196,15 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('1.12.1')) {
             $featureService = $this->getServiceManager()->get(TestRunnerFeatureService::class);
-            $featureService->register(new SecurityFeature());
-            $this->getServiceManager()->register(TestRunnerFeatureService::SERVICE_ID, $featureService);
-            $this->addReport(new Report(Report::TYPE_WARNING, 'Run '.\oat\taoTestRunnerPlugins\scripts\migrations\DeliverySecurityFeature::class . ' script'));
+            $registeredFeatures = $featureService->getOption(TestRunnerFeatureService::OPTION_AVAILABLE);
+            $testRunnerFeature = new SecurityFeature();
+            // if other extension has already installed this feature
+            if (!array_key_exists($testRunnerFeature->getId(), $registeredFeatures)) {
+                $featureService->register($testRunnerFeature);
+                $this->getServiceManager()->register(TestRunnerFeatureService::SERVICE_ID, $featureService);
+                $this->addReport(new Report(Report::TYPE_WARNING,
+                    'Run ' . \oat\taoTestRunnerPlugins\scripts\migrations\DeliverySecurityFeature::class . ' script'));
+            }
             $this->setVersion('1.13.0');
         }
 
@@ -211,6 +219,18 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         if ($this->isVersion('1.14.0')) {
+            ClientLibConfigRegistry::getRegistry()->register(
+                'taoTestRunnerPlugins/runner/plugins/security/preventCopy', ['debounceDelay' => 750]
+            );
+            ClientLibConfigRegistry::getRegistry()->register(
+                'taoTestRunnerPlugins/runner/plugins/security/disableCommands', ['debounceDelay' => 750]
+            );
+            $this->setVersion('1.15.0');
+        }
+
+        $this->skip('1.15.0', '1.15.1');
+
+        if ($this->isVersion('1.15.1')) {
             $pluginRegistry = PluginRegistry::getRegistry();
             $featureService = $this->getServiceManager()->get(TestRunnerFeatureService::class);
             $features = $featureService->getAll(false);
@@ -241,7 +261,7 @@ class Updater extends common_ext_ExtensionUpdater
                     ])
                 ]);
             }
-            $this->setVersion('1.15.0');
+            $this->setVersion('1.16.0');
         }
     }
 }

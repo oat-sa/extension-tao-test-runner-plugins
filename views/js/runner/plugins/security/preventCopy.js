@@ -73,7 +73,7 @@ define([
      * is found on the module config
      */
     var defaultConfig = {
-        debounceDelay: 250
+        debounceDelay: 500
     };
 
     var config = _.defaults(module.config() || {}, defaultConfig);
@@ -92,13 +92,12 @@ define([
      * @param {Function} listener
      */
     function registerEvent(target, eventName, listener) {
-        var listenerFn = _.debounce(listener, config.debounceDelay);
         if (target.addEventListener) {
-            target.addEventListener(eventName, listenerFn, false);
+            target.addEventListener(eventName, listener, false);
         } else if (target.attachEvent) {
-            target.attachEvent('on' + eventName, listenerFn);
+            target.attachEvent('on' + eventName, listener);
         } else {
-            target['on' + eventName] = listenerFn;
+            target['on' + eventName] = listener;
         }
     }
 
@@ -139,6 +138,8 @@ define([
          */
         install: function install() {
             var testRunner = this.getTestRunner();
+            var prohibitedKeyFunc;
+            var prohibitedKeyDebounce;
 
             function prevent(event) {
                 event.stopPropagation();
@@ -150,9 +151,11 @@ define([
             registerEvent(window, 'paste', prevent);
 
             _.forEach(shortcuts, function(shortcut) {
-                shortcutHelper.add(shortcut.key, function() {
+                prohibitedKeyFunc = function() {
                     testRunner.trigger('prohibited-key', shortcut.label);
-                });
+                };
+                prohibitedKeyDebounce = _.debounce(prohibitedKeyFunc, config.debounceDelay, { leading : true, trailing : false});
+                shortcutHelper.add(shortcut.key, prohibitedKeyDebounce);
             });
 
             testRunner.on('destroy', function() {
