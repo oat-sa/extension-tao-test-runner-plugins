@@ -29,8 +29,6 @@ use oat\taoTests\models\runner\plugins\TestPlugin;
 use oat\taoTests\models\runner\features\SecurityFeature;
 use oat\taoTests\models\runner\features\TestRunnerFeatureService;
 use common_report_Report as Report;
-use oat\taoTestRunnerPlugins\scripts\tools\PluginManager;
-use oat\taoTests\models\runner\features\ManageableFeature;
 
 /**
  * Class Updater
@@ -228,40 +226,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('1.15.0');
         }
 
-        $this->skip('1.15.0', '1.15.1');
-
-        if ($this->isVersion('1.15.1')) {
-            $pluginRegistry = PluginRegistry::getRegistry();
-            $featureService = $this->getServiceManager()->get(TestRunnerFeatureService::class);
-            $features = $featureService->getAll(false);
-            if (!isset($features['security'])) {
-                $securityPluginIds = array_reduce(
-                    $pluginRegistry->getMap(),
-                    function ($ids, $plugin) {
-                        if ($ids === null) {
-                            $ids = [];
-                        }
-                        if ($plugin['category'] === 'security') {
-                            $ids[] = $plugin['id'];
-                        }
-                        return $ids;
-                    }
-                );
-                $pluginManager = new PluginManager();
-                $pluginManager->setServiceLocator($this->getServiceManager());
-                $pluginManager([
-                    '--addFeature',
-                    '--featureOptions', json_encode([
-                        ManageableFeature::OPTION_ID => 'security',
-                        ManageableFeature::OPTION_DESCRIPTION => 'Security plugins',
-                        ManageableFeature::OPTION_LABEL => 'Security plugins',
-                        ManageableFeature::OPTION_ACTIVE => true,
-                        ManageableFeature::OPTION_ENABLED_BY_DEFAULT => true,
-                        ManageableFeature::OPTION_PLUGIN_IDS => $securityPluginIds,
-                    ])
-                ]);
-            }
-            $this->setVersion('1.16.0');
-        }
+        $this->skip('1.15.0', '1.16.0');
     }
 }
