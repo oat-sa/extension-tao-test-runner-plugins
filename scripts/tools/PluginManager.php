@@ -215,6 +215,7 @@ class PluginManager extends ScriptAction
             }
         }
         $feature = new ManageableFeature($options);
+        $feature->setServiceLocator($this->getServiceLocator());
         $testRunnerFeatureService = $this->getServiceLocator()->get(TestRunnerFeatureService::class);
         $testRunnerFeatureService->register($feature);
         $this->getServiceLocator()->register(TestRunnerFeatureService::SERVICE_ID, $testRunnerFeatureService);
@@ -264,7 +265,9 @@ class PluginManager extends ScriptAction
         array_unique($pluginIds);
         $featureOptions[ManageableFeature::OPTION_PLUGIN_IDS] = $pluginIds;
         $testRunnerFeatureService->unregister($feature->getId());
-        $testRunnerFeatureService->register(new ManageableFeature($featureOptions));
+        $feature = new ManageableFeature($featureOptions);
+        $feature->setServiceLocator($this->getServiceLocator());
+        $testRunnerFeatureService->register($feature);
         $this->getServiceLocator()->register(TestRunnerFeatureService::SERVICE_ID, $testRunnerFeatureService);
 
         return Report::createSuccess('Plugins `' . implode(',', $addedPluginIds) . '` successfully registered');
@@ -298,7 +301,9 @@ class PluginManager extends ScriptAction
 
         $featureOptions[ManageableFeature::OPTION_PLUGIN_IDS] = $pluginIds;
         $testRunnerFeatureService->unregister($feature->getId());
-        $testRunnerFeatureService->register(new ManageableFeature($featureOptions));
+        $feature = new ManageableFeature($featureOptions);
+        $feature->setServiceLocator($this->getServiceLocator());
+        $testRunnerFeatureService->register($feature);
         $this->getServiceLocator()->register(TestRunnerFeatureService::SERVICE_ID, $testRunnerFeatureService);
 
         return Report::createSuccess('Plugins `' . implode(',', $removedPluginIds) . '` successfully registered');
