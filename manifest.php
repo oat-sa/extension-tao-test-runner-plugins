@@ -22,7 +22,7 @@ return array(
     'label' => 'Manage test runner plugins',
     'description' =>  "Manage test runner's plugins",
     'license' => 'GPL-2.0',
-    'version' => '1.16.0',
+    'version' => '1.16.1',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao' => '>=16.1.0',
