@@ -217,25 +217,26 @@ define([
 
                     stopFullScreenChangeObserver();
                     disableItem();
+                    if (fullScreenSupported) {
+                        testRunner.trigger('alert.fullscreen', message, function(reason) {
 
-                    testRunner.trigger('alert.fullscreen', message, function(reason) {
-
-                        if (reason === 'esc') {
-                            waitingForUser = false;
-                            return alertUser();
-                        }
-
-                        requestFullScreen();
-
-                        _.defer(function() {
-                            waitingForUser = false;
-                            enableItem();
-
-                            if (!fullScreenSupported) {
-                                startFullScreenChangeObserver();
+                            if (reason === 'esc') {
+                                waitingForUser = false;
+                                return alertUser();
                             }
+
+                            requestFullScreen();
+
+                            _.defer(function() {
+                                waitingForUser = false;
+                                enableItem();
+
+                                if (!fullScreenSupported) {
+                                    startFullScreenChangeObserver();
+                                }
+                            });
                         });
-                    });
+                    }
                 }
             }
 
