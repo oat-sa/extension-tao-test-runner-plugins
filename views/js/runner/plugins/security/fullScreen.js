@@ -213,11 +213,10 @@ define([
 
             function alertUser() {
                 if (!waitingForUser) {
-                    waitingForUser = true;
-
-                    stopFullScreenChangeObserver();
-                    disableItem();
                     if (fullScreenSupported) {
+                        waitingForUser = true;
+                        stopFullScreenChangeObserver();
+                        disableItem();
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
 
                             if (reason === 'esc') {
