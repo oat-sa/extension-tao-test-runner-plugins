@@ -142,6 +142,21 @@ define([
     }
 
     /**
+     * Exit fullscreen mode
+     */
+    function exitFullScreen() {
+        if (doc.exitFullscreen) {
+            doc.exitFullscreen();
+        } else if (doc.mozCancelFullScreen) { /* Firefox */
+            doc.mozCancelFullScreen();
+        } else if (doc.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+            doc.webkitExitFullscreen();
+        } else if (doc.msExitFullscreen) { /* IE/Edge */
+            doc.msExitFullscreen();
+        }
+    }
+
+    /**
      * Notifies that we have entered in full screen mode
      * @param {runner} testRunner
      */
@@ -256,6 +271,11 @@ define([
                         disableItem();
                     }
                 });
+            });
+
+            testRunner.on('destroy', function() {
+                leaveFullScreen(testRunner);
+                exitFullScreen();
             });
 
             // checks for frame embedding
