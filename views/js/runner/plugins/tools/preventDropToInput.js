@@ -22,11 +22,10 @@
  * Test Runner Tool Plugin : Prevent drop images to inputs
  */
 define([
-    'jquery',
     'lodash',
-    'i18n',
-    'taoTests/runner/plugin'
-], function ($, _, __, pluginFactory) {
+    'taoTests/runner/plugin',
+    'util/namespace'
+], function (_, pluginFactory, namespaceHelper) {
     'use strict';
 
     /**
@@ -51,28 +50,6 @@ define([
         init: function init() {
             var self = this;
             var testRunner = self.getTestRunner();
-            var outside = false;
-
-            /**
-             * Unfortunately we need to check browser vendor
-             * @return {boolean}
-             */
-            function isChrome() {
-                var isChromium = window.chrome,
-                    winNav = window.navigator,
-                    vendorName = winNav.vendor,
-                    isOpera = winNav.userAgent.indexOf("OPR") > -1,
-                    isIEedge = winNav.userAgent.indexOf("Edge") > -1,
-                    isIOSChrome = winNav.userAgent.match("CriOS");
-
-                return isIOSChrome || (
-                    isChromium !== null &&
-                    typeof isChromium !== "undefined" &&
-                    vendorName === "Google Inc."
-                    && isOpera === false
-                    && isIEedge === false
-                );
-            }
 
             this.getTestRunner()
                 .after('renderitem', function () {
@@ -80,11 +57,13 @@ define([
                     var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
 
                     $items
-                        .off('dragover')
-                        .off('drop')
-                        .on('drop dragover', function (event) {
+                        .off('.preventdrop')
+                        .on(namespaceHelper.namespaceAll('drop dragover', 'preventdrop'), function (event) {
                             event.preventDefault();
                         });
+                }).on('destroy', function() {
+                    var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
+                    $items.off('.preventdrop');
                 });
         }
     });
