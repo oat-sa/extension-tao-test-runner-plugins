@@ -62,6 +62,7 @@ define([
                             event.preventDefault();
                         });
                 }).on('destroy', function() {
+                    var config = _.defaults((self.getConfig() || {}), _defaults);
                     var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
                     $items.off('.preventdrop');
                 });
