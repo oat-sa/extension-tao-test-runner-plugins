@@ -73,7 +73,11 @@ define([
                         // so for the prevent dropping - just make element as disabled, the restore its state
                         .on(namespaceHelper.namespaceAll('dragover', 'preventdropimg'), function (event) {
                             // if img then I don't want to do drop
-                            if (dropped.tagName === 'IMG') {
+                            if (dropped.tagName === 'IMG'
+                                || dropped.tagName === 'OBJECT'
+                                || dropped.tagName === 'EMBED'
+                                || dropped.tagName === 'SVG'
+                            ) {
                                 disabled = $(event.target);
                                 disabled.prop('disabled', true);
                             }
