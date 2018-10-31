@@ -38,6 +38,14 @@ define([
     };
 
     /**
+     * Lower case only
+     * @type {string[]}
+     */
+    var restrictedTags = [
+        'img'
+    ];
+
+    /**
      * Creates the preventDragDrop plugin
      */
     return pluginFactory({
@@ -64,7 +72,9 @@ define([
                         })
                         .on(namespaceHelper.namespaceAll('dragend', 'preventdropimg'), function (event) {
                             dropped = null;
-                            disabled.prop('disabled', false);
+                            if (_.isObject(disabled)) {
+                                disabled.prop('disabled', false);
+                            }
                         });
 
                     $items
@@ -73,13 +83,11 @@ define([
                         // so for the prevent dropping - just make element as disabled, the restore its state
                         .on(namespaceHelper.namespaceAll('dragover', 'preventdropimg'), function (event) {
                             // if img then I don't want to do drop
-                            if (dropped.tagName === 'IMG'
-                                || dropped.tagName === 'OBJECT'
-                                || dropped.tagName === 'EMBED'
-                                || dropped.tagName === 'SVG'
-                            ) {
+                            if (_.isObject(dropped) && _.contains(restrictedTags, dropped.tagName.toLowerCase())) {
                                 disabled = $(event.target);
-                                disabled.prop('disabled', true);
+                                if (disabled.length) {
+                                    disabled.prop('disabled', true);
+                                }
                             }
                         });
                 }).on('destroy', function() {
