@@ -77,12 +77,13 @@ define([
 
             var doPause = function doPause() {
                 var context = testRunner.getTestContext();
-                var states = testRunner.getTestData().states;
+                var testData = testRunner.getTestData();
+                var states = testData.states;
                 if (!bluring && context.state <= states.interacting && !testRunner.getState('finish')) {
                     bluring = true;
                     focusBackTimeout()
                         .then(function resolve() {
-                            if (context.securePauseStateRequired) {
+                            if (testData.securePauseStateRequired) {
                                 testRunner.trigger('blur').trigger('pause', {
                                     message: lostFocusPauseMessage,
                                     reasons : {

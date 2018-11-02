@@ -115,13 +115,13 @@ define([
 
                 $(window)
                 .on('keyup' + '.' + this.getName(), function (e) {
-                    var context;
+                    var testData;
                     if (e.key === 'PrintScreen') {
                         triggerCopyEvent();
-                        context = testRunner.getTestContext();
+                        testData = testRunner.getTestData();
                         testRunner
                             .trigger('prohibited-key', 'PrintScreen');
-                        if (context.securePauseStateRequired) {
+                        if (testData.securePauseStateRequired) {
                             testRunner.trigger('pause', {
                                     message: printScreenPauseMessage,
                                     reasons: {
