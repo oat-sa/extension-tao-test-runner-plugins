@@ -1,43 +1,45 @@
+/**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2014-2018 (original work) Open Assessment Technologies SA;
+ */
+
+/**
+ * configure the extension bundles
+ * @author Bertrand Chevrier <bertrand@taotesting.com>
+ */
 module.exports = function(grunt) {
     'use strict';
 
-    var root        = grunt.option('root');
-    var libs        = grunt.option('mainlibs');
-    var ext         = require(root + '/tao/views/build/tasks/helpers/extensions')(grunt, root);
-    var out         = 'output';
-
-    var testPlugins = ext.getExtensionSources('taoTestRunnerPlugins', [
-        'views/js/runner/plugins/**/*.js'
-    ], true);
-
-    var paths = {
-        'taoTestRunnerPlugins' : root + '/taoTestRunnerPlugins/views/js',
-        'taoTests' : root + '/taoTests/views/js',
-        'taoQtiTest' : root + '/taoQtiTest/views/js'
-    };
-
     grunt.config.merge({
-        requirejs: {
+        bundle : {
             taotestrunnerplugins : {
-                options: {
-                    paths : paths,
-                    include: testPlugins,
-                    exclude : ['json!i18ntr/messages.json'].concat(libs),
-                    out: out + "/testPlugins.min.js"
+                options : {
+                    extension : 'taoTestRunnerPlugins',
+                    outputDir : 'loader',
+                    dependencies : ['taoQtiTest', 'taoTests'],
+                    bundles : [{
+                        name : 'testPlugins',
+                        include: ['taoTestRunnerPlugins/runner/plugins/**/*'],
+                        dependencies : []
+                    }]
                 }
-            }
-        },
-
-        copy : {
-            taotestrunnerpluginsbundle : {
-                files: [
-                    { src: [out + '/testPlugins.min.js'],  dest: root + '/taoTestRunnerPlugins/views/js/loader/testPlugins.min.js' },
-                    { src: [out + '/testPlugins.min.js.map'],  dest: root + '/taoTestRunnerPlugins/views/js/loader/testPlugins.min.js.map' }
-                ]
             }
         }
     });
 
     // bundle task
-    grunt.registerTask('taotestrunnerpluginsbundle', ['clean:bundle', 'requirejs:taotestrunnerplugins', 'copy:taotestrunnerpluginsbundle']);
+    grunt.registerTask('taotestrunnerpluginsbundle', ['bundle:taotestrunnerplugins']);
 };
