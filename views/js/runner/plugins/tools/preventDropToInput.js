@@ -34,7 +34,8 @@ define([
      * @private
      */
     var _defaults = {
-        selector: 'input.qti-textEntryInteraction, .qti-extendedTextInteraction textarea'
+        selector: 'input.qti-textEntryInteraction, .qti-extendedTextInteraction textarea',
+        draggableSelector: 'img, image'
     };
 
     /**
@@ -57,7 +58,7 @@ define([
                     var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
                     var disabled = [];
 
-                    $('img')
+                    $(config.draggableSelector)
                         .off('.preventdropimg')
                         .on(namespaceHelper.namespaceAll('dragstart', 'preventdropimg'), function (event) {
                             _.forEach($items, function (el, key) {
@@ -74,7 +75,8 @@ define([
                             disabled = [];
                         });
                 }).on('destroy', function() {
-                    $('img').off('.preventdropimg');
+                    var config = _.defaults((self.getConfig() || {}), _defaults);
+                    $(config.draggableSelector).off('.preventdropimg');
                 });
         }
     });
