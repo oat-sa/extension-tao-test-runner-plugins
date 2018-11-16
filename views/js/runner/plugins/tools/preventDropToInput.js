@@ -34,16 +34,9 @@ define([
      * @private
      */
     var _defaults = {
-        selector: 'input.qti-textEntryInteraction, .qti-extendedTextInteraction textarea'
+        selector: 'input.qti-textEntryInteraction, .qti-extendedTextInteraction textarea',
+        draggableSelector: 'img, image'
     };
-
-    /**
-     * Lower case only
-     * @type {string[]}
-     */
-    var restrictedTags = [
-        'img'
-    ];
 
     /**
      * Creates the preventDragDrop plugin
@@ -63,37 +56,27 @@ define([
                 .after('renderitem', function () {
                     var config = _.defaults((self.getConfig() || {}), _defaults);
                     var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
-                    var dropped, disabled;
+                    var disabled = [];
 
-                    $('img')
+                    $(config.draggableSelector)
                         .off('.preventdropimg')
                         .on(namespaceHelper.namespaceAll('dragstart', 'preventdropimg'), function (event) {
-                            dropped = event.target;
+                            _.forEach($items, function (el, key) {
+                                var $el = $(el);
+                                disabled[key] = !!$el.prop('disabled');
+                                $el.prop('disabled', true);
+                            });
                         })
                         .on(namespaceHelper.namespaceAll('dragend', 'preventdropimg'), function (event) {
-                            dropped = null;
-                            if (_.isObject(disabled)) {
-                                disabled.prop('disabled', false);
-                            }
-                        });
-
-                    $items
-                        .off('.preventdropimg')
-                        // Drop event doesn't work in case that ExtendedTextInteraction is included
-                        // so for the prevent dropping - just make element as disabled, the restore its state
-                        .on(namespaceHelper.namespaceAll('dragover', 'preventdropimg'), function (event) {
-                            // if img then I don't want to do drop
-                            if (_.isObject(dropped) && _.contains(restrictedTags, dropped.tagName.toLowerCase())) {
-                                disabled = $(event.target);
-                                if (disabled.length) {
-                                    disabled.prop('disabled', true);
-                                }
-                            }
+                            _.forEach($items, function (el, key) {
+                                var $el = $(el);
+                                $el.prop('disabled', disabled[key]);
+                            });
+                            disabled = [];
                         });
                 }).on('destroy', function() {
                     var config = _.defaults((self.getConfig() || {}), _defaults);
-                    var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
-                    $items.off('.preventdropimg');
+                    $(config.draggableSelector).off('.preventdropimg');
                 });
         }
     });
