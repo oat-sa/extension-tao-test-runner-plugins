@@ -101,24 +101,45 @@ define([
                 }
             };
 
+            //simple function to check if iframe belongs to ckeditor instance
+            var isCkEditorIframe = function isCkEditorIframe(elt) {
+                return elt.className.indexOf('cke_') !== -1;
+            };
+
+            //moved iframe handle functions (next 2) from inline, just to avoid code duplication
+            var handleInnerWindowFocus = function handleInnerWindowFocus(){
+                innerFocus = true;
+            };
+
+            var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(){
+                innerFocus = false;
+                _.defer(function(){
+                    if(!mainFocus && !innerFocus){
+                        //the inner window has lost the focus and no one else has it
+                        doPause();
+                    }
+                });
+            };
+
             var handleIframesFocus = function handleIframesFocus(){
 
                 //all iframe that could be within the item
                 self.getAreaBroker().getContainer().find('iframe').each(function(){
                     try {
-                        this.contentWindow.addEventListener('focus', function handleInnerWindowFocus(){
-                            innerFocus = true;
-                        });
 
-                        this.contentWindow.addEventListener('blur', function handleInnerWindowFocusLoose(){
-                            innerFocus = false;
-                            _.defer(function(){
-                                if(!mainFocus && !innerFocus){
-                                    //the inner window has lost the focus and no one else has it
-                                    doPause();
-                                }
-                            });
-                        });
+                        if (isCkEditorIframe(this)) {
+                            var instanceIdentifier = this.title.substr(this.title.indexOf('editor'));
+                            var editor = window.CKEDITOR.instances[instanceIdentifier];
+
+                            editor.on('focus', handleInnerWindowFocus);
+
+                            editor.on('blur', handleInnerWindowFocusLoose);
+                        } else {
+                            this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
+
+                            this.contentWindow.addEventListener('blur', handleInnerWindowFocusLoose);
+                        }
+                        // console.log(this, this.contentWindow, $res, $res2);
                     } catch(permissionError) {
                         //in case of iframe with a different origin we can't access the contentWindow
                     }
