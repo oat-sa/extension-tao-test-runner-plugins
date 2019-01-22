@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE structures SYSTEM "../../tao/doc/structures.dtd">
 <structures>
+    <structure id="tools" name="Tools" level="18" group="settings">
+        <description/>
+        <icon id="icon-tools" src=""/>
+        <sections>
+            <section id="settings-upload-offline" name="Upload offline test completion" url="/taoTestRunnerPlugins/OfflineResultImport/index"/>
+        </sections>
+    </structure>
 </structures>
