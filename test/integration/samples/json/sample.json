@@ -1,0 +1,323 @@
+{
+  "timestamp": 1546612795762,
+  "testData": {
+    "title": "Test 2",
+    "identifier": "Test-2",
+    "className": "assessmentTest",
+    "toolName": "tao",
+    "exclusivelyLinear": true,
+    "hasTimeLimits": true,
+    "states": {
+      "initial": 0,
+      "interacting": 1,
+      "modalFeedback": 2,
+      "suspended": 3,
+      "closed": 4
+    },
+    "itemStates": {
+      "initial": 0,
+      "interacting": 1,
+      "modalFeedback": 2,
+      "suspended": 3,
+      "closed": 4,
+      "solution": 5,
+      "review": 6,
+      "notSelected": 255
+    },
+    "timeLimits": {
+      "maxTime": {
+        "duration": 7200,
+        "iso": "PT2H"
+      }
+    },
+    "config": {
+      "timerWarning": {
+        "assessmentItemRef": null,
+        "assessmentSection": null,
+        "testPart": null,
+        "assessmentTest": null
+      },
+      "catEngineWarning": null,
+      "progressIndicator": {
+        "type": "percentage",
+        "renderer": "percentage",
+        "scope": "test",
+        "forced": false,
+        "showLabel": true,
+        "showTotal": true,
+        "categories": []
+      },
+      "review": {
+        "enabled": true,
+        "scope": "test",
+        "useTitle": true,
+        "forceTitle": false,
+        "forceInformationalTitle": false,
+        "showLegend": true,
+        "defaultOpen": true,
+        "itemTitle": "Item %d",
+        "informationalItemTitle": "Instructions",
+        "preventsUnseen": true,
+        "canCollapse": false,
+        "displaySubsectionTitle": true,
+        "allowSkipahead": false
+      },
+      "exitButton": false,
+      "nextSection": false,
+      "plugins": {
+        "answer-masking": {
+          "restoreStateOnToggle": true,
+          "restoreStateOnMove": true,
+          "hostName": "testRunner"
+        },
+        "overlay": {
+          "full": false,
+          "hostName": "testRunner"
+        },
+        "collapser": {
+          "collapseTools": true,
+          "collapseNavigation": false,
+          "collapseInOrder": false,
+          "hover": false,
+          "collapseOrder": []
+        },
+        "magnifier": {
+          "zoomMin": 2,
+          "zoomMax": 8,
+          "zoomStep": 0.5,
+          "hostName": "testRunner"
+        },
+        "calculator": {
+          "template": "",
+          "hostName": "testRunner"
+        }
+      },
+      "security": {
+        "csrfToken": true
+      },
+      "timer": {
+        "target": "server",
+        "resetAfterResume": false,
+        "keepUpToTimeout": false,
+        "restoreTimerFromClient": false
+      },
+      "enableAllowSkipping": true,
+      "enableValidateResponses": true,
+      "checkInformational": true,
+      "enableUnansweredItemsWarning": true,
+      "allowShortcuts": true,
+      "shortcuts": {
+        "calculator": {
+          "toggle": "C"
+        },
+        "zoom": {
+          "in": "I",
+          "out": "O"
+        },
+        "comment": {
+          "toggle": "A"
+        },
+        "itemThemeSwitcher": {
+          "toggle": "T"
+        },
+        "review": {
+          "toggle": "R",
+          "flag": "M"
+        },
+        "keyNavigation": {
+          "previous": "Shift+Tab",
+          "next": "Tab"
+        },
+        "next": {
+          "trigger": "J"
+        },
+        "previous": {
+          "trigger": "K"
+        },
+        "dialog": [],
+        "magnifier": {
+          "toggle": "L",
+          "in": "Shift+I",
+          "out": "Shift+O",
+          "close": "esc"
+        },
+        "highlighter": {
+          "toggle": "Shift+U"
+        },
+        "area-masking": {
+          "toggle": "Y"
+        },
+        "line-reader": {
+          "toggle": "G"
+        },
+        "answer-masking": {
+          "toggle": "D"
+        }
+      },
+      "itemCaching": {
+        "enabled": true,
+        "amount": 3
+      },
+      "guidedNavigation": false
+    }
+  },
+  "testConfig": {
+    "exitUrl": "http://sample.local/taoDelivery/DeliveryServer/index",
+    "testDefinition": "http://sample/first.rdf#i1544535042652725",
+    "testCompilation": "http://sample/first.rdf#i1544535107181528-|http://sample/first.rdf#i1544535107965629+",
+    "serviceCallId": "http://sample/first.rdf#i154661273822140",
+    "deliveryServerConfig": [],
+    "bootstrap": {
+      "serviceExtension": "taoQtiTest",
+      "serviceController": "Runner",
+      "timeout": 0,
+      "communication": {
+        "enabled": true,
+        "type": "poll",
+        "extension": null,
+        "controller": null,
+        "action": "messages",
+        "syncActions": [
+          "move",
+          "skip",
+          "storeTraceData",
+          "timeout",
+          "exitTest"
+        ],
+        "service": null,
+        "params": []
+      }
+    },
+    "provider": "qti",
+    "proxyProvider": "preCachingProxy",
+    "renderTo": {
+      "0": {
+        "sizcache07181890587788555": "5.3.83",
+        "sizset": false
+      },
+      "length": 1,
+      "prevObject": {
+        "0": {
+          "location": {
+            "href": "http://sample.local/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+            "ancestorOrigins": {},
+            "origin": "http://sample.local",
+            "protocol": "http:",
+            "host": "sample.local",
+            "hostname": "sample.local",
+            "port": "",
+            "pathname": "/taoDelivery/DeliveryServer/runDeliveryExecution",
+            "search": "?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+            "hash": ""
+          },
+          "jQuery180038539095036168036": 3
+        },
+        "context": {
+          "location": {
+            "href": "http://sample.local/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+            "ancestorOrigins": {},
+            "origin": "http://sample.local",
+            "protocol": "http:",
+            "host": "sample.local",
+            "hostname": "sample.local",
+            "port": "",
+            "pathname": "/taoDelivery/DeliveryServer/runDeliveryExecution",
+            "search": "?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+            "hash": ""
+          },
+          "jQuery180038539095036168036": 3
+        },
+        "length": 1
+      },
+      "context": {
+        "location": {
+          "href": "http://sample.local/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+          "ancestorOrigins": {},
+          "origin": "http://sample.local",
+          "protocol": "http:",
+          "host": "sample.local",
+          "hostname": "sample.local",
+          "port": "",
+          "pathname": "/taoDelivery/DeliveryServer/runDeliveryExecution",
+          "search": "?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+          "hash": ""
+        },
+        "jQuery180038539095036168036": 3
+      },
+      "selector": ".runner"
+    }
+  },
+  "actionQueue": [
+    {
+      "action": "move",
+      "timestamp": 1546612781734,
+      "parameters": {
+        "itemDefinition": "item-1",
+        "itemResponse": "{\"RESPONSE\":{\"base\":null}}",
+        "itemState": "{\"RESPONSE\":{\"response\":{\"base\":null}}}",
+        "direction": "next",
+        "scope": "item",
+        "itemDuration": 25.051399999996647,
+        "start": true,
+        "actionId": "move_1546612781729",
+        "testDefinition": "http://sample/first.rdf#i1544535042652725",
+        "testCompilation": "http://sample/first.rdf#i1544535107181528-|http://sample/first.rdf#i1544535107965629+",
+        "serviceCallId": "http://sample/first.rdf#i154661273822140",
+        "offline": true
+      }
+    },
+    {
+      "action": "move",
+      "timestamp": 1546612782342,
+      "parameters": {
+        "itemDefinition": "item-2",
+        "itemResponse": "{\"RESPONSE\":{\"list\":{\"identifier\":[]}}}",
+        "itemState": "{\"RESPONSE\":{\"response\":{\"list\":{\"identifier\":[]}},\"order\":[\"Prehistory\",\"ModernEra\",\"Antiquity\",\"MiddleAges\",\"ContemporaryEra\"]}}",
+        "direction": "next",
+        "scope": "item",
+        "itemDuration": 0,
+        "start": true,
+        "actionId": "move_1546612782338",
+        "testDefinition": "http://sample/first.rdf#i1544535042652725",
+        "testCompilation": "http://sample/first.rdf#i1544535107181528-|http://sample/first.rdf#i1544535107965629+",
+        "serviceCallId": "http://sample/first.rdf#i154661273822140",
+        "offline": true
+      }
+    },
+    {
+      "action": "move",
+      "timestamp": 1546612783047,
+      "parameters": {
+        "itemDefinition": "item-3",
+        "itemResponse": "{\"RESPONSE\":{\"base\":{\"integer\":0}}}",
+        "itemState": "{\"RESPONSE\":{\"response\":{\"base\":{\"integer\":0}}}}",
+        "direction": "next",
+        "scope": "item",
+        "itemDuration": 0,
+        "start": true,
+        "actionId": "move_1546612783041",
+        "testDefinition": "http://sample/first.rdf#i1544535042652725",
+        "testCompilation": "http://sample/first.rdf#i1544535107181528-|http://sample/first.rdf#i1544535107965629+",
+        "serviceCallId": "http://sample/first.rdf#i154661273822140",
+        "offline": true
+      }
+    },
+    {
+      "action": "move",
+      "timestamp": 1546612784553,
+      "parameters": {
+        "itemDefinition": "item-4",
+        "itemResponse": "{\"RESPONSE\":{\"list\":{\"directedPair\":[]}}}",
+        "itemState": "{\"RESPONSE\":{\"response\":{\"list\":{\"directedPair\":[]}},\"order\":[[\"C\",\"D\",\"P\",\"L\"],[\"R\",\"T\",\"M\"]]}}",
+        "direction": "next",
+        "scope": "item",
+        "itemDuration": 1.0027999999001622,
+        "start": true,
+        "actionId": "move_1546612784550",
+        "testDefinition": "http://sample/first.rdf#i1544535042652725",
+        "testCompilation": "http://sample/first.rdf#i1544535107181528-|http://sample/first.rdf#i1544535107965629+",
+        "serviceCallId": "http://sample/first.rdf#i154661273822140"
+      }
+    }
+  ]
+}
