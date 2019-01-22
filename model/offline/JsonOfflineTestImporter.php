@@ -53,6 +53,9 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
     /** @var OfflineTestParser */
     private $offlineParser;
 
+    /** @var Report */
+    private $report;
+
     /**
      * Returns a textual description of the import format
      *
@@ -89,7 +92,8 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
             $uploadedFile = $this->fetchUploadedFile($form);
         }
 
-        $report = Report::createInfo(__('Test actions importing'));
+        $this->report = Report::createInfo(__('Test actions importing'));
+
         try {
 
             switch ($uploadedFile->getMimeType()) {
@@ -110,14 +114,14 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
             $successReport->setData([
                 'uriResource' => $this->getOfflineParser()->getSessionId()
             ]);
-            $report->add($successReport);
+            $this->report->add($successReport);
 
         } catch (\Exception $e) {
-            $report = Report::createFailure(__('Fail to import test actions with message: '. $e->getMessage()));
+            $this->report = Report::createFailure(__('Fail to import test actions with message: '. $e->getMessage()));
         }
         $this->getUploadService()->remove($uploadedFile);
 
-        return $report;
+        return $this->report;
     }
 
     /**
@@ -185,6 +189,11 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
     protected function importActions()
     {
         $data = $this->getOfflineParser()->getActionsQueue();
+
+        if (!$data) {
+            throw new \common_Exception(__('Cannot find any actions for importing.'));
+        }
+
         $input[] = [
             'channel' => 'sync',
             'message' => $data
@@ -213,6 +222,13 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
 
         $this->getCommunicationService()->processInput($serviceContext, $input);
         $deliveryExecution->setState(DeliveryExecutionInterface::STATE_FINISHED);
+        $successReport = Report::createSuccess(
+            __('%s actions were successfully imported', sizeof($data))
+        );
+        $successReport->setData([
+            'uriResource' => $this->getOfflineParser()->getSessionId()
+        ]);
+        $this->report->add($successReport);
     }
 
     /**

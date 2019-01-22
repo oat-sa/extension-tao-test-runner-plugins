@@ -23,8 +23,8 @@ use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
-use oat\taoOutcomeUi\model\offline\JsonOfflineTestImporter;
-use oat\taoOutcomeUi\model\offline\OfflineTestParser;
+use oat\taoTestRunnerPlugins\model\offline\JsonOfflineTestImporter;
+use oat\taoTestRunnerPlugins\model\offline\OfflineTestParser;
 use oat\taoQtiTest\models\runner\communicator\QtiCommunicationService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
@@ -50,7 +50,7 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
 
         $this->assertInstanceOf('common_report_Report', $report);
         $this->assertEquals(common_report_Report::TYPE_INFO, $report->getType());
-        $this->assertEquals(1, count($report->getSuccesses()));
+        $this->assertEquals(2, count($report->getSuccesses()));
     }
     /**
      * @param $path
