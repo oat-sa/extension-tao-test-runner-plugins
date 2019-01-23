@@ -50,7 +50,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
     /** @var QtiRunnerServiceContext */
     private $serviceContext;
 
-    /** @var OfflineTestParser */
+    /** @var OfflineTestParserInterface */
     private $offlineParser;
 
     /** @var Report */
@@ -162,7 +162,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
     }
 
     /**
-     * @return OfflineTestParser
+     * @return OfflineTestParserInterface
      */
     protected function getOfflineParser()
     {
@@ -213,7 +213,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
         $testSession = $serviceContext->getTestSession();
 
         $testSession->setVariable(new OutcomeVariable(
-            OfflineTestParser::IS_OFFLINE_VARIABLE,
+            OfflineTestParserInterface::IS_OFFLINE_VARIABLE,
             Cardinality::SINGLE,
             BaseType::FLOAT,
             new QtiFloat(1.0))

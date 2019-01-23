@@ -24,7 +24,7 @@ use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoTestRunnerPlugins\model\offline\JsonOfflineTestImporter;
-use oat\taoTestRunnerPlugins\model\offline\OfflineTestParser;
+use oat\taoTestRunnerPlugins\model\offline\OfflineTestParserInterface;
 use oat\taoQtiTest\models\runner\communicator\QtiCommunicationService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
@@ -96,7 +96,7 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
         $assessmentTestSession = $this->prophesize(AssessmentTestSession::class);
         $assessmentTestSession->setVariable(
             new OutcomeVariable(
-                OfflineTestParser::IS_OFFLINE_VARIABLE,
+                OfflineTestParserInterface::IS_OFFLINE_VARIABLE,
                 Cardinality::SINGLE,
                 BaseType::FLOAT,
                 new QtiFloat(1.0)

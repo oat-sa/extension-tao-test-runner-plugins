@@ -24,10 +24,10 @@ namespace oat\taoTestRunnerPlugins\model\offline;
 use oat\oatbox\filesystem\File;
 
 /**
- * Interface OfflineTestParser
+ * Interface OfflineTestParserInterface
  * @package oat\taoTestRunnerPlugins\model\offline
  */
-interface OfflineTestParser
+interface OfflineTestParserInterface
 {
     const IS_OFFLINE_VARIABLE = 'WasCompletedOffline';
 

@@ -27,7 +27,7 @@ use oat\oatbox\filesystem\File;
  * Class JsonOfflineTestParser
  * @package oat\taoTestRunnerPlugins\model\offline
  */
-class JsonOfflineTestParser implements OfflineTestParser
+class JsonOfflineTestParser implements OfflineTestParserInterface
 {
     /** @var string */
     private $content;
