@@ -50,7 +50,7 @@ class JsonOfflineTestParser implements OfflineTestParser
     /**
      * @return array
      */
-    public function getBody()
+    protected function getBody()
     {
         if (!$this->body || !is_array($this->body)) {
             $this->body = json_decode($this->getContent(), true);
@@ -61,7 +61,7 @@ class JsonOfflineTestParser implements OfflineTestParser
     /**
      * @return File
      */
-    public function getFile()
+    protected function getFile()
     {
         return $this->file;
     }

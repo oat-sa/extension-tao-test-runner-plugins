@@ -24,9 +24,9 @@ namespace oat\taoTestRunnerPlugins\model\offline;
 use common_report_Report as Report;
 use oat\oatbox\filesystem\File;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
-use oat\taoDelivery\model\execution\Service;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoQtiTest\models\runner\communicator\QtiCommunicationService;
+use oat\taoQtiTest\models\runner\communicator\SyncChannel;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
 use qtism\common\datatypes\QtiFloat;
@@ -195,7 +195,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
         }
 
         $input[] = [
-            'channel' => 'sync',
+            'channel' => SyncChannel::CHANNEL_NAME,
             'message' => $data
         ];
 
@@ -223,7 +223,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
         $this->getCommunicationService()->processInput($serviceContext, $input);
         $deliveryExecution->setState(DeliveryExecutionInterface::STATE_FINISHED);
         $successReport = Report::createSuccess(
-            __('%s actions were successfully imported', sizeof($data))
+            __('%s actions were successfully imported', count($data))
         );
         $successReport->setData([
             'uriResource' => $this->getOfflineParser()->getSessionId()

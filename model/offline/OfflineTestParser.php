@@ -40,16 +40,6 @@ interface OfflineTestParser
     /**
      * @return array
      */
-    public function getBody();
-
-    /**
-     * @return File
-     */
-    public function getFile();
-
-    /**
-     * @return array
-     */
     public function getActionsQueue();
 
     /**
