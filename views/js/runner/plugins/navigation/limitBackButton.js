@@ -17,7 +17,7 @@
  */
 
 /**
- * Plugin that limits the use of the back button only when there is no responses in the current item.
+ * This is a plugin that limits the use of the back button only when there is no responses in the current item.
  * So, if the user has entered a response to any interaction then the back button will be disabled.
  *
  * We can check if an interaction is already answered by listening to `responsechange` on item runner,
@@ -43,6 +43,11 @@
  *
  * Custom listeners will be added to the remaining interactions:
  *      - upload
+ *      - audio recording
+ *      - likert scale
+ *      - liquids
+ *
+ * Special listeners
  *      - number pad for text entry
  *
  * @author Ricardo Proença <ricardo@taotesting.com>
@@ -66,9 +71,11 @@ define([
         var self = this;
         this.disableState = true;
 
-        this.storage.setItem(getItemKey(itemIdentifier), this.disableState).then(function () {
-            toggleBackButton(testRunner, self.disableState);
-        });
+        if (!self.isNavigationTriggered) {
+            this.storage.setItem(getItemKey(itemIdentifier), this.disableState).then(function () {
+                toggleBackButton(testRunner, self.disableState);
+            });
+        }
     };
 
     /**
@@ -120,8 +127,11 @@ define([
             return testRunner.getPluginStore(this.getName()).then(function (store) {
                 self.storage = store;
                 self.disableState = false;
+                // Some PCI triggers responsechange at navigation events, and we don't want to change state when moving
+                self.isNavigationTriggered = false;
 
                 testRunner.before('move.' + self.getName(), function (e, direction) {
+                    self.isNavigationTriggered = true;
                     if (direction === "previous" && self.disableState) {
                         return Promise.reject();
                     }
@@ -140,7 +150,11 @@ define([
                     .after('renderitem', function (itemIdentifier, itemData) {
                         var itemRunner = testRunner.itemRunner;
 
-                        itemRunner.on('responsechange', updateState.bind(self, testRunner, itemIdentifier));
+                        itemRunner.before('statechange', updateState.bind(self, testRunner, itemIdentifier));
+
+                        itemRunner.after('statechange', function () {
+                            self.isNavigationTriggered = false;
+                        });
 
                         // add custom interaction listeners
                         var interactions = itemData.content.data.body.elements;
