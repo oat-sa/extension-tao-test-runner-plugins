@@ -34,8 +34,6 @@ define([
 
     var defaultEventName = "change";
 
-    var itemInteractions = {};
-
     var customListeners = [
         {
             selector: ".widget-numpad",
@@ -65,11 +63,9 @@ define([
             $element.off("." + pluginName);
         });
 
-        _.forEach(itemInteractions, function (interaction) {
-            var selector = "[data-serial='" + interaction.serial + "']";
-            var $element = testRunner.getAreaBroker().getContentArea().find(selector);
-
-            $element.off("." + pluginName);
+        var itemInteractions = testRunner.getAreaBroker().getContentArea().find('.qti-interaction');
+        _.forEach(itemInteractions, function (element) {
+            $(element).off("." + pluginName);
         });
     };
 
@@ -96,12 +92,12 @@ define([
                     disableState ? previous.disable() : previous.enable();
                 };
 
-                var createListener = function createListener(element, eventName) {
+                var createListener = function createListener($element, eventName) {
                     var event = eventName
                         ? eventName + "." + pluginName
                         : defaultEventName + "." + pluginName;
 
-                    element.on(event, function () {
+                    $element.on(event, function () {
                         testRunner.itemRunner.trigger("responsechange." + pluginName);
                     });
                 };
@@ -145,12 +141,9 @@ define([
                             createListener($element, plugin.eventName);
                         });
 
-                        itemInteractions = itemData.content.data.body.elements;
-                        _.forEach(itemInteractions, function (interaction) {
-                            var selector = "[data-serial='" + interaction.serial + "']";
-                            var $element = self.getAreaBroker().getContentArea().find(selector);
-
-                            createListener($element);
+                        var itemInteractions = self.getAreaBroker().getContentArea().find('.qti-interaction');
+                        _.forEach(itemInteractions, function (element) {
+                            createListener($(element));
                         });
                     })
                     .on("loaditem", function (itemIdentifier) {
