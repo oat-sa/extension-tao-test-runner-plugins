@@ -46,6 +46,18 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'tags' => [ ]
             ]
         ],
+        'navigation' => [
+            [
+                'id' => 'limitBackButton',
+                'name' => 'Limit Back Button',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/navigation/limitBackButton',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Limit back button to items with responses',
+                'category' => 'navigation',
+                'active' => false,
+                'tags' => []
+            ]
+        ],
         'probes' => [
             [
                 'id' => 'latencyEvents',
