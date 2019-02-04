@@ -24,20 +24,20 @@
  * @author Ricardo Proença <ricardo@taotesting.com>
  */
 define([
-    "jquery",
-    "lodash",
+    'jquery',
+    'lodash',
     'taoTests/runner/plugin'
 ], function ($, _, pluginFactory) {
     'use strict';
 
-    var pluginName = "limitBackButton";
+    var pluginName = 'limitBackButton';
 
-    var defaultEventName = "change";
+    var defaultEventName = 'change';
 
     var customListeners = [
         {
-            selector: ".widget-numpad",
-            eventName: "click"
+            selector: '.widget-numpad',
+            eventName: 'click'
         }
     ];
 
@@ -48,7 +48,7 @@ define([
      * @returns {string}
      */
     var getItemKey = function getItemKey(itemIdentifier) {
-        return itemIdentifier + "-limit-back-button";
+        return itemIdentifier + '-limit-back-button';
     };
 
     /**
@@ -57,16 +57,14 @@ define([
      * @param {Object} testRunner - test runner, needed to find interactions elements
      */
     var removeAllListeners = function removeAllListeners(testRunner) {
+        var areaBroker = testRunner.getAreaBroker();
         _.forEach(customListeners, function (plugin) {
-            var $element = testRunner.getAreaBroker().getContainer().find(plugin.selector);
+            var $element = areaBroker.getContainer().find(plugin.selector);
 
-            $element.off("." + pluginName);
+            $element.off('.' + pluginName);
         });
 
-        var itemInteractions = testRunner.getAreaBroker().getContentArea().find('.qti-interaction');
-        _.forEach(itemInteractions, function (element) {
-            $(element).off("." + pluginName);
-        });
+        areaBroker.getContentArea().find('.qti-interaction').off('.' + pluginName);
     };
 
     /**
@@ -87,7 +85,7 @@ define([
                 var processingMoveAction = false;
 
                 var toggleBackButton = function toggleBackButton() {
-                    var previous = testRunner.getPlugin("previous");
+                    var previous = testRunner.getPlugin('previous');
 
                     disableState ? previous.disable() : previous.enable();
                 };
@@ -98,35 +96,36 @@ define([
                         : defaultEventName + "." + pluginName;
 
                     $element.on(event, function () {
-                        testRunner.itemRunner.trigger("responsechange." + pluginName);
+                        testRunner.itemRunner.trigger('responsechange.' + pluginName);
                     });
                 };
 
-                testRunner.before("move." + pluginName, function (e, direction) {
+                testRunner.before('move.' + pluginName, function (e, direction) {
                     processingMoveAction = true;
-                    if (direction === "previous" && disableState) {
+                    if (direction === 'previous' && disableState) {
                         return Promise.reject();
                     }
                 });
 
-                testRunner.after("enablenav." + pluginName, function () {
+                testRunner.after('enablenav.' + pluginName, function () {
                     toggleBackButton(disableState);
                 });
 
-                testRunner.after("disablenav." + pluginName, function () {
+                testRunner.after('disablenav.' + pluginName, function () {
                     if (disableState) {
-                        testRunner.trigger("enablenav");
+                        testRunner.trigger('enablenav');
                     }
                 });
 
                 testRunner
-                    .after("renderitem", function (itemIdentifier, itemData) {
+                    .after('renderitem', function (itemIdentifier) {
                         var self = this;
                         var itemRunner = testRunner.itemRunner;
+                        var $itemInteractions;
 
                         processingMoveAction = false;
 
-                        itemRunner.on("responsechange." + pluginName, function () {
+                        itemRunner.on('responsechange.' + pluginName, function () {
                             if (!processingMoveAction) {
                                 disableState = true;
                                 store
@@ -141,12 +140,10 @@ define([
                             createListener($element, plugin.eventName);
                         });
 
-                        var itemInteractions = self.getAreaBroker().getContentArea().find('.qti-interaction');
-                        _.forEach(itemInteractions, function (element) {
-                            createListener($(element));
-                        });
+                        $itemInteractions = self.getAreaBroker().getContentArea().find('.qti-interaction');
+                        createListener($itemInteractions);
                     })
-                    .on("loaditem", function (itemIdentifier) {
+                    .on('loaditem', function (itemIdentifier) {
                         store
                             .getItem(getItemKey(itemIdentifier))
                             .then(function (val) {
@@ -154,7 +151,7 @@ define([
                                 toggleBackButton();
                             });
                     })
-                    .on("beforeunloaditem", function () {
+                    .on('beforeunloaditem', function () {
                         removeAllListeners(testRunner);
                     });
             });
