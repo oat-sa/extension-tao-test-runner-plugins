@@ -48,10 +48,10 @@ class Updater extends common_ext_ExtensionUpdater
     {
         $this->skip('0.1.0', '1.0.0');
 
-        if($this->isVersion('1.0.0')){
+        if ($this->isVersion('1.0.0')) {
             $registry = PluginRegistry::getRegistry();
-            foreach($registry->getMap() as $module => $plugin){
-                if(preg_match("/^taoTestRunnerPlugins/", $module) && is_null($plugin['bundle'])){
+            foreach ($registry->getMap() as $module => $plugin) {
+                if (preg_match("/^taoTestRunnerPlugins/", $module) && is_null($plugin['bundle'])) {
                     $plugin['bundle'] = 'taoTestRunnerPlugins/loader/testPlugins.min';
                     $registry->register(TestPlugin::fromArray($plugin));
                 }
@@ -82,7 +82,7 @@ class Updater extends common_ext_ExtensionUpdater
                         'description' => 'Register metrics',
                         'category' => 'probes',
                         'active' => true,
-                        'tags' => [  ]
+                        'tags' => []
                     ]
                 ],
                 'security' => [
@@ -104,7 +104,7 @@ class Updater extends common_ext_ExtensionUpdater
                         'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
                         'category' => 'security',
                         'active' => true,
-                        'tags' => [  ]
+                        'tags' => []
                     ],
                     [
                         'id' => 'disableCommands',
@@ -132,15 +132,15 @@ class Updater extends common_ext_ExtensionUpdater
                         'description' => 'Force the test in full screen mode',
                         'category' => 'security',
                         'active' => true,
-                        'tags' => [  ]
+                        'tags' => []
                     ]
                 ]
             ];
 
             $registry = PluginRegistry::getRegistry();
 
-            foreach($plugins as $categoryPlugins) {
-                foreach($categoryPlugins as $pluginData){
+            foreach ($plugins as $categoryPlugins) {
+                foreach ($categoryPlugins as $pluginData) {
                     $registry->register(TestPlugin::fromArray($pluginData));
                 }
             }
@@ -149,7 +149,7 @@ class Updater extends common_ext_ExtensionUpdater
         }
         $this->skip('1.5.0', '1.7.0');
 
-        if($this->isVersion('1.7.0')){
+        if ($this->isVersion('1.7.0')) {
             $registry = PluginRegistry::getRegistry();
 
             $registry->register(TestPlugin::fromArray([
@@ -227,5 +227,22 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('1.15.0', '2.2.0');
+
+        if ($this->isVersion('2.2.0')) {
+            $registry = PluginRegistry::getRegistry();
+
+            $registry->register(TestPlugin::fromArray([
+                'id' => 'limitBackButton',
+                'name' => 'Limit Back Button',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/navigation/limitBackButton',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Limit back button to items with responses',
+                'category' => 'navigation',
+                'active' => false,
+                'tags' => []
+            ]));
+
+            $this->setVersion('2.3.0');
+        }
     }
 }
