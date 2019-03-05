@@ -25,11 +25,6 @@ use tao_actions_CommonModule;
 
 class Delivery extends tao_actions_CommonModule
 {
-
-    public function __construct()
-    {
-    }
-
     public function index() {
         $this->setView('Delivery/index.tpl');
     }
