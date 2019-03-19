@@ -19,6 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
+
     'lodash',
     'core/eventifier',
     'core/promise',
@@ -28,30 +29,27 @@ define([
 
     QUnit.module('API');
 
-
     QUnit.test('module', function(assert) {
-        QUnit.expect(1);
-        assert.equal(typeof latency, 'object', "The module exposes an object");
+        assert.expect(1);
+        assert.equal(typeof latency, 'object', 'The module exposes an object');
     });
 
-
-    QUnit.cases([
-        { title : 'init' },
-        { title : 'getTimerValue' },
-        { title : 'hasCaptureProcessor' },
-        { title : 'registerCaptureProcessor' },
-        { title : 'applyCaptureProcessor' },
-        { title : 'removeCaptureProcessor' }
+    QUnit.cases.init([
+        {title: 'init'},
+        {title: 'getTimerValue'},
+        {title: 'hasCaptureProcessor'},
+        {title: 'registerCaptureProcessor'},
+        {title: 'applyCaptureProcessor'},
+        {title: 'removeCaptureProcessor'}
     ]).test('module has ', function(data, assert) {
-        QUnit.expect(1);
+        assert.expect(1);
         assert.equal(typeof latency[data.title], 'function', 'The probes latency object exposes a "' + data.title + '" function');
     });
 
-
     QUnit.module('Method');
 
-
-    QUnit.asyncTest('init', function(assert) {
+    QUnit.test('init', function(assert) {
+        var ready = assert.async();
         var probes = [{
             name: 'init',
             events: 'init',
@@ -129,10 +127,10 @@ define([
             }
         };
         var testRunner = eventifier({
-            getProxy: function () {
+            getProxy: function() {
                 return {
-                    sendVariables: function (trace) {
-                        var traceData = _.indexBy(probeData, function (entry) {
+                    sendVariables: function(trace) {
+                        var traceData = _.indexBy(probeData, function(entry) {
                             return (entry.marker ? entry.marker + '-' : '') + entry.type + '-' + entry.id;
                         });
                         assert.deepEqual(trace, traceData, 'The trace data should have been provided');
@@ -145,15 +143,15 @@ define([
             getTestContext: function() {
                 return testContext;
             },
-            getProbeOverseer: function () {
+            getProbeOverseer: function() {
                 return {
-                    add: function (probe) {
+                    add: function(probe) {
                         assert.equal(typeof probe.capture, 'function', 'Check value of probe.capture for ' + probe.name);
 
                         testRunner.on(probe.events || probe.stopEvents, function() {
                             var trace = {
-                                id: idx ++,
-                                type : probe.name,
+                                id: idx++,
+                                type: probe.name,
                                 marker: probe.stopEvents ? 'stop' : null
                             };
                             if (probe.capture) {
@@ -165,7 +163,7 @@ define([
                             probeData.push(trace);
                         });
                     },
-                    flush: function () {
+                    flush: function() {
                         assert.ok(true, 'Flushing the probes data');
                         return Promise.resolve(probeData);
                     }
@@ -173,11 +171,11 @@ define([
             }
         });
 
-        QUnit.expect(18);
+        assert.expect(18);
 
         testRunner.after('exit', function() {
             assert.ok(true, 'Test runner exited');
-            QUnit.start();
+            ready();
         });
 
         latency.registerCaptureProcessor('captureCustom', function(runner, eventName, param1, param2) {
@@ -225,14 +223,14 @@ define([
         }, 250);
     });
 
-
-    QUnit.asyncTest('getTimerValue', function(assert) {
+    QUnit.test('getTimerValue', function(assert) {
+        var ready = assert.async();
         var testTimer = 20;
         var sectionTimer = 10;
         var testRunner = eventifier({
-            getProxy: function () {
+            getProxy: function() {
                 return {
-                    sendVariables: function () {}
+                    sendVariables: function() {}
                 };
             },
             getTestData: function() {
@@ -241,10 +239,10 @@ define([
             getTestContext: function() {
                 return testContext;
             },
-            getProbeOverseer: function () {
+            getProbeOverseer: function() {
                 return {
-                    add: function (probe) {},
-                    flush: function () {
+                    add: function(probe) {},
+                    flush: function() {
                         assert.ok(true, 'Flushing the probes data');
                         return Promise.resolve([]);
                     }
@@ -252,11 +250,11 @@ define([
             }
         });
 
-        QUnit.expect(9);
+        assert.expect(9);
 
         testRunner.after('exit', function() {
             assert.ok(true, 'Test runner exited');
-            QUnit.start();
+            ready();
         });
 
         assert.equal(latency.init(testRunner, []), latency, 'Initializing the probes');
@@ -291,23 +289,21 @@ define([
         }, 250);
     });
 
-
-    QUnit.cases([
-        { title : 'captureTest', has: true },
-        { title : 'captureAll', has: true },
-        { title : 'captureShortcut', has: true },
-        { title : 'captureFoo', has: false }
+    QUnit.cases.init([
+        {title: 'captureTest', has: true},
+        {title: 'captureAll', has: true},
+        {title: 'captureShortcut', has: true},
+        {title: 'captureFoo', has: false}
     ]).test('hasCaptureProcessor ', function(data, assert) {
-        QUnit.expect(1);
+        assert.expect(1);
         assert.equal(latency.hasCaptureProcessor(data.title), data.has, 'Check the capture processor "' + data.title + '"');
     });
-
 
     QUnit.test('registerCaptureProcessor', function(assert) {
         var name = 'captureFoo';
         var processor = function() {};
 
-        QUnit.expect(7);
+        assert.expect(7);
 
         assert.equal(latency.hasCaptureProcessor(name), false, 'The capture processor is not yet registered');
         assert.equal(latency.registerCaptureProcessor(name, processor), latency, 'Registering the processor');
@@ -330,7 +326,6 @@ define([
         }, 'Should throw an error if the processor is not a function');
     });
 
-
     QUnit.test('applyCaptureProcessor', function(assert) {
         var testRunner = {};
         var eventName = 'foo';
@@ -341,7 +336,7 @@ define([
             param: param
         };
 
-        QUnit.expect(6);
+        assert.expect(6);
 
         latency.registerCaptureProcessor('captureOne', function(tr, ev, other) {
             assert.equal(tr, testRunner, 'The test runner is provided');
@@ -366,12 +361,11 @@ define([
         }, 'Should throw an error if the name is empty');
     });
 
-
     QUnit.test('removeCaptureProcessor', function(assert) {
         var name = 'captureBar';
         var processor = function() {};
 
-        QUnit.expect(7);
+        assert.expect(7);
 
         assert.equal(latency.hasCaptureProcessor(name), false, 'The capture processor is not yet registered');
         assert.equal(latency.registerCaptureProcessor(name, processor), latency, 'Registering the processor');

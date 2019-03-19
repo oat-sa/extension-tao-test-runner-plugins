@@ -20,16 +20,12 @@
  */
 
 define([
+
     'jquery',
     'taoTests/runner/runner',
     'taoQtiTest/test/runner/mocks/providerMock',
     'taoTestRunnerPlugins/runner/plugins/navigation/limitBackButton'
-], function (
-    $,
-    runnerFactory,
-    providerMock,
-    pluginFactory
-) {
+], function($, runnerFactory, providerMock, pluginFactory) {
     'use strict';
 
     var pluginApi;
@@ -41,12 +37,12 @@ define([
      */
     QUnit.module('pluginFactory');
 
-    QUnit.test('module', 3, function (assert) {
+    QUnit.test('module', function(assert) {
         var runner = runnerFactory(providerName);
 
-        assert.equal(typeof pluginFactory, 'function', "The pluginFactory module exposes a function");
-        assert.equal(typeof pluginFactory(runner), 'object', "The plugin factory produces an instance");
-        assert.notStrictEqual(pluginFactory(runner), pluginFactory(runner), "The plugin factory provides a different instance on each call");
+        assert.equal(typeof pluginFactory, 'function', 'The pluginFactory module exposes a function');
+        assert.equal(typeof pluginFactory(runner), 'object', 'The plugin factory produces an instance');
+        assert.notStrictEqual(pluginFactory(runner), pluginFactory(runner), 'The plugin factory provides a different instance on each call');
     });
 
     pluginApi = [
@@ -61,8 +57,8 @@ define([
     ];
 
     QUnit
-        .cases(pluginApi)
-        .test('plugin API ', 1, function (data, assert) {
+        .cases.init(pluginApi)
+        .test('plugin API ', function(data, assert) {
             var runner = runnerFactory(providerName);
             var plugin = pluginFactory(runner);
             assert.equal(typeof plugin[data.name], 'function', 'The pluginFactory instances expose a "' + data.name + '" function');
