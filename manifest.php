@@ -22,10 +22,10 @@ return array(
     'label' => 'Manage test runner plugins',
     'description' =>  "Manage test runner's plugins",
     'license' => 'GPL-2.0',
-    'version' => '2.4.0',
+    'version' => '2.5.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
-        'tao'            => '>=30.0.0',
+        'tao'            => '>=31.0.0',
         'taoDelivery'    => '>=11.0.0',
         'taoDeliveryRdf' => '>=6.0.0',
         'taoQtiTest'     => '>=29.0.0',

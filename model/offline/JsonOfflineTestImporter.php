@@ -81,10 +81,11 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
     /**
      * @param \core_kernel_classes_Class $class
      * @param Form|array $form
+     * @param string|null $userId owner of the resource
      * @return Report
      * @throws \common_exception_Error
      */
-    public function import($class, $form)
+    public function import($class, $form, $userId = null)
     {
         if (isset($form['uploaded_file']) && $form['uploaded_file'] instanceof File) {
             $uploadedFile = $form['uploaded_file'];
