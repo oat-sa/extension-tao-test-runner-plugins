@@ -40,7 +40,7 @@ define([
 
     /**
      * Creates the defaultHeading plugin.
-     * Added h1 tag with default text in case if there is no h1 tags in test item
+     * Add h1 tag with default text in case if there is no h1 tags in test item
      * The tag will be visible only for screenreader devices
      */
     return pluginFactory({
