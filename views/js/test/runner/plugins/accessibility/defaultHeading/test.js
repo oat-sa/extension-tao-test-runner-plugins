@@ -38,6 +38,8 @@ define([
     });
 
     QUnit.test('module', function (assert) {
+        assert.expect(3);
+
         var runner = runnerFactory(providerName);
 
         assert.equal(typeof pluginFactory, 'function', 'The pluginFactory module exposes a function');
@@ -59,6 +61,8 @@ define([
     QUnit
         .cases.init(pluginApi)
         .test('plugin API ', function (data, assert) {
+            assert.expect(1);
+
             var runner = runnerFactory(providerName);
             var plugin = pluginFactory(runner);
 
@@ -66,6 +70,8 @@ define([
         });
 
     QUnit.test('init', function (assert) {
+        assert.expect(3);
+
         var runner = runnerFactory(providerName);
         var plugin = pluginFactory(runner);
 
@@ -85,6 +91,8 @@ define([
     });
 
     QUnit.test('destroy', function (assert) {
+        assert.expect(3);
+
         var runner = runnerFactory(providerName);
         var plugin = pluginFactory(runner);
 
