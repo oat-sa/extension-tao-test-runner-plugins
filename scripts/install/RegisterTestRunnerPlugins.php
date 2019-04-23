@@ -139,7 +139,19 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'active' => false,
                 'tags' => [ ]
             ]
-        ]
+        ],
+        'accessibility' => [
+            [
+                'id' => 'defaultHeading',
+                'name' => 'Default Heading',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/accessibility/defaultHeading',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Added h1 tag with default text in case if there is no h1 tags in test item. The tag will be visible only for screenreader devices',
+                'category' => 'accessibility',
+                'active' => false,
+                'tags' => [ ]
+            ]
+        ],
     ];
 
     /**

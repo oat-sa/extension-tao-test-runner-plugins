@@ -246,5 +246,22 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('2.3.0', '2.5.0');
+
+        if ($this->isVersion('2.5.0')) {
+            $registry = PluginRegistry::getRegistry();
+
+            $registry->register(TestPlugin::fromArray([
+                'id' => 'defaultHeading',
+                'name' => 'Default Heading',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/accessibility/defaultHeading',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Added h1 tag with default text in case if there is no h1 tags in test item. The tag will be visible only for screenreader devices',
+                'category' => 'accessibility',
+                'active' => false,
+                'tags' => [ ]
+            ]));
+
+            $this->setVersion('2.6.0');
+        }
     }
 }
