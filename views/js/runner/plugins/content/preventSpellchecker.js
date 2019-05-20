@@ -49,14 +49,17 @@ define([
          */
         init: function init() {
             var config = _.defaults((this.getConfig() || {}), _defaults);
+            var testRunner = this.getTestRunner();
 
-            this.getTestRunner()
+            testRunner
                 .after('renderitem', function () {
-                    $(config.selector).attr('spellcheck', 'off');
-                    $(config.selector).attr('autocorrect', 'off');
+                    var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
+                    $items.attr('spellcheck', 'false');
+                    $items.attr('autocorrect', 'off');
                 }).on('destroy', function() {
-                    $(config.selector).removeAttr('spellcheck');
-                    $(config.selector).removeAttr('autocorrect');
+                    var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
+                    $items.removeAttr('spellcheck');
+                    $items.removeAttr('autocorrect');
                 });
         },
     });
