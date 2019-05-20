@@ -22,10 +22,11 @@
  * Test Runner Tool Plugin : Prevent drop images to inputs
  */
 define([
+    'jquery',
     'lodash',
     'taoTests/runner/plugin',
     'util/namespace'
-], function (_, pluginFactory, namespaceHelper) {
+], function ($, _, pluginFactory, namespaceHelper) {
     'use strict';
 
     /**
@@ -39,7 +40,7 @@ define([
     };
 
     /**
-     * Creates the preventDragDrop plugin
+     * Creates the preventDropToInput plugin
      */
     return pluginFactory({
 
