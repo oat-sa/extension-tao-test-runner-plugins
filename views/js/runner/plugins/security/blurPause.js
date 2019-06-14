@@ -113,12 +113,14 @@ define([
 
             var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(){
                 innerFocus = false;
-                _.defer(function(){
+                // select element on iOS devices for some reason lost focus when an option is selected
+                // but after some delay the focus is restored back to the element
+                _.delay(function(){
                     if(!mainFocus && !innerFocus){
                         //the inner window has lost the focus and no one else has it
                         doPause();
                     }
-                });
+                }, focusBackTimeoutDelayMs);
             };
 
             var handleIframesFocus = function handleIframesFocus(){
