@@ -102,6 +102,12 @@ define([
     var fullScreenSupported = !!fullScreenProperty;
 
     /**
+     * Check for iOS platform
+     * @type {Boolean}
+     */
+    var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+
+    /**
      * Checks if the page has been embedded inside a frame
      * @returns {Boolean}
      */
@@ -215,6 +221,12 @@ define([
          * Initializes the plugin (called during runner's init)
          */
         init: function init() {
+            // Since iOS platform restrict keyboard usage in full sreen mode,
+            // do nothing if plugin run under iOS platform
+            if (iOS) {
+                return;
+            }
+
             var testRunner = this.getTestRunner();
             var waitingForUser = false;
 
