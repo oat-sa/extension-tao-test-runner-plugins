@@ -221,14 +221,15 @@ define([
          * Initializes the plugin (called during runner's init)
          */
         init: function init() {
-            // Since iOS platform restrict keyboard usage in full sreen mode,
-            // do nothing if plugin run under iOS platform
-            if (iOS) {
-                return;
-            }
-
             var testRunner = this.getTestRunner();
             var waitingForUser = false;
+
+            // Check if plugin can be allowed
+            function isAllowed() {
+                // Since iOS platform restrict keyboard usage in full sreen mode,
+                // do not allow plugin on iOS devices
+                return !iOS;
+            }
 
             function enableItem() {
                 testRunner.trigger('enablenav enabletools');
@@ -274,51 +275,55 @@ define([
                 }
             }
 
-            // when the runner has just started and the full screen prompt is still displayed, disable the item
-            testRunner.after('renderitem.fullscreen', function() {
-                testRunner.off('renderitem.fullscreen');
+            if (isAllowed()) {
+                // when the runner has just started and the full screen prompt is still displayed, disable the item
+                testRunner.after('renderitem.fullscreen', function() {
+                    testRunner.off('renderitem.fullscreen');
 
-                _.defer(function() {
-                    if (waitingForUser) {
+                    _.defer(function() {
+                        if (waitingForUser) {
+                            disableItem();
+                        }
+                    });
+                });
+
+                testRunner.on('destroy', function() {
+                    leaveFullScreen(testRunner);
+                    exitFullScreen();
+                });
+
+                // checks for frame embedding
+                if (isFrameEmbedded()) {
+                    // breaks the init process here as the test must be paused
+                    return testRunner.on('init', function() {
+                        waitingForUser = true;
                         disableItem();
+                        testRunner
+                            .trigger('unsecured-launch')
+                            .trigger('alert.fullscreen', launchError, doPause);
+                    });
+                }
+
+                // listen either to the native or the change event created in the observer above
+                doc.addEventListener(fullScreenEventName, function() {
+                    isFullScreen = checkFullScreen();
+                    if (!isFullScreen) {
+                        leaveFullScreen(testRunner);
+                        alertUser();
+                    } else {
+                        enterFullScreen(testRunner);
                     }
                 });
-            });
 
-            testRunner.on('destroy', function() {
-                leaveFullScreen(testRunner);
-                exitFullScreen();
-            });
-
-            // checks for frame embedding
-            if (isFrameEmbedded()) {
-                // breaks the init process here as the test must be paused
-                return testRunner.on('init', function() {
-                    waitingForUser = true;
-                    disableItem();
-                    testRunner
-                        .trigger('unsecured-launch')
-                        .trigger('alert.fullscreen', launchError, doPause);
-                });
-            }
-
-            // listen either to the native or the change event created in the observer above
-            doc.addEventListener(fullScreenEventName, function() {
                 isFullScreen = checkFullScreen();
                 if (!isFullScreen) {
                     leaveFullScreen(testRunner);
                     alertUser();
-                } else {
-                    enterFullScreen(testRunner);
+                } else if (!fullScreenSupported) {
+                    startFullScreenChangeObserver();
                 }
-            });
-
-            isFullScreen = checkFullScreen();
-            if (!isFullScreen) {
-                leaveFullScreen(testRunner);
-                alertUser();
-            } else if (!fullScreenSupported) {
-                startFullScreenChangeObserver();
+            } else {
+                this.disable();
             }
         }
     });
