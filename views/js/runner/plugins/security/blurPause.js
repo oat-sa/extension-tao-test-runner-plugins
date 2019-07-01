@@ -61,6 +61,7 @@ define([
             // Fix for TAO-4419 (Edge compatibility)
             // We slightly delay the actual blur to give the focus a chance to come back very quickly.
             // This allow the test taker to close the annoying full screen confirmation message displayed by Edge.
+            // Also this handle the case when there is a delay while focus moved to ckeditor
             var focusBackTimeoutDelayMs = 200;
             var focusBackTimeout = function focusBackTimeout() {
                 return new Promise(function(resolve, reject) {
@@ -70,7 +71,10 @@ define([
                     });
                     _.delay(function() {
                         pageStatus.off('.focusBack');
-                        resolve(); // focus is lost for good
+
+                        // check that the inner focus is not back as well
+                        innerFocus ? reject() : resolve();
+
                     }, focusBackTimeoutDelayMs);
                 });
             };
@@ -113,12 +117,14 @@ define([
 
             var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(){
                 innerFocus = false;
-                _.defer(function(){
+                // select element on iOS devices for some reason lost focus when an option is selected
+                // but after some delay the focus is restored back to the element
+                _.delay(function(){
                     if(!mainFocus && !innerFocus){
                         //the inner window has lost the focus and no one else has it
                         doPause();
                     }
-                });
+                }, focusBackTimeoutDelayMs);
             };
 
             var handleIframesFocus = function handleIframesFocus(){
