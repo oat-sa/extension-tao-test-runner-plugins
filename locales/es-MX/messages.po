@@ -4,9 +4,9 @@ msgstr ""
 "PO-Revision-Date: 2019-07-05T08:55:51\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: en-US\n"
+"Language: es-MX\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: en-US\n"
+"targetLanguage: es-MX\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
@@ -17,7 +17,7 @@ msgid "%s actions were successfully imported"
 msgstr ""
 
 msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
-msgstr ""
+msgstr "Todos los estudiantes comenzarán la siguiente sección al mismo tiempo. Por favor Relájese tranquilamente hasta que el supervisor de la sala comience la siguiente sección."
 
 msgid "Assessment ended. Please email the downloaded file to complete the process."
 msgstr ""
@@ -89,7 +89,7 @@ msgid "Test could not be launched. Test must always be launched in a full screen
 msgstr ""
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "La evaluación se ha pausado debido a un intento de navegar a otra ventana o tabulador. Póngase en contacto con su Proctor o administrador para reanudar su evaluación"
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
 msgstr ""
@@ -101,7 +101,7 @@ msgid "The download will be available in <strong>%d</strong> seconds"
 msgstr ""
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr ""
+msgstr "Esta prueba debe tomarse en modo de pantalla completa (%s)."
 
 msgid "Upload"
 msgstr ""
@@ -110,7 +110,7 @@ msgid "Upload offline test"
 msgstr ""
 
 msgid "You are encountering a connectivity loss. The test has been suspended."
-msgstr ""
+msgstr "Tiene una pérdida de conectividad. La prueba ha sido suspendida."
 
 msgid "You are encountering a prolonged connectivity loss."
 msgstr ""
