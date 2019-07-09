@@ -55,6 +55,7 @@ define([
             //to know if the focus is given to inner element or the main window
             var mainFocus = true;
             var innerFocus = false;
+            var ckEditorFocus = false;
 
             var bluring = false;
 
@@ -73,7 +74,7 @@ define([
                         pageStatus.off('.focusBack');
 
                         // check that the inner focus is not back as well
-                        innerFocus ? reject() : resolve();
+                        innerFocus || ckEditorFocus ? reject() : resolve();
 
                     }, focusBackTimeoutDelayMs);
                 });
@@ -120,11 +121,25 @@ define([
                 // select element on iOS devices for some reason lost focus when an option is selected
                 // but after some delay the focus is restored back to the element
                 _.delay(function(){
-                    if(!mainFocus && !innerFocus){
+                    if(!mainFocus && !innerFocus && !ckEditorFocus){
                         //the inner window has lost the focus and no one else has it
                         doPause();
                     }
                 }, focusBackTimeoutDelayMs);
+            };
+
+            var handleCkEditorFocus = function handleCkEditorFocus(){
+                ckEditorFocus = true;
+            };
+
+            var handleCkEditorFocusLoose = function handleCkEditorFocusLoose(){
+                ckEditorFocus = false;
+
+                _.defer(function(){
+                    if(!mainFocus && !innerFocus && !ckEditorFocus){
+                        doPause();
+                    }
+                });
             };
 
             var handleIframesFocus = function handleIframesFocus(){
@@ -132,20 +147,18 @@ define([
                 //all iframe that could be within the item
                 self.getAreaBroker().getContainer().find('iframe').each(function(){
                     try {
-
                         if (isCkEditorIframe(this)) {
                             var instanceIdentifier = this.title.substr(this.title.indexOf('editor'));
                             var editor = window.CKEDITOR.instances[instanceIdentifier];
 
-                            editor.on('focus', handleInnerWindowFocus);
+                            editor.on('focus', handleCkEditorFocus);
 
-                            editor.on('blur', handleInnerWindowFocusLoose);
-                        } else {
-                            this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
-
-                            this.contentWindow.addEventListener('blur', handleInnerWindowFocusLoose);
+                            editor.on('blur', handleCkEditorFocusLoose);
                         }
-                        // console.log(this, this.contentWindow, $res, $res2);
+
+                        this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
+
+                        this.contentWindow.addEventListener('blur', handleInnerWindowFocusLoose);
                     } catch(permissionError) {
                         //in case of iframe with a different origin we can't access the contentWindow
                     }
@@ -158,7 +171,7 @@ define([
                     mainFocus = false;
 
                     _.defer(function(){
-                        if(!innerFocus){
+                        if(!innerFocus && !ckEditorFocus){
                             //the main window has lost the focus and the focus isn't on an inner window
                             doPause();
                         }
