@@ -275,6 +275,16 @@ define([
                 }
             }
 
+            function handleFullScreenChange() {
+                isFullScreen = checkFullScreen();
+                if (!isFullScreen) {
+                    leaveFullScreen(testRunner);
+                    alertUser();
+                } else {
+                    enterFullScreen(testRunner);
+                }
+            }
+
             if (isAllowed()) {
                 // when the runner has just started and the full screen prompt is still displayed, disable the item
                 testRunner.after('renderitem.fullscreen', function() {
@@ -287,10 +297,12 @@ define([
                     });
                 });
 
-                testRunner.on('destroy', function() {
-                    leaveFullScreen(testRunner);
-                    exitFullScreen();
-                });
+                testRunner
+                    .on('exit', function() {
+                        doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
+                        leaveFullScreen(testRunner);
+                        exitFullScreen();
+                    });
 
                 // checks for frame embedding
                 if (isFrameEmbedded()) {
@@ -305,15 +317,7 @@ define([
                 }
 
                 // listen either to the native or the change event created in the observer above
-                doc.addEventListener(fullScreenEventName, function() {
-                    isFullScreen = checkFullScreen();
-                    if (!isFullScreen) {
-                        leaveFullScreen(testRunner);
-                        alertUser();
-                    } else {
-                        enterFullScreen(testRunner);
-                    }
-                });
+                doc.addEventListener(fullScreenEventName, handleFullScreenChange);
 
                 isFullScreen = checkFullScreen();
                 if (!isFullScreen) {
