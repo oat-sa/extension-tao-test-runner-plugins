@@ -55,6 +55,7 @@ define([
             //to know if the focus is given to inner element or the main window
             var mainFocus = true;
             var innerFocus = false;
+            var ckEditorFocus = false;
 
             var bluring = false;
 
@@ -73,7 +74,7 @@ define([
                         pageStatus.off('.focusBack');
 
                         // check that the inner focus is not back as well
-                        innerFocus ? reject() : resolve();
+                        innerFocus || ckEditorFocus ? reject() : resolve();
 
                     }, focusBackTimeoutDelayMs);
                 });
@@ -110,42 +111,49 @@ define([
                 return elt.className.indexOf('cke_') !== -1;
             };
 
-            //moved iframe handle functions (next 2) from inline, just to avoid code duplication
-            var handleInnerWindowFocus = function handleInnerWindowFocus(){
-                innerFocus = true;
+            var handleInnerWindowFocus = function handleInnerWindowFocus(e, ckEditor){
+                if (ckEditor) {
+                    ckEditorFocus = true;
+                } else {
+                    innerFocus = true;
+                }
             };
 
-            var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(){
-                innerFocus = false;
-                // select element on iOS devices for some reason lost focus when an option is selected
-                // but after some delay the focus is restored back to the element
-                _.delay(function(){
-                    if(!mainFocus && !innerFocus){
-                        //the inner window has lost the focus and no one else has it
+            var handleCkEditorFocus = handleInnerWindowFocus.bind(null, null, true);
+
+            var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(e, ckEditor){
+                if (ckEditor) {
+                    ckEditorFocus = false;
+                } else {
+                    innerFocus = false;
+                }
+
+                _.defer(function(){
+                    if(!mainFocus && !innerFocus && !ckEditorFocus){
                         doPause();
                     }
-                }, focusBackTimeoutDelayMs);
+                });
             };
+
+            var handleCkEditorFocusLoose = handleInnerWindowFocusLoose.bind(null, null, true);
 
             var handleIframesFocus = function handleIframesFocus(){
 
                 //all iframe that could be within the item
                 self.getAreaBroker().getContainer().find('iframe').each(function(){
                     try {
-
                         if (isCkEditorIframe(this)) {
                             var instanceIdentifier = this.title.substr(this.title.indexOf('editor'));
                             var editor = window.CKEDITOR.instances[instanceIdentifier];
 
-                            editor.on('focus', handleInnerWindowFocus);
+                            editor.on('focus', handleCkEditorFocus);
 
-                            editor.on('blur', handleInnerWindowFocusLoose);
-                        } else {
-                            this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
-
-                            this.contentWindow.addEventListener('blur', handleInnerWindowFocusLoose);
+                            editor.on('blur', handleCkEditorFocusLoose);
                         }
-                        // console.log(this, this.contentWindow, $res, $res2);
+
+                        this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
+
+                        this.contentWindow.addEventListener('blur', handleInnerWindowFocusLoose);
                     } catch(permissionError) {
                         //in case of iframe with a different origin we can't access the contentWindow
                     }
@@ -158,7 +166,7 @@ define([
                     mainFocus = false;
 
                     _.defer(function(){
-                        if(!innerFocus){
+                        if(!innerFocus && !ckEditorFocus){
                             //the main window has lost the focus and the focus isn't on an inner window
                             doPause();
                         }
@@ -175,6 +183,7 @@ define([
                 .on('renderitem', handleIframesFocus)
                 .on('unloaditem', function(){
                     innerFocus = false;
+                    ckEditorFocus = false;
                 });
         }
     });
