@@ -111,7 +111,7 @@ define([
                 return elt.className.indexOf('cke_') !== -1;
             };
 
-            var handleCkEditorFocus = function handleInnerWindowFocus(e, ckEditor){
+            var handleInnerWindowFocus = function handleInnerWindowFocus(e, ckEditor){
                 if (ckEditor) {
                     ckEditorFocus = true;
                 } else {
@@ -119,7 +119,7 @@ define([
                 }
             };
 
-            var handleCkEditorFocusLoose = function handleInnerWindowFocusLoose(e, ckEditor){
+            var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(e, ckEditor){
                 if (ckEditor) {
                     ckEditorFocus = false;
                 } else {
