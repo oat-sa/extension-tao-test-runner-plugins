@@ -119,6 +119,8 @@ define([
                 }
             };
 
+            var handleCkEditorFocus = handleInnerWindowFocus.bind(null, null, true);
+
             var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(e, ckEditor){
                 if (ckEditor) {
                     ckEditorFocus = false;
@@ -133,6 +135,8 @@ define([
                 });
             };
 
+            var handleCkEditorFocusLoose = handleInnerWindowFocusLoose.bind(null, null, true);
+
             var handleIframesFocus = function handleIframesFocus(){
 
                 //all iframe that could be within the item
@@ -142,9 +146,9 @@ define([
                             var instanceIdentifier = this.title.substr(this.title.indexOf('editor'));
                             var editor = window.CKEDITOR.instances[instanceIdentifier];
 
-                            editor.on('focus', function() { handleInnerWindowFocus(null, true); });
+                            editor.on('focus', handleCkEditorFocus);
 
-                            editor.on('blur', function() { handleInnerWindowFocusLoose(null, true); });
+                            editor.on('blur', handleCkEditorFocusLoose);
                         }
 
                         this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
