@@ -111,29 +111,20 @@ define([
                 return elt.className.indexOf('cke_') !== -1;
             };
 
-            //moved iframe handle functions (next 2) from inline, just to avoid code duplication
-            var handleInnerWindowFocus = function handleInnerWindowFocus(){
-                innerFocus = true;
+            var handleCkEditorFocus = function handleInnerWindowFocus(e, ckEditor){
+                if (ckEditor) {
+                    ckEditorFocus = true;
+                } else {
+                    innerFocus = true;
+                }
             };
 
-            var handleInnerWindowFocusLoose = function handleInnerWindowFocusLoose(){
-                innerFocus = false;
-                // select element on iOS devices for some reason lost focus when an option is selected
-                // but after some delay the focus is restored back to the element
-                _.delay(function(){
-                    if(!mainFocus && !innerFocus && !ckEditorFocus){
-                        //the inner window has lost the focus and no one else has it
-                        doPause();
-                    }
-                }, focusBackTimeoutDelayMs);
-            };
-
-            var handleCkEditorFocus = function handleCkEditorFocus(){
-                ckEditorFocus = true;
-            };
-
-            var handleCkEditorFocusLoose = function handleCkEditorFocusLoose(){
-                ckEditorFocus = false;
+            var handleCkEditorFocusLoose = function handleInnerWindowFocusLoose(e, ckEditor){
+                if (ckEditor) {
+                    ckEditorFocus = false;
+                } else {
+                    innerFocus = false;
+                }
 
                 _.defer(function(){
                     if(!mainFocus && !innerFocus && !ckEditorFocus){
@@ -151,9 +142,9 @@ define([
                             var instanceIdentifier = this.title.substr(this.title.indexOf('editor'));
                             var editor = window.CKEDITOR.instances[instanceIdentifier];
 
-                            editor.on('focus', handleCkEditorFocus);
+                            editor.on('focus', () => handleInnerWindowFocus(null, true));
 
-                            editor.on('blur', handleCkEditorFocusLoose);
+                            editor.on('blur', () => handleInnerWindowFocusLoose(null, true));
                         }
 
                         this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
