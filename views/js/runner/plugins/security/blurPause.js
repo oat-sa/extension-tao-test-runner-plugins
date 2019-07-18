@@ -179,6 +179,7 @@ define([
                 .on('renderitem', handleIframesFocus)
                 .on('unloaditem', function(){
                     innerFocus = false;
+                    ckEditorFocus = false;
                 });
         }
     });
