@@ -142,9 +142,9 @@ define([
                             var instanceIdentifier = this.title.substr(this.title.indexOf('editor'));
                             var editor = window.CKEDITOR.instances[instanceIdentifier];
 
-                            editor.on('focus', () => handleInnerWindowFocus(null, true));
+                            editor.on('focus', function() { handleInnerWindowFocus(null, true); });
 
-                            editor.on('blur', () => handleInnerWindowFocusLoose(null, true));
+                            editor.on('blur', function() { handleInnerWindowFocusLoose(null, true); });
                         }
 
                         this.contentWindow.addEventListener('focus', handleInnerWindowFocus);
