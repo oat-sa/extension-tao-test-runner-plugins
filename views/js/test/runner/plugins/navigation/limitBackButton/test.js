@@ -20,17 +20,19 @@
  */
 
 define([
-
-    'jquery',
     'taoTests/runner/runner',
-    'taoQtiTest/test/runner/mocks/providerMock',
     'taoTestRunnerPlugins/runner/plugins/navigation/limitBackButton'
-], function($, runnerFactory, providerMock, pluginFactory) {
+], function(runnerFactory, pluginFactory) {
     'use strict';
 
     var pluginApi;
     var providerName = 'mock';
-    runnerFactory.registerProvider(providerName, providerMock());
+    runnerFactory.registerProvider(providerName, {
+        name: providerName,
+        loadAreaBroker(){ },
+        loadProxy(){ },
+        init(){ }
+    });
 
     /**
      * The following tests applies to all plugins

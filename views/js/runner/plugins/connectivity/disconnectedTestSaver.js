@@ -233,19 +233,22 @@ define([
              * @returns {Promise}
              */
             this.prepareDownload = function prepareDownload(actions) {
-                var trConfig = testRunner.getConfig();
-                var timestamp = Date.now();
-                var dateTime = new Date(timestamp).toISOString();
-                var testData = testRunner.getTestData();
-                var testId = testData.title;
-                var niceFilename = 'Download of ' + testId + ' at ' + dateTime + '.json';
+                const testConfig = testRunner.getConfig();
+                const timestamp = Date.now();
+                const dateTime = new Date(timestamp).toISOString();
+
+                //@deprecated  this can be empty, all values will be available from the config
+                const testData = testRunner.getTestData() || {};
+                const testMap  = testRunner.getTestMap();
+                const testTitle = testMap.title || testData.title;
+                const filename = `Download of ${testTitle} at ${dateTime}.json`;
 
                 return {
-                    filename: niceFilename,
+                    filename,
                     content: JSON.stringify({
-                        timestamp: timestamp,
-                        testData: testData,
-                        testConfig: trConfig,
+                        timestamp,
+                        testData,
+                        testConfig,
                         actionQueue: actions
                     })
                 };
