@@ -92,9 +92,9 @@ define([
          * @returns {Object}
          */
         captureTest: function captureTest(testRunner){
-            var data = testRunner.getTestData();
+            const testMap = testRunner.getTestMap();
             return {
-                testId : data.identifier
+                testId : testMap.identifier
             };
         },
 
@@ -104,10 +104,10 @@ define([
          * @returns {Object}
          */
         captureAll: function captureAll(testRunner){
-            var data = testRunner.getTestData();
-            var context = testRunner.getTestContext();
+            const context = testRunner.getTestContext();
+            const testMap = testRunner.getTestMap();
             return {
-                testId : data.identifier,
+                testId : testMap.identifier,
                 testPartId : context.testPartId,
                 sectionId : context.sectionId,
                 itemId : context.itemIdentifier,

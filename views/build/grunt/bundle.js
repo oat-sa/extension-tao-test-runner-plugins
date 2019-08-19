@@ -32,6 +32,7 @@ module.exports = function(grunt) {
                     dependencies : ['taoQtiTest', 'taoTests'],
                     bundles : [{
                         name : 'testPlugins',
+                        babel : true,
                         include: ['taoTestRunnerPlugins/runner/plugins/**/*'],
                         dependencies : []
                     }]

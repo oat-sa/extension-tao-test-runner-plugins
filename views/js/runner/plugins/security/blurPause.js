@@ -25,8 +25,9 @@ define([
     'lodash',
     'i18n',
     'ui/pageStatus',
-    'taoTests/runner/plugin'
-], function (_, __, pageStatusFactory, pluginFactory) {
+    'taoTests/runner/plugin',
+    'taoQtiTest/runner/config/states'
+], function (_, __, pageStatusFactory, pluginFactory, states) {
     'use strict';
 
     var pageStatus = pageStatusFactory();
@@ -82,8 +83,7 @@ define([
 
             var doPause = function doPause() {
                 var context = testRunner.getTestContext();
-                var states = testRunner.getTestData().states;
-                if (!bluring && context.state <= states.interacting && !testRunner.getState('finish')) {
+                if (!bluring && context.state <= states.testSessionStates.interacting && !testRunner.getState('finish')) {
                     bluring = true;
                     focusBackTimeout()
                         .then(function resolve() {
