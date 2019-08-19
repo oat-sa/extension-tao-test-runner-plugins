@@ -24,11 +24,10 @@
 define([
     'lodash',
     'i18n',
-    'core/promise',
     'taoTests/runner/plugin',
     'taoQtiTest/runner/helpers/map',
     'taoQtiTest/runner/config/states'
-], function(_, __, Promise, pluginFactory, mapHelper, states) {
+], function(_, __, pluginFactory, mapHelper, states) {
     'use strict';
 
     /**
