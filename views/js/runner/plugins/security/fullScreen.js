@@ -270,7 +270,7 @@ define([
 
             function doPause() {
                 var context = testRunner.getTestContext();
-                if (context.state <= states.testSessionStates.interacting && !testRunner.getState('finish')) {
+                if (context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
                     testRunner.trigger('pause', {reason: launchError});
                 }
             }
