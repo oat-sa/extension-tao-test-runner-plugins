@@ -83,7 +83,7 @@ define([
 
             var doPause = function doPause() {
                 var context = testRunner.getTestContext();
-                if (!bluring && context.state <= states.testSessionStates.interacting && !testRunner.getState('finish')) {
+                if (!bluring && context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
                     bluring = true;
                     focusBackTimeout()
                         .then(function resolve() {

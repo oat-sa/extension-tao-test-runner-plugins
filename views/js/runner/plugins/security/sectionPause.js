@@ -78,7 +78,7 @@ define([
                                         .off('.sectionPause')
                                         .before('pause.sectionPause', function() {
                                             testRunner.trigger('leave', {
-                                                code: states.testSessionStates.suspended,
+                                                code: states.testSession.suspended,
                                                 message: pauseMessage
                                             });
                                             return Promise.reject();
