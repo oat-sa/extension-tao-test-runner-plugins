@@ -22,8 +22,9 @@
 define([
     'lodash',
     'i18n',
-    'taoTests/runner/plugin'
-], function (_, __, pluginFactory) {
+    'taoTests/runner/plugin',
+    'taoQtiTest/runner/config/states'
+], function (_, __, pluginFactory, states) {
     'use strict';
 
     var doc = document;
@@ -269,8 +270,7 @@ define([
 
             function doPause() {
                 var context = testRunner.getTestContext();
-                var states = testRunner.getTestData().states;
-                if (context.state <= states.interacting && !testRunner.getState('finish')) {
+                if (context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
                     testRunner.trigger('pause', {reason: launchError});
                 }
             }

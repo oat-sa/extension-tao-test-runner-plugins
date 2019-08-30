@@ -51,13 +51,10 @@ define([
          * Initializes the plugin (called during runner's init)
          */
         init: function init() {
-            var testRunner = this.getTestRunner();
-            var testData = testRunner.getTestData() || {};
-            var testConfig = testData.config || {};
-            var pluginsConfig = testConfig.plugins || {};
-            var config = pluginsConfig.defaultHeading || {};
-            var headingText = config.heading || defaultHeadingText;
-            var headingTag;
+            const testRunner = this.getTestRunner();
+            const config = this.getConfig();
+            const headingText = config.heading || defaultHeadingText;
+            let headingTag;
 
             // Add if necessary default h1 tag after every item render
             testRunner

@@ -19,7 +19,6 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-
     'lodash',
     'core/eventifier',
     'core/promise',
@@ -70,7 +69,7 @@ define([
         }];
         var idx = 1;
         var probeData = [];
-        var testData = {
+        var testMap = {
             identifier: 'fooBar'
         };
         var testContext = {
@@ -85,7 +84,7 @@ define([
                 type: 'init',
                 marker: null,
                 context: {
-                    testId: testData.identifier
+                    testId: testMap.identifier
                 }
             },
             shortcut: {
@@ -93,7 +92,7 @@ define([
                 type: 'shortcut',
                 marker: null,
                 context: {
-                    testId: testData.identifier,
+                    testId: testMap.identifier,
                     testPartId: testContext.testPartId,
                     sectionId: testContext.sectionId,
                     itemId: testContext.itemIdentifier,
@@ -107,7 +106,7 @@ define([
                 type: 'item',
                 marker: 'stop',
                 context: {
-                    testId: testData.identifier,
+                    testId: testMap.identifier,
                     testPartId: testContext.testPartId,
                     sectionId: testContext.sectionId,
                     itemId: testContext.itemIdentifier,
@@ -137,8 +136,8 @@ define([
                     }
                 };
             },
-            getTestData: function() {
-                return testData;
+            getTestMap() {
+                return testMap;
             },
             getTestContext: function() {
                 return testContext;
@@ -233,8 +232,8 @@ define([
                     sendVariables: function() {}
                 };
             },
-            getTestData: function() {
-                return testData;
+            getTestMap() {
+                return testMap;
             },
             getTestContext: function() {
                 return testContext;

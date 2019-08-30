@@ -24,10 +24,10 @@
 define([
     'lodash',
     'i18n',
-    'core/promise',
     'taoTests/runner/plugin',
-    'taoQtiTest/runner/helpers/map'
-], function(_, __, Promise, pluginFactory, mapHelper) {
+    'taoQtiTest/runner/helpers/map',
+    'taoQtiTest/runner/config/states'
+], function(_, __, pluginFactory, mapHelper, states) {
     'use strict';
 
     /**
@@ -78,7 +78,7 @@ define([
                                         .off('.sectionPause')
                                         .before('pause.sectionPause', function() {
                                             testRunner.trigger('leave', {
-                                                code: testRunner.getTestData().states.suspended,
+                                                code: states.testSession.suspended,
                                                 message: pauseMessage
                                             });
                                             return Promise.reject();
