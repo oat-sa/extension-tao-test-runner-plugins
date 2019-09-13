@@ -34,7 +34,8 @@ define([
     'ui/waitingDialog/waitingDialog',
     'ui/feedback',
     'layout/loading-bar',
-    'taoTests/runner/plugin'
+    'taoTests/runner/plugin',
+    'taoQtiTest/runner/helpers/navigation'
 ], function (
     $,
     _,
@@ -46,7 +47,8 @@ define([
     waitingDialogFactory,
     feedback,
     loadingBar,
-    pluginFactory
+    pluginFactory,
+    navigationHelper
 ) {
     'use strict';
 
@@ -256,8 +258,13 @@ define([
 
             // Intercept attempts to end the test when offline:
             testRunner.before('next skip', function(e, data){
+                const testContext = testRunner.getTestContext();
+                const isLast = navigationHelper.isLast(
+                    testRunner.getTestMap(),
+                    testContext.itemIdentifier
+                );
 
-                if (testRunner.getTestContext().isLast && proxy.isOffline()) {
+                if (isLast && proxy.isOffline()) {
                     // Suppress usual offline error behaviour:
                     testRunner.off('error.connectivity');
                     testRunner.before('error.connectivity', function(err) {

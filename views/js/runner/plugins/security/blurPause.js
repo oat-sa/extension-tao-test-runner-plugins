@@ -82,12 +82,18 @@ define([
             };
 
             var doPause = function doPause() {
-                var context = testRunner.getTestContext();
+                const context = testRunner.getTestContext();
+                const options = testRunner.getOptions();
+                //@deprecated securePauseStateRequired, use options.sectionPayse or options.proctored
+                const forcePause = typeof options.sectionPause === 'boolean' ?
+                    options.sectionPause :
+                    (options.proctored || context.securePauseStateRequired);
+
                 if (!bluring && context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
                     bluring = true;
                     focusBackTimeout()
                         .then(function resolve() {
-                            if (context.securePauseStateRequired) {
+                            if ( forcePause ) {
                                 testRunner.trigger('blur').trigger('pause', {
                                     message: lostFocusPauseMessage,
                                     reasons : {
