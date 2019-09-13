@@ -113,22 +113,27 @@ define([
                 // will override, if possible, anything put into the clipboard after a copy event (whether manually or automatically triggered)
                 document.addEventListener('copy', handleCopyEvent);
 
-                $(window)
-                .on('keyup' + '.' + this.getName(), function (e) {
-                    var context;
+                $(window).on(`keyup.${this.getName()}`, e => {
                     if (e.key === 'PrintScreen') {
                         triggerCopyEvent();
-                        context = testRunner.getTestContext();
-                        testRunner
-                            .trigger('prohibited-key', 'PrintScreen');
-                        if (context.securePauseStateRequired) {
+                        const context = testRunner.getTestContext();
+                        const options = testRunner.getOptions();
+                        //@deprecated securePauseStateRequired, use options.sectionPayse or options.proctored
+                        const forcePause = typeof options.sectionPause === 'boolean' ?
+                            options.sectionPause :
+                            (options.proctored || context.securePauseStateRequired);
+
+
+                        testRunner.trigger('prohibited-key', 'PrintScreen');
+
+                        if ( forcePause ) {
                             testRunner.trigger('pause', {
-                                    message: printScreenPauseMessage,
-                                    reasons: {
-                                        category: __('examinee'),
-                                        subCategory: __('behaviour')
-                                    }
-                                });
+                                message: printScreenPauseMessage,
+                                reasons: {
+                                    category: __('examinee'),
+                                    subCategory: __('behaviour')
+                                }
+                            });
                         } else {
                             testRunner.trigger('warning', printScreenMessage);
                         }
