@@ -111,12 +111,6 @@ define([
                     toggleBackButton(disableState);
                 });
 
-                testRunner.after('disablenav.' + pluginName, function () {
-                    if (disableState) {
-                        testRunner.trigger('enablenav');
-                    }
-                });
-
                 testRunner
                     .after('renderitem', function (itemIdentifier) {
                         var self = this;
