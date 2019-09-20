@@ -109,6 +109,7 @@ define([
                 testRunner.before('move.' + pluginName, function (e, direction) {
                     processingMoveAction = true;
                     if (direction === 'previous' && disableState) {
+                        testRunner.trigger('enablenav');
                         return Promise.reject();
                     }
                 });
