@@ -100,6 +100,12 @@ define([
                     });
                 };
 
+                testRunner.before('nav-previous.' + pluginName, function () {
+                    if (disableState) {
+                        return Promise.reject();
+                    }
+                });
+
                 testRunner.before('move.' + pluginName, function (e, direction) {
                     processingMoveAction = true;
                     if (direction === 'previous' && disableState) {
