@@ -219,7 +219,9 @@ define([
             var waitingForUser = false;
 
             function enableItem() {
-                testRunner.trigger('enablenav enabletools');
+                if (testRunner.itemRunner !== undefined) {
+                    testRunner.trigger('enablenav enabletools');
+                }
             }
 
             function disableItem() {
