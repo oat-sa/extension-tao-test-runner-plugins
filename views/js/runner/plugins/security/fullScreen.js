@@ -233,7 +233,7 @@ define([
             }
 
             function enableItem() {
-                if (testRunner.itemRunner !== undefined) {
+                if (testRunner.itemRunner) {
                     testRunner.trigger('enablenav enabletools');
                 }
             }
