@@ -233,7 +233,9 @@ define([
             }
 
             function enableItem() {
-                testRunner.trigger('enablenav enabletools');
+                if (testRunner.itemRunner) {
+                    testRunner.trigger('enablenav enabletools');
+                }
             }
 
             function disableItem() {
@@ -319,13 +321,20 @@ define([
                 // listen either to the native or the change event created in the observer above
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
 
-                isFullScreen = checkFullScreen();
-                if (!isFullScreen) {
-                    leaveFullScreen(testRunner);
-                    alertUser();
-                } else if (!fullScreenSupported) {
-                    startFullScreenChangeObserver();
-                }
+                // first check should be done after 'renderitem' event
+                // because current focused element will be blured, to reinitialize keyboard navigation
+                // in testRunner in function initTestRunnerNavigation of keyNavigation
+                testRunner.after('renderitem.fullscreen', function() {
+                    isFullScreen = checkFullScreen();
+                    if (!isFullScreen) {
+                        leaveFullScreen(testRunner);
+                        alertUser();
+                    } else if (!fullScreenSupported) {
+                        startFullScreenChangeObserver();
+                    }
+                    testRunner.off('renderitem.fullscreen');
+                })
+                
             } else {
                 this.disable();
             }
