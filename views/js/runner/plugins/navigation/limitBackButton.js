@@ -100,21 +100,22 @@ define([
                     });
                 };
 
+                testRunner.before('nav-previous.' + pluginName, function () {
+                    if (disableState) {
+                        return Promise.reject();
+                    }
+                });
+
                 testRunner.before('move.' + pluginName, function (e, direction) {
                     processingMoveAction = true;
                     if (direction === 'previous' && disableState) {
+                        testRunner.trigger('enablenav');
                         return Promise.reject();
                     }
                 });
 
                 testRunner.after('enablenav.' + pluginName, function () {
                     toggleBackButton(disableState);
-                });
-
-                testRunner.after('disablenav.' + pluginName, function () {
-                    if (disableState) {
-                        testRunner.trigger('enablenav');
-                    }
                 });
 
                 testRunner
