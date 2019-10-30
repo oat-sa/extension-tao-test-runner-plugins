@@ -32,6 +32,8 @@ define([
 
     var pageStatus = pageStatusFactory();
 
+    //do not remove these comments, this is used to generate the translation in .po file
+    // __('The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.');
     var lostFocusPauseMessage = 'The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.';
     var lostFocusMessage = __('Attempt to navigate to another window or tab.');
 

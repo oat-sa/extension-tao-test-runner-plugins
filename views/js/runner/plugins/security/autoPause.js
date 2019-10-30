@@ -24,6 +24,8 @@ define([
 ], function (__, pluginFactory) {
     'use strict';
 
+    //do not remove these comments, this is used to generate the translation in .po file
+    // __('You are encountering a connectivity loss. The test has been suspended.');
     var pauseMessage = 'You are encountering a connectivity loss. The test has been suspended.';
 
     /**

@@ -29,6 +29,8 @@ define([
      */
     var platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
 
+    //do not remove these comments, this is used to generate the translation in .po file
+    // __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.');
     var printScreenPauseMessage = 'The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.';
     var printScreenMessage = __('Attempt to print screen.');
     /**
