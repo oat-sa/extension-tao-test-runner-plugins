@@ -101,7 +101,8 @@ define([
                                     reasons : {
                                         category : 'examinee',
                                         subCategory : 'behaviour'
-                                    }
+                                    },
+                                    originalMessage: lostFocusPauseMessage
                                 });
                             } else {
                                 testRunner.trigger('blur').trigger('warning', lostFocusMessage);
