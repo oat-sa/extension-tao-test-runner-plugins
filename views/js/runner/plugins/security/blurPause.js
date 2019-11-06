@@ -32,7 +32,9 @@ define([
 
     var pageStatus = pageStatusFactory();
 
-    var lostFocusPauseMessage = __('The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.');
+    //do not remove these comments, this is used to generate the translation in .po file
+    // __('The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.');
+    var lostFocusPauseMessage = 'The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment.';
     var lostFocusMessage = __('Attempt to navigate to another window or tab.');
 
     /**
@@ -95,11 +97,12 @@ define([
                         .then(function resolve() {
                             if ( forcePause ) {
                                 testRunner.trigger('blur').trigger('pause', {
-                                    message: lostFocusPauseMessage,
+                                    message: __(lostFocusPauseMessage),
                                     reasons : {
-                                        category : __('examinee'),
-                                        subCategory : __('behaviour')
-                                    }
+                                        category : 'examinee',
+                                        subCategory : 'behaviour'
+                                    },
+                                    originalMessage: lostFocusPauseMessage
                                 });
                             } else {
                                 testRunner.trigger('blur').trigger('warning', lostFocusMessage);
