@@ -37,8 +37,11 @@ define([
 
     /**
      * The message is displayed just before the pause to explain why.
+     *
+     * do not remove these comments, this is used to generate the translation in .po file
+     * __('All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section.');
      */
-    var pauseMessage = __('All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section.');
+    var pauseMessage = 'All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section.';
 
     return pluginFactory({
 
@@ -88,10 +91,11 @@ define([
                             .trigger('disableitem')
                             .trigger('pause', {
                                 reasons : {
-                                    category : __('condition'),
-                                    subCategory : __('pausedSection')
+                                    category : 'condition',
+                                    subCategory : 'pausedSection'
                                 },
-                                message: pauseMessage
+                                message: __(pauseMessage),
+                                originalMessage: pauseMessage
                             });
                         return reject();
                     }

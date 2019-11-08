@@ -24,7 +24,9 @@ define([
 ], function (__, pluginFactory) {
     'use strict';
 
-    var pauseMessage = __('You are encountering a connectivity loss. The test has been suspended.');
+    //do not remove these comments, this is used to generate the translation in .po file
+    // __('You are encountering a connectivity loss. The test has been suspended.');
+    var pauseMessage = 'You are encountering a connectivity loss. The test has been suspended.';
 
     /**
      * Creates the autoPause plugin.
@@ -50,10 +52,11 @@ define([
                             .trigger('disconnectpause')
                             .trigger('pause', {
                                 reasons : {
-                                    category : __('technical'),
-                                    subCategory : __('network')
+                                    category : 'technical',
+                                    subCategory : 'network'
                                 },
-                                message: pauseMessage
+                                message: __(pauseMessage),
+                                originalMessage: pauseMessage
                             });
                     }
                 });
