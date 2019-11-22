@@ -30,42 +30,24 @@ define([
 ], function ($, _, pluginFactory) {
     'use strict';
 
-    var pluginName = 'limitBackButton';
-
-    var defaultEventName = 'change';
-
-    var customListeners = [
-        {
-            selector: '.widget-numpad',
-            eventName: 'click'
-        }
-    ];
+    const pluginName = 'limitBackButton';
 
     /**
-     * Gets the unique item key identifier for this plugin
-     *
-     * @param {string} itemIdentifier - item runner identifier
-     * @returns {string}
+     * The name of the "back button" plugin
      */
-    var getItemKey = function getItemKey(itemIdentifier) {
-        return itemIdentifier + '-limit-back-button';
-    };
+    const backButtonPluginName = 'previous';
 
     /**
-     * Remove all listeners from an item
-     *
-     * @param {Object} testRunner - test runner, needed to find interactions elements
+     * Which events are listened and considered as changes
      */
-    var removeAllListeners = function removeAllListeners(testRunner) {
-        var areaBroker = testRunner.getAreaBroker();
-        _.forEach(customListeners, function (plugin) {
-            var $element = areaBroker.getContainer().find(plugin.selector);
+    const customListeners = [{
+        selector: '.widget-numpad',
+        eventName: 'click'
+    }, {
+        selector: '.qti-interaction',
+        eventName: 'change'
+    }];
 
-            $element.off('.' + pluginName);
-        });
-
-        areaBroker.getContentArea().find('.qti-interaction').off('.' + pluginName);
-    };
 
     /**
      * Returns the configured plugin
@@ -75,90 +57,126 @@ define([
         name: pluginName,
 
         /**
-         * Initialize the plugin (called during runner's init)
+         * Install new methods to the plugin instance for internal usage
          */
-        init: function init() {
-            var testRunner = this.getTestRunner();
+        install() {
 
-            return testRunner.getPluginStore(this.getName()).then(function (store) {
-                var disableState = false;
-                var processingMoveAction = false;
-
-                var toggleBackButton = function toggleBackButton() {
-                    var previous = testRunner.getPlugin('previous');
-
-                    disableState ? previous.disable() : previous.enable();
-                };
-
-                var createListener = function createListener($element, eventName) {
-                    var event = eventName
-                        ? eventName + "." + pluginName
-                        : defaultEventName + "." + pluginName;
-
-                    $element.on(event, function () {
-                        testRunner.itemRunner.trigger('responsechange.' + pluginName);
+            /**
+             * Install the event listener that trigger changes
+             * @fires runner#plugin-responsechange.limitBackButton
+             */
+            this.addCustomListeners = function addCustomListeners() {
+                if (Array.isArray(customListeners)) {
+                    const $container = this.getTestRunner().getAreaBroker().getContainer();
+                    customListeners.forEach( ({selector, eventName }) => {
+                        $(selector, $container).on(
+                            `${eventName}.${pluginName}`,
+                            () => this.trigger('responsechange')
+                        );
                     });
+                }
+            };
+
+            /**
+             * Removes the event listeners
+             */
+            this.removeCustomListeners = function removeCustomListeners() {
+                if (Array.isArray(customListeners)) {
+                    const $container = this.getTestRunner().getAreaBroker().getContainer();
+                    customListeners.forEach( ({selector, eventName }) => {
+                        $(selector, $container).off(`${eventName}.${pluginName}`);
+                    });
+                }
+            };
+        },
+
+        /**
+         * Initialize the plugin (called during runner's init)
+         * @returns {Promise} once the initialization is done
+         */
+        init() {
+            const testRunner = this.getTestRunner();
+            const backButtonPlugin = testRunner.getPlugin(backButtonPluginName);
+
+            //works only when a
+            if ( !backButtonPlugin ) {
+                return;
+            }
+
+            return testRunner.getPluginStore(this.getName()).then( store => {
+
+                //double security, keep the state to prevents actual events to to be handled
+                //in addition to the DOM disabling
+                let disableState = false;
+
+                //do not update during a navigation
+                let processingMoveAction = false;
+                let currentItemIdentifier;
+
+                /**
+                 * Save the current state in the store and toggle the button state
+                 * @returns {Promise} once saved and toggled
+                 */
+                const updatePreviousPlugin = () => {
+                    if (!processingMoveAction && currentItemIdentifier) {
+                        return store.getItem(currentItemIdentifier)
+                            .then( answered => {
+                                if (answered === true) {
+                                    disableState = true;
+                                    backButtonPlugin.disable();
+                                } else {
+                                    backButtonPlugin.enable();
+                                }
+                            })
+                            .catch( err => testRunner.trigger('error', err));
+                    }
+                    return Promise.resolve();
                 };
-
-                testRunner.before('nav-previous.' + pluginName, function () {
-                    if (disableState) {
-                        return Promise.reject();
-                    }
-                });
-
-                testRunner.before('move.' + pluginName, function (e, direction) {
-                    processingMoveAction = true;
-                    if (direction === 'previous' && disableState) {
-                        return Promise.reject();
-                    }
-                });
-
-                testRunner.after('enablenav.' + pluginName, function () {
-                    toggleBackButton(disableState);
-                });
 
                 testRunner
-                    .after('renderitem', function (itemIdentifier) {
-                        var self = this;
-                        var itemRunner = testRunner.itemRunner;
-                        var $itemInteractions;
-
+                    .before('nav-previous', () => {
+                        if (disableState) {
+                            return Promise.reject();
+                        }
+                    })
+                    .before('move', (e, direction)  => {
+                        processingMoveAction = true;
+                        if (direction === 'previous' && disableState) {
+                            return Promise.reject();
+                        }
+                    })
+                    .after('enablenav', () => {
                         processingMoveAction = false;
 
-                        itemRunner.on('responsechange.' + pluginName, function () {
-                            if (!processingMoveAction) {
-                                disableState = true;
-                                store
-                                    .setItem(getItemKey(itemIdentifier))
-                                    .then(toggleBackButton);
-                            }
-                        });
-
-                        _.forEach(customListeners, function (plugin) {
-                            var $element = self.getAreaBroker().getContainer().find(plugin.selector);
-
-                            createListener($element, plugin.eventName);
-                        });
-
-                        $itemInteractions = self.getAreaBroker().getContentArea().find('.qti-interaction');
-                        createListener($itemInteractions);
+                        updatePreviousPlugin();
                     })
-                    .on('loaditem', function (itemIdentifier) {
-                        store
-                            .getItem(getItemKey(itemIdentifier))
-                            .then(function (val) {
-                                disableState = val;
-                                toggleBackButton();
-                            });
+                    .on('loaditem', itemIdentifier => {
+                        disableState = false;
+                        currentItemIdentifier = itemIdentifier;
                     })
-                    .on('beforeunloaditem', function () {
-                        removeAllListeners(testRunner);
-                    });
+                    .after('renderitem', () => {
+
+                        updatePreviousPlugin();
+
+                        testRunner.itemRunner.on('responsechange', () => this.trigger('responsechange') );
+
+                        this.addCustomListeners();
+                    })
+                    .on(`plugin-responsechange.${pluginName}`, () => {
+                        if (currentItemIdentifier && !processingMoveAction)  {
+                            return store.setItem(currentItemIdentifier, true)
+                                .then(updatePreviousPlugin);
+                        }
+                    })
+                    .on('beforeunloaditem', () => this.removeCustomListeners());
             });
         },
 
-        destroy: function () {
-            removeAllListeners(this.getTestRunner());
+        /**
+         * Clean up the place
+         */
+        destroy () {
+            this.removeCustomListeners();
         }
     });
 });
