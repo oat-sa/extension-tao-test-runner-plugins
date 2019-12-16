@@ -46,6 +46,18 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'tags' => [ ]
             ]
         ],
+        'controls' => [
+            [
+                'id' => 'sessionHeartbeat',
+                'name' => 'Session Heartbeat',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/controls/sessionHeartbeat',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Send a regular signal to keep the session alive',
+                'category' => 'controls',
+                'active' => false,
+                'tags' => [ ]
+            ]
+        ],
         'navigation' => [
             [
                 'id' => 'limitBackButton',
@@ -158,6 +170,12 @@ class RegisterTestRunnerPlugins extends InstallAction
         'answerCache' => [
             'config' => [
                 'allAttempts' => false
+            ]
+        ],
+        'sessionHeartbeat' => [
+            'config' => [
+                'interval' => '900',
+                'action' => 'up'
             ]
         ]
     ];
