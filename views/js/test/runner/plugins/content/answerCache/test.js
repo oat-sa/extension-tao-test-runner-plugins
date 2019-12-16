@@ -60,21 +60,25 @@ define([
     /**
      * Mocks a store
      * @param {Object} store
-     * @returns {Promise<{Object}>}
+     * @returns Object}
      */
     function getStoreMock(store = {}) {
-        return Promise.resolve({
-            getItem(key) {
-                return Promise.resolve(store[key]);
-            },
-            setItem(key, value) {
-                store[key] = value;
-                return Promise.resolve(true);
-            },
-            clear() {
-                _.forEach(store, (v, key) => delete store[key]);
+        return {
+            getStore() {
+                return Promise.resolve({
+                    getItem(key) {
+                        return Promise.resolve(store[key]);
+                    },
+                    setItem(key, value) {
+                        store[key] = value;
+                        return Promise.resolve(true);
+                    },
+                    clear() {
+                        _.forEach(store, (v, key) => delete store[key]);
+                    }
+                });
             }
-        });
+        };
     }
 
     /**
@@ -145,8 +149,9 @@ define([
         const store = {};
         const emptyState = buildState('');
         const changedState = buildState('abcd');
+        const attempt = 1;
         const itemIdentifier = 'item-1';
-        const storeIdentifier = 'item-1';
+        const storeIdentifier = `${itemIdentifier}#${attempt}`;
 
         assert.expect(5);
 
@@ -155,11 +160,7 @@ define([
             loadAreaBroker() {},
             loadProxy() {},
             loadTestStore() {
-                return {
-                    getStore() {
-                        return getStoreMock(store);
-                    }
-                };
+                return getStoreMock(store);
             },
             init() {},
             renderItem() {
@@ -172,10 +173,7 @@ define([
         runner
             .on('init', () => {
                 assert.ok(true, 'Runner has been initialized');
-                runner.setTestContext({
-                    itemIdentifier: itemIdentifier,
-                    attempt: 1
-                });
+                runner.setTestContext({itemIdentifier, attempt});
                 runner.renderItem(itemIdentifier, {});
             })
             .on('renderitem', () => {
@@ -212,8 +210,9 @@ define([
         const localProviderName = 'answerCacheMock';
         const emptyState = buildState('');
         const changedState = buildState('abcd');
+        const attempt = 1;
         const itemIdentifier = 'item-1';
-        const storeIdentifier = 'item-1';
+        const storeIdentifier = `${itemIdentifier}#${attempt}`;
         const store = {
             [storeIdentifier]: changedState
         };
@@ -225,11 +224,7 @@ define([
             loadAreaBroker() {},
             loadProxy() {},
             loadTestStore() {
-                return {
-                    getStore() {
-                        return getStoreMock(store);
-                    }
-                };
+                return getStoreMock(store);
             },
             init() {},
             renderItem() {
@@ -242,10 +237,7 @@ define([
         runner
             .on('init', () => {
                 assert.ok(true, 'Runner has been initialized');
-                runner.setTestContext({
-                    itemIdentifier: itemIdentifier,
-                    attempt: 1
-                });
+                runner.setTestContext({itemIdentifier, attempt});
                 runner.renderItem(itemIdentifier, {});
             })
             .on('renderitem', () => {
@@ -269,13 +261,141 @@ define([
             .init();
     });
 
-    QUnit.test('Clear cached answers', assert => {
+    QUnit.test('No reload for responded item', assert => {
+        const done = assert.async();
+        const localProviderName = 'answerCacheMock';
+        const initialState = buildState('abcd');
+        const changedState = buildState('foo');
+        const attempt = 1;
+        const itemIdentifier = 'item-1';
+        const storeIdentifier = `${itemIdentifier}#${attempt}`;
+        const store = {
+            [storeIdentifier]: changedState
+        };
+
+        assert.expect(3);
+
+        runnerFactory.registerProvider(localProviderName, {
+            name: localProviderName,
+            loadAreaBroker() {},
+            loadProxy() {},
+            loadTestStore() {
+                return getStoreMock(store);
+            },
+            init() {},
+            renderItem() {
+                this.itemRunner = getItemRunnerMock(initialState);
+            }
+        });
+
+        const runner = runnerFactory(localProviderName, [answerCachePluginFactory]);
+
+        runner
+            .on('init', () => {
+                assert.ok(true, 'Runner has been initialized');
+                runner.setTestContext({itemIdentifier, attempt});
+                runner.renderItem(itemIdentifier, {});
+            })
+            .on('renderitem', () => {
+                Promise.resolve()
+                    .then(() => new Promise(resolve => {
+                        window.setTimeout(() => {
+                            assert.equal(typeof runner.itemRunner, 'object', 'The item runner is set');
+                            assert.deepEqual(runner.itemRunner.getState(), initialState, 'The item state has not been restored from the cache');
+                            resolve();
+                        }, 100);
+                    }))
+                    .then(() => {
+                        runner.destroy();
+                    });
+            })
+            .on('destroy', done)
+            .on('error', err => {
+                assert.ok(false, err.message);
+                done();
+            })
+            .init();
+    });
+
+    QUnit.test('Reload for responded item when option enabled', assert => {
+        const done = assert.async();
+        const localProviderName = 'answerCacheMock';
+        const initialState = buildState('abcd');
+        const changedState = buildState('foo');
+        const attempt = 1;
+        const itemIdentifier = 'item-1';
+        const storeIdentifier = `${itemIdentifier}#${attempt}`;
+        const store = {
+            [storeIdentifier]: changedState
+        };
+
+        assert.expect(3);
+
+        runnerFactory.registerProvider(localProviderName, {
+            name: localProviderName,
+            loadAreaBroker() {},
+            loadProxy() {},
+            loadTestStore() {
+                return getStoreMock(store);
+            },
+            init() {
+                const plugins = this.getPlugins() || {};
+                const pluginsConfig = this.getPluginsConfig() || {};
+
+                _.forEach(pluginsConfig, (config, pluginName) => {
+                    plugins[pluginName].setConfig(config);
+                });
+            },
+            renderItem() {
+                this.itemRunner = getItemRunnerMock(initialState);
+            }
+        });
+
+        const runner = runnerFactory(localProviderName, [answerCachePluginFactory], {
+            options: {
+                plugins: {
+                    answerCache: {
+                        allAttempts: true
+                    }
+                }
+            }
+        });
+
+        runner
+            .on('init', () => {
+                assert.ok(true, 'Runner has been initialized');
+                runner.setTestContext({itemIdentifier, attempt});
+                runner.renderItem(itemIdentifier, {});
+            })
+            .after('renderitem', () => {
+                Promise.resolve()
+                    .then(() => new Promise(resolve => {
+                        window.setTimeout(() => {
+                            assert.equal(typeof runner.itemRunner, 'object', 'The item runner is set');
+                            assert.deepEqual(runner.itemRunner.getState(), changedState, 'The item state has been restored from the cache');
+                            resolve();
+                        }, 100);
+                    }))
+                    .then(() => {
+                        runner.destroy();
+                    });
+            })
+            .on('destroy', done)
+            .on('error', err => {
+                assert.ok(false, err.message);
+                done();
+            })
+            .init();
+    });
+
+    QUnit.test('No reload for different attempt', assert => {
         const done = assert.async();
         const localProviderName = 'answerCacheMock';
         const emptyState = buildState('');
         const changedState = buildState('abcd');
+        const attempt = 1;
         const itemIdentifier = 'item-1';
-        const storeIdentifier = 'item-1';
+        const storeIdentifier = `${itemIdentifier}#${attempt}`;
         const store = {
             [storeIdentifier]: changedState
         };
@@ -287,27 +407,35 @@ define([
             loadAreaBroker() {},
             loadProxy() {},
             loadTestStore() {
-                return {
-                    getStore() {
-                        return getStoreMock(store);
-                    }
-                };
+                return getStoreMock(store);
             },
-            init() {},
+            init() {
+                const plugins = this.getPlugins() || {};
+                const pluginsConfig = this.getPluginsConfig() || {};
+
+                _.forEach(pluginsConfig, (config, pluginName) => {
+                    plugins[pluginName].setConfig(config);
+                });
+            },
             renderItem() {
                 this.itemRunner = getItemRunnerMock(emptyState);
             }
         });
 
-        const runner = runnerFactory(localProviderName, [answerCachePluginFactory]);
+        const runner = runnerFactory(localProviderName, [answerCachePluginFactory], {
+            options: {
+                plugins: {
+                    answerCache: {
+                        allAttempts: true
+                    }
+                }
+            }
+        });
 
         runner
             .on('init', () => {
                 assert.ok(true, 'Runner has been initialized');
-                runner.setTestContext({
-                    itemIdentifier: itemIdentifier,
-                    attempt: 1
-                });
+                runner.setTestContext({itemIdentifier, attempt});
                 runner.renderItem(itemIdentifier, {});
             })
             .on('renderitem.first', () => {
@@ -321,14 +449,16 @@ define([
                         }, 100);
                     }))
                     .then(() => new Promise(resolve => {
+                        store[storeIdentifier] = buildState('foo');
                         runner
-                            .after('unloaditem', () => {
+                            .on('renderitem', () => {
                                 window.setTimeout(() => {
-                                    assert.equal(typeof store[storeIdentifier], 'undefined', 'The store has been cleared');
+                                    assert.deepEqual(runner.itemRunner.getState(), emptyState, 'The item state has not been loaded from cache');
                                     resolve();
                                 }, 100);
                             })
-                            .trigger('unloaditem');
+                            .setTestContext({itemIdentifier, attempt: 2})
+                            .loadItem(itemIdentifier);
                     }))
                     .then(() => {
                         runner.destroy();
@@ -341,4 +471,76 @@ define([
             })
             .init();
     });
+
+    QUnit
+        .cases.init([
+            {title: 'on move', event: 'loaditem'},
+            {title: 'on finish', event: 'finish'}
+        ])
+        .test('Clear cached answers ', (data, assert) => {
+            const done = assert.async();
+            const localProviderName = 'answerCacheMock';
+            const emptyState = buildState('');
+            const changedState = buildState('abcd');
+            const attempt = 1;
+            const itemIdentifier = 'item-1';
+            const storeIdentifier = `${itemIdentifier}#${attempt}`;
+            const store = {
+                [storeIdentifier]: changedState
+            };
+
+            assert.expect(4);
+
+            runnerFactory.registerProvider(localProviderName, {
+                name: localProviderName,
+                loadAreaBroker() {},
+                loadProxy() {},
+                loadTestStore() {
+                    return getStoreMock(store);
+                },
+                init() {},
+                renderItem() {
+                    this.itemRunner = getItemRunnerMock(emptyState);
+                }
+            });
+
+            const runner = runnerFactory(localProviderName, [answerCachePluginFactory]);
+
+            runner
+                .on('init', () => {
+                    assert.ok(true, 'Runner has been initialized');
+                    runner.setTestContext({itemIdentifier, attempt});
+                    runner.renderItem(itemIdentifier, {});
+                })
+                .on('renderitem.first', () => {
+                    runner.off('renderitem.first');
+                    Promise.resolve()
+                        .then(() => new Promise(resolve => {
+                            window.setTimeout(() => {
+                                assert.equal(typeof runner.itemRunner, 'object', 'The item runner is set');
+                                assert.deepEqual(runner.itemRunner.getState(), changedState, 'The item state has been restored from the cache');
+                                resolve();
+                            }, 100);
+                        }))
+                        .then(() => new Promise(resolve => {
+                            runner
+                                .after(data.event, () => {
+                                    window.setTimeout(() => {
+                                        assert.equal(typeof store[storeIdentifier], 'undefined', 'The store has been cleared');
+                                        resolve();
+                                    }, 100);
+                                })
+                                .trigger(data.event);
+                        }))
+                        .then(() => {
+                            runner.destroy();
+                        });
+                })
+                .on('destroy', done)
+                .on('error', err => {
+                    assert.ok(false, err.message);
+                    done();
+                })
+                .init();
+        });
 });
