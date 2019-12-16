@@ -265,5 +265,14 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('2.6.0', '2.10.4');
+
+        if ($this->isVersion('2.10.4')) {
+            $extension = $this->getServiceManager()->get(\common_ext_ExtensionsManager::SERVICE_ID)->getExtensionById('taoQtiTest');
+            $config = $extension->getConfig('testRunner');
+            $config['plugins']['answerCache']['allAttempts'] = false;
+            $extension->setConfig('testRunner', $config);
+
+            $this->setVersion('2.11.0');
+        }
     }
 }
