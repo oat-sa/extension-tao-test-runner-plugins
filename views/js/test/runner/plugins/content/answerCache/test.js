@@ -21,12 +21,14 @@
 
 define([
     'jquery',
+    'lodash',
     'core/eventifier',
     'taoTests/runner/runner',
     'taoTests/runner/plugin',
     'taoTestRunnerPlugins/runner/plugins/content/answerCache'
 ], function (
     $,
+    _,
     eventifier,
     runnerFactory,
     pluginFactory,
@@ -42,6 +44,76 @@ define([
         init() {}
     });
 
+    /**
+     * Builds a state object from the provided value
+     * @param {String} value
+     * @returns {Object}
+     */
+    function buildState(value = '') {
+        return {
+            base: {
+                string: value
+            }
+        };
+    }
+
+    /**
+     * Mocks a store
+     * @param {Object} store
+     * @returns {Promise<{Object}>}
+     */
+    function getStoreMock(store = {}) {
+        return Promise.resolve({
+            getItem(key) {
+                return Promise.resolve(store[key]);
+            },
+            setItem(key, value) {
+                store[key] = value;
+                return Promise.resolve(true);
+            },
+            clear() {
+                _.forEach(store, (v, key) => delete store[key]);
+            }
+        });
+    }
+
+    /**
+     * Mocks an item runner
+     * @param {Object} initialState
+     * @returns {itemRunner}
+     */
+    function getItemRunnerMock(initialState) {
+        let state = initialState;
+        return eventifier({
+            _item: {
+                responses: {
+                    responseDeclaration1: {
+                        attributes: {
+                            identifier: 'RESPONSE',
+                            cardinality: 'single',
+                            baseType: 'string'
+                        },
+                        defaultValue: []
+                    }
+                }
+            },
+            getResponses() {
+                return {
+                    RESPONSE: state
+                };
+            },
+            setResponses(response) {
+                this.setState(response);
+                this.trigger('responsechange');
+            },
+            getState() {
+                return state;
+            },
+            setState(newState) {
+                state = newState;
+            }
+        });
+    }
 
     QUnit.module('pluginFactory');
 
@@ -67,21 +139,14 @@ define([
 
     QUnit.module('behavior');
 
-    QUnit.test('Reload answers', assert => {
+    QUnit.test('Cache answers', assert => {
         const done = assert.async();
         const localProviderName = 'answerCacheMock';
         const store = {};
-        const emptyState = {
-            base: {
-                string: ''
-            }
-        };
-        const changedState = {
-            base: {
-                string: 'abcd'
-            }
-        };
-        let state = emptyState;
+        const emptyState = buildState('');
+        const changedState = buildState('abcd');
+        const itemIdentifier = 'item-1';
+        const storeIdentifier = 'item-1';
 
         assert.expect(5);
 
@@ -92,49 +157,13 @@ define([
             loadTestStore() {
                 return {
                     getStore() {
-                        return Promise.resolve({
-                            getItem(key) {
-                                return Promise.resolve(store[key]);
-                            },
-                            setItem(key, value) {
-                                store[key] = value;
-                                return Promise.resolve(true);
-                            }
-                        });
+                        return getStoreMock(store);
                     }
                 };
             },
             init() {},
             renderItem() {
-                this.itemRunner = eventifier({
-                    _item: {
-                        responses: {
-                            responsedeclaration_5df3b12bb96b9184208345: {
-                                attributes: {
-                                    identifier: 'RESPONSE',
-                                    cardinality: 'single',
-                                    baseType: 'string'
-                                },
-                                defaultValue: []
-                            }
-                        }
-                    },
-                    getResponses() {
-                        return {
-                            RESPONSE: state
-                        };
-                    },
-                    setResponses(response) {
-                        this.setState(response);
-                        this.trigger('responsechange');
-                    },
-                    getState() {
-                        return state;
-                    },
-                    setState(newState) {
-                        state = newState;
-                    }
-                });
+                this.itemRunner = getItemRunnerMock(emptyState);
             }
         });
 
@@ -144,10 +173,10 @@ define([
             .on('init', () => {
                 assert.ok(true, 'Runner has been initialized');
                 runner.setTestContext({
-                    itemIdentifier: 'item-1',
+                    itemIdentifier: itemIdentifier,
                     attempt: 1
                 });
-                runner.renderItem('item-1', {});
+                runner.renderItem(itemIdentifier, {});
             })
             .on('renderitem', () => {
                 Promise.resolve()
@@ -162,9 +191,144 @@ define([
                         runner.itemRunner.setResponses(changedState);
                         window.setTimeout(() => {
                             assert.deepEqual(runner.itemRunner.getState(), changedState, 'The item state has changed');
-                            assert.deepEqual(store['item-1'], changedState, 'The item state has changed');
+                            assert.deepEqual(store[storeIdentifier], changedState, 'The item state has changed');
                             resolve();
                         }, 100);
+                    }))
+                    .then(() => {
+                        runner.destroy();
+                    });
+            })
+            .on('destroy', done)
+            .on('error', err => {
+                assert.ok(false, err.message);
+                done();
+            })
+            .init();
+    });
+
+    QUnit.test('Reload cached answers', assert => {
+        const done = assert.async();
+        const localProviderName = 'answerCacheMock';
+        const emptyState = buildState('');
+        const changedState = buildState('abcd');
+        const itemIdentifier = 'item-1';
+        const storeIdentifier = 'item-1';
+        const store = {
+            [storeIdentifier]: changedState
+        };
+
+        assert.expect(3);
+
+        runnerFactory.registerProvider(localProviderName, {
+            name: localProviderName,
+            loadAreaBroker() {},
+            loadProxy() {},
+            loadTestStore() {
+                return {
+                    getStore() {
+                        return getStoreMock(store);
+                    }
+                };
+            },
+            init() {},
+            renderItem() {
+                this.itemRunner = getItemRunnerMock(emptyState);
+            }
+        });
+
+        const runner = runnerFactory(localProviderName, [answerCachePluginFactory]);
+
+        runner
+            .on('init', () => {
+                assert.ok(true, 'Runner has been initialized');
+                runner.setTestContext({
+                    itemIdentifier: itemIdentifier,
+                    attempt: 1
+                });
+                runner.renderItem(itemIdentifier, {});
+            })
+            .on('renderitem', () => {
+                Promise.resolve()
+                    .then(() => new Promise(resolve => {
+                        window.setTimeout(() => {
+                            assert.equal(typeof runner.itemRunner, 'object', 'The item runner is set');
+                            assert.deepEqual(runner.itemRunner.getState(), changedState, 'The item state has been restored from the cache');
+                            resolve();
+                        }, 100);
+                    }))
+                    .then(() => {
+                        runner.destroy();
+                    });
+            })
+            .on('destroy', done)
+            .on('error', err => {
+                assert.ok(false, err.message);
+                done();
+            })
+            .init();
+    });
+
+    QUnit.test('Clear cached answers', assert => {
+        const done = assert.async();
+        const localProviderName = 'answerCacheMock';
+        const emptyState = buildState('');
+        const changedState = buildState('abcd');
+        const itemIdentifier = 'item-1';
+        const storeIdentifier = 'item-1';
+        const store = {
+            [storeIdentifier]: changedState
+        };
+
+        assert.expect(4);
+
+        runnerFactory.registerProvider(localProviderName, {
+            name: localProviderName,
+            loadAreaBroker() {},
+            loadProxy() {},
+            loadTestStore() {
+                return {
+                    getStore() {
+                        return getStoreMock(store);
+                    }
+                };
+            },
+            init() {},
+            renderItem() {
+                this.itemRunner = getItemRunnerMock(emptyState);
+            }
+        });
+
+        const runner = runnerFactory(localProviderName, [answerCachePluginFactory]);
+
+        runner
+            .on('init', () => {
+                assert.ok(true, 'Runner has been initialized');
+                runner.setTestContext({
+                    itemIdentifier: itemIdentifier,
+                    attempt: 1
+                });
+                runner.renderItem(itemIdentifier, {});
+            })
+            .on('renderitem.first', () => {
+                runner.off('renderitem.first');
+                Promise.resolve()
+                    .then(() => new Promise(resolve => {
+                        window.setTimeout(() => {
+                            assert.equal(typeof runner.itemRunner, 'object', 'The item runner is set');
+                            assert.deepEqual(runner.itemRunner.getState(), changedState, 'The item state has been restored from the cache');
+                            resolve();
+                        }, 100);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .after('unloaditem', () => {
+                                window.setTimeout(() => {
+                                    assert.equal(typeof store[storeIdentifier], 'undefined', 'The store has been cleared');
+                                    resolve();
+                                }, 100);
+                            })
+                            .trigger('unloaditem');
                     }))
                     .then(() => {
                         runner.destroy();
