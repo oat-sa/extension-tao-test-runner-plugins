@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2017 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2017-2019 (original work) Open Assessment Technologies SA ;
  */
 /**
  * Plugin that puts in cache the current item's state upon move.
@@ -39,36 +39,40 @@ define([
         /**
          * Initialize the plugin (called during runner's init)
          */
-        init: function init() {
-            var self = this;
-            var testRunner = this.getTestRunner();
+        init() {
+            const testRunner = this.getTestRunner();
 
-            return testRunner.getPluginStore(this.getName()).then(function (store) {
-                self.storage = store;
+            return testRunner.getPluginStore(this.getName()).then(store => {
+                this.storage = store;
 
                 testRunner
-                    .after('renderitem', function () {
-                        var itemRunner = testRunner.itemRunner;
-                        var testContext = testRunner.getTestContext();
-                        var key = testContext.itemIdentifier;
+                    .after('renderitem', () => {
+                        const itemRunner = testRunner.itemRunner;
+                        const testContext = testRunner.getTestContext();
+                        const key = `${testContext.itemIdentifier}#${testContext.attempt}`;
+                        const {allAttempts} = this.getConfig();
 
-                        if (itemRunner && !currentItem.isAnswered(testRunner)) {
-                            itemRunner.on('responsechange', function () {
-                                self.storage.setItem(key, itemRunner.getState());
-                            });
-                            return self.storage.getItem(key)
-                                .then(function (state) {
+                        // clear the cache when we have reached safely the next step in the navigation
+                        testRunner.on(namespaceHelper.namespaceAll('loaditem finish', this.getName()), () => {
+                            testRunner.off(`.${this.getName()}`);
+                            return this.storage.clear();
+                        });
+
+                        if (itemRunner && (allAttempts || !currentItem.isAnswered(testRunner))) {
+                            // cache answers on each response change
+                            itemRunner
+                                .off(`.${this.getName()}`)
+                                .on(`responsechange.${this.getName()}`, () => {
+                                    this.storage.setItem(key, itemRunner.getState());
+                                });
+
+                            // load the cached answers if any
+                            return this.storage.getItem(key)
+                                .then(state => {
                                     if (state) {
                                         itemRunner.setState(state);
                                     }
                                 });
-                        }
-                    })
-                    .on('unloaditem', function () {
-                        // the store should not be cleared after a pause
-                        // otherwise the response won't be restored after resume
-                        if (!testRunner.getState('closedOrSuspended')) {
-                            return self.storage.clear();
                         }
                     });
             });
