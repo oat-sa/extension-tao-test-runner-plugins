@@ -265,5 +265,38 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('2.6.0', '2.10.4');
+
+        if ($this->isVersion('2.10.4')) {
+            $extension = $this->getServiceManager()->get(\common_ext_ExtensionsManager::SERVICE_ID)->getExtensionById('taoQtiTest');
+            $config = $extension->getConfig('testRunner');
+            $config['plugins']['answerCache']['allAttempts'] = false;
+            $extension->setConfig('testRunner', $config);
+
+            $this->setVersion('2.11.0');
+        }
+
+        if ($this->isVersion('2.11.0')) {
+            $extension = $this->getServiceManager()->get(\common_ext_ExtensionsManager::SERVICE_ID)->getExtensionById('taoQtiTest');
+            $config = $extension->getConfig('testRunner');
+            $config['plugins']['sessionHeartbeat'] = [
+                'interval' => '900',
+                'action' => 'up'
+            ];
+            $extension->setConfig('testRunner', $config);
+
+            $registry = PluginRegistry::getRegistry();
+            $registry->register(TestPlugin::fromArray([
+                'id' => 'sessionHeartbeat',
+                'name' => 'Session Heartbeat',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/controls/sessionHeartbeat',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Send a regular signal to keep the session alive',
+                'category' => 'controls',
+                'active' => false,
+                'tags' => [ ]
+            ]));
+
+            $this->setVersion('2.12.0');
+        }
     }
 }
