@@ -86,8 +86,7 @@ class JsonOfflineTestParser implements OfflineTestParserInterface
     public function getActionsQueue()
     {
         $body = $this->getBody();
-        $actionQueue = isset($body['actionQueue']) ? $body['actionQueue'] : [];
-        return $actionQueue;
+        return $body['actionQueue'] ?? [];
     }
 
     /**
@@ -119,9 +118,14 @@ class JsonOfflineTestParser implements OfflineTestParserInterface
     /**
      * @return bool
      */
-    public function isInterrupted()
+    public function isInterrupted(): bool
     {
         $body = $this->getBody();
-        return isset($body[self::KEY_IS_EXIT_TEST]) ? (bool) $body[self::KEY_IS_EXIT_TEST] : false;
+
+        if (isset($body[self::KEY_IS_EXIT_TEST])) {
+            return filter_var($body[self::KEY_IS_EXIT_TEST], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return false;
     }
 }

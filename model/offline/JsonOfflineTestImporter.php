@@ -120,6 +120,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
         } catch (\Exception $e) {
             $this->report = Report::createFailure(__('Fail to import test actions with message: '. $e->getMessage()));
         }
+
         $this->getUploadService()->remove($uploadedFile);
 
         return $this->report;
@@ -189,7 +190,9 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
      */
     protected function importActions()
     {
-        $data = $this->getOfflineParser()->getActionsQueue();
+        $parsedSession = $this->getOfflineParser();
+
+        $data = $parsedSession->getActionsQueue();
 
         if (!$data) {
             throw new \common_Exception(__('Cannot find any actions for importing.'));
@@ -201,7 +204,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
         ];
 
         /** @var DeliveryExecutionInterface $deliveryExecution */
-        $deliveryExecution = $this->getProxyService()->getDeliveryExecution($this->getOfflineParser()->getSessionId());
+        $deliveryExecution = $this->getProxyService()->getDeliveryExecution($parsedSession->getSessionId());
 
         if ($deliveryExecution->getState()->getUri() !== DeliveryExecutionInterface::STATE_ACTIVE) {
             throw new \common_Exception(__('Delivery execution %s is not active state.', $deliveryExecution->getIdentifier()));
@@ -212,7 +215,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
 
         $testState = DeliveryExecutionInterface::STATE_TERMINATED;
 
-        if (!$this->getOfflineParser()->isInterrupted()) {
+        if (!$parsedSession->isInterrupted()) {
 
             /** @var AssessmentTestSession $testSession */
             $testSession = $serviceContext->getTestSession();
@@ -236,7 +239,8 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
         $successReport = Report::createSuccess(
             __('%s actions were successfully imported', count($data))
         );
-        $successReport->setData(['uriResource' => $this->getOfflineParser()->getSessionId()]);
+
+        $successReport->setData(['uriResource' => $parsedSession->getSessionId()]);
 
         $this->report->add($successReport);
     }
