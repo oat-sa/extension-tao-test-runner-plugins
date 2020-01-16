@@ -29,6 +29,8 @@ use oat\oatbox\filesystem\File;
  */
 class JsonOfflineTestParser implements OfflineTestParserInterface
 {
+    const KEY_IS_EXIT_TEST = 'isExitTest';
+
     /** @var string */
     private $content;
 
@@ -84,8 +86,7 @@ class JsonOfflineTestParser implements OfflineTestParserInterface
     public function getActionsQueue()
     {
         $body = $this->getBody();
-        $actionQueue = isset($body['actionQueue']) ? $body['actionQueue'] : [];
-        return $actionQueue;
+        return $body['actionQueue'] ?? [];
     }
 
     /**
@@ -112,5 +113,19 @@ class JsonOfflineTestParser implements OfflineTestParserInterface
         $body = $this->getBody();
         $testConfig = $body['testConfig'];
         return (isset($testConfig[$key]) && $testConfig[$key]) ? $testConfig[$key] : null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInterrupted(): bool
+    {
+        $body = $this->getBody();
+
+        if (isset($body[self::KEY_IS_EXIT_TEST])) {
+            return filter_var($body[self::KEY_IS_EXIT_TEST], FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return false;
     }
 }

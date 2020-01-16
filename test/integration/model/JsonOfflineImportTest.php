@@ -18,6 +18,8 @@
  *
  */
 
+use League\Flysystem\FileExistsException;
+use oat\oatbox\filesystem\File;
 use oat\tao\model\upload\UploadService;
 use oat\tao\test\TaoPhpUnitTestRunner;
 use oat\taoDelivery\model\execution\DeliveryExecution;
@@ -28,33 +30,73 @@ use oat\taoTestRunnerPlugins\model\offline\OfflineTestParserInterface;
 use oat\taoQtiTest\models\runner\communicator\QtiCommunicationService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
+use Prophecy\Argument;
 use qtism\common\datatypes\QtiFloat;
 use qtism\common\enums\BaseType;
 use qtism\common\enums\Cardinality;
 use qtism\runtime\common\OutcomeVariable;
 use qtism\runtime\tests\AssessmentTestSession;
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 class JsonOfflineImportTest extends TaoPhpUnitTestRunner
 {
-
-    public function testImport()
+    /**
+     * @dataProvider importDataProvider
+     *
+     * @param $sampleFile
+     * @param $expectedDeliveryExecutionStatus
+     *
+     * @throws FileExistsException
+     * @throws common_Exception
+     * @throws common_exception_Error
+     */
+    public function testImport($sampleFile, $expectedDeliveryExecutionStatus)
     {
-        $file = $this->getTempFileToUpload('json/sample.json');
+        $file = $this->getTempFileToUpload($sampleFile);
+
         $importer = new JsonOfflineTestImporter();
         $importer->setServiceLocator($this->getMockServiceLocator());
-        $class = $this->prophesize('\core_kernel_classes_Class');
-        $resource = $this->prophesize('\core_kernel_classes_Resource');
-        $class->createInstanceWithProperties([])
-            ->willReturn($resource->reveal());
+
+        $class = $this->prophesize(core_kernel_classes_Class::class);
+        $resource = $this->prophesize(core_kernel_classes_Resource::class);
+
+        $class->createInstanceWithProperties([])->willReturn($resource->reveal());
+
         $report = $importer->import($class->reveal(), ['uploaded_file' => $file]);
 
-        $this->assertInstanceOf('common_report_Report', $report);
+        $this->assertInstanceOf(common_report_Report::class, $report);
         $this->assertEquals(common_report_Report::TYPE_INFO, $report->getType());
-        $this->assertEquals(2, count($report->getSuccesses()));
+
+        $successes = $report->getSuccesses(true);
+
+        $this->assertCount(2, $successes);
+
+        /** @var common_report_Report $lastReportEntry */
+        $lastReportEntry = array_pop($successes);
+        $importedUri = $lastReportEntry->getData()['uriResource'];
+
+        $de = $importer->getServiceLocator()->get(ServiceProxy::SERVICE_ID)->getDeliveryExecution($importedUri);
+
+        $this->assertEquals($expectedDeliveryExecutionStatus, $de->getState()->getUri());
     }
+
+    /**
+     * @return array
+     */
+    public function importDataProvider()
+    {
+        return [
+            ['json/sample.json', DeliveryExecutionInterface::STATE_FINISHED],
+            ['json/sample-interrupted.json', DeliveryExecutionInterface::STATE_TERMINATED]
+        ];
+    }
+
     /**
      * @param $path
-     * @return \oat\oatbox\filesystem\File
+     *
+     * @return File
+     * @throws FileExistsException
+     * @throws common_Exception
      */
     protected function getTempFileToUpload($path)
     {
@@ -63,8 +105,10 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
         $file = $this->getTempDirectory()->getFile('test-import');
         $file->write(file_get_contents($path));
         $this->assertTrue($file->exists());
+
         return $file;
     }
+
     /**
      * @param $path
      * @return string
@@ -76,8 +120,9 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
             'samples' . DIRECTORY_SEPARATOR .
             trim($path, '\\/');
     }
+
     /**
-     * @return \Zend\ServiceManager\ServiceLocatorInterface
+     * @return ServiceLocatorInterface
      */
     protected function getMockServiceLocator()
     {
@@ -85,14 +130,22 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
         $deP->getIdentifier()->willReturn('http://sample/first.rdf#i154661273822140');
         $deP->getLabel()->willReturn('test');
         $deP->getUserIdentifier()->willReturn('http://sample/first.rdf#i154661273822141');
-        $stateProphecy = $this->prophesize(\core_kernel_classes_Resource::class);
+
+        $stateProphecy = $this->prophesize(core_kernel_classes_Resource::class);
         $stateProphecy->getUri()->willReturn(DeliveryExecution::STATE_ACTIVE);
+
         $deP->getState()->willReturn($stateProphecy);
-        $deP->setState(DeliveryExecutionInterface::STATE_FINISHED)->willReturn($stateProphecy);
+
+        $deP->setState(Argument::any())->will(function ($args) use($stateProphecy) {
+            $stateProphecy->getUri()->willReturn(array_shift($args));
+        });
+
         $de = $deP->reveal();
+
         $prophecy = $this->prophesize(ServiceProxy::class);
         $prophecy->getDeliveryExecution('http://sample/first.rdf#i154661273822140')->willReturn($de);
         $upload = $this->prophesize(UploadService::class);
+
         $assessmentTestSession = $this->prophesize(AssessmentTestSession::class);
         $assessmentTestSession->setVariable(
             new OutcomeVariable(
@@ -102,6 +155,7 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
                 new QtiFloat(1.0)
             )
         )->willReturn(true);
+
         $assessmentTestSession = $assessmentTestSession->reveal();
         $serviceContext =  $this->prophesize(QtiRunnerServiceContext::class);
         $serviceContext->getTestSession()->willReturn($assessmentTestSession);
@@ -116,13 +170,13 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
         )->willReturn($serviceContext);
         $qtiCommunicationService = $this->prophesize(QtiCommunicationService::class);
         $qtiCommunicationService->processInput($serviceContext, $this->getMockData())->willReturn(true);
-        $serviceLocatorMock = $this->getServiceLocatorMock([
+
+        return $this->getServiceLocatorMock([
             ServiceProxy::SERVICE_ID => $prophecy,
             QtiRunnerService::SERVICE_ID => $qtiRunnerService,
             UploadService::SERVICE_ID => $upload,
             QtiCommunicationService::SERVICE_ID => $qtiCommunicationService
         ]);
-        return $serviceLocatorMock;
     }
     /**
      * @return array
