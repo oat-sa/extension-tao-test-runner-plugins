@@ -74,6 +74,13 @@ define([
                                 $el.prop('disabled', disabled[key]);
                             });
                             disabled = [];
+                        })
+                        .on(namespaceHelper.namespaceAll('dragleave', 'preventdropimg'), function (event) {
+                            _.forEach($items, function (el, key) {
+                                var $el = $(el);
+                                $el.prop('disabled', disabled[key]);
+                            });
+                            disabled = [];
                         });
                 }).on('destroy', function() {
                     var config = _.defaults((self.getConfig() || {}), _defaults);
