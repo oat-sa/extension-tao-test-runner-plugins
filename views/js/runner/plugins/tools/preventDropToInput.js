@@ -54,7 +54,7 @@ define([
             var testRunner = self.getTestRunner();
 
             this.getTestRunner()
-                .after('renderitem', function () {
+                .after('renderitem', function renderItem() {
                     var config = _.defaults((self.getConfig() || {}), _defaults);
                     var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
                     var disabled = {};
@@ -78,14 +78,13 @@ define([
                             });
                         })
                         .on(namespaceHelper.namespaceAll('dragend', 'preventdropimg'), function handleDragEnd(event) {
-                            event.preventDefault();
                             _.forEach($items, function (el, key) {
                                 var $el = $(el);
                                 $el.prop('disabled', disabled[key]);
                             });
                             disabled = {};
                         });
-                }).on('destroy', function() {
+                }).on('destroy', function destroy() {
                     var config = _.defaults((self.getConfig() || {}), _defaults);
                     $(config.draggableSelector).off('.preventdropimg');
                 });
