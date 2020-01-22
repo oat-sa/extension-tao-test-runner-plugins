@@ -77,7 +77,7 @@ define([
                                 $el.prop('disabled', true);
                             });
                         })
-                        .on(namespaceHelper.namespaceAll('dragend', 'preventdropimg'), function handleDragEnd(event) {
+                        .on(namespaceHelper.namespaceAll('dragend', 'preventdropimg'), function handleDragEnd() {
                             _.forEach($items, function (el, key) {
                                 var $el = $(el);
                                 $el.prop('disabled', disabled[key]);
