@@ -20,6 +20,7 @@
  */
 namespace oat\taoTestRunnerPlugins\controller;
 
+use core_kernel_classes_Class;
 use oat\taoTestRunnerPlugins\model\offline\JsonOfflineTestImporter;
 
 /**
@@ -66,7 +67,7 @@ class OfflineResultImport extends \tao_actions_Import
 
     /**
      * Helper to get the selected class, needs to be passed as hidden field in the form
-     * @return \core_kernel_classes_Class
+     * @return core_kernel_classes_Class
      */
     protected function getCurrentClass()
     {
