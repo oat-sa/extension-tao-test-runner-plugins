@@ -40,7 +40,7 @@ class JsonOfflineTestParser implements OfflineTestParserInterface, ServiceLocato
     const KEY_IS_EXIT_TEST = 'isExitTest';
 
     const PROTECTED_FIELDS = [
-        'testDefinition', 'testCompilation', 'serviceCallId', 'exitUrl'
+        'testDefinition', 'testCompilation', 'serviceCallId', 'exitUrl', 'testServiceCallId'
     ];
 
     /** @var string */
