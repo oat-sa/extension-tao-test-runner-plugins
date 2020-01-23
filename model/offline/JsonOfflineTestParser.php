@@ -106,11 +106,6 @@ class JsonOfflineTestParser implements OfflineTestParserInterface, ServiceLocato
         $uriProvider = $this->getUriProviderService();
         $validInstanceLink = $uriProvider->provide();
 
-//        print_r($uri);
-//        echo '    ';
-//        print_r($validInstanceLink);
-//        echo PHP_EOL;
-
         return Uri::getDomain($uri) === Uri::getDomain($validInstanceLink);
     }
 
