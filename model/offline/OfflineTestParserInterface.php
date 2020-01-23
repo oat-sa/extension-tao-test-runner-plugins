@@ -29,7 +29,7 @@ use oat\oatbox\filesystem\File;
  */
 interface OfflineTestParserInterface
 {
-    const IS_OFFLINE_VARIABLE = 'WasCompletedOffline';
+    public const IS_OFFLINE_VARIABLE = 'WasCompletedOffline';
 
     /**
      * OfflineParser constructor.

@@ -184,7 +184,9 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
     {
         if (!$this->offlineParser) {
             $this->offlineParser = new $type($uploadedFile);
+            $this->offlineParser->setServiceLocator($this->getServiceLocator());
         }
+
         return $this;
     }
 
