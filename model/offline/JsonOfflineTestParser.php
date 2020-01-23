@@ -21,15 +21,27 @@
 
 namespace oat\taoTestRunnerPlugins\model\offline;
 
+use common_Exception;
+use http\Exception\InvalidArgumentException;
+use oat\generis\model\kernel\uri\UriProvider;
 use oat\oatbox\filesystem\File;
+use tao_helpers_Uri as Uri;
+use Zend\ServiceManager\ServiceLocatorAwareInterface;
+use Zend\ServiceManager\ServiceLocatorAwareTrait;
 
 /**
  * Class JsonOfflineTestParser
  * @package oat\taoTestRunnerPlugins\model\offline
  */
-class JsonOfflineTestParser implements OfflineTestParserInterface
+class JsonOfflineTestParser implements OfflineTestParserInterface, ServiceLocatorAwareInterface
 {
+    use ServiceLocatorAwareTrait;
+
     const KEY_IS_EXIT_TEST = 'isExitTest';
+
+    const PROTECTED_FIELDS = [
+        'testDefinition', 'testCompilation', 'serviceCallId', 'exitUrl'
+    ];
 
     /** @var string */
     private $content;
@@ -57,6 +69,7 @@ class JsonOfflineTestParser implements OfflineTestParserInterface
         if (!$this->body || !is_array($this->body)) {
             $this->body = json_decode($this->getContent(), true);
         }
+
         return $this->body;
     }
 
@@ -76,8 +89,60 @@ class JsonOfflineTestParser implements OfflineTestParserInterface
         if (!$this->content) {
             $this->content = $this->getFile()->read();
         }
-        return $this->content;
 
+        return $this->content;
+    }
+
+    /**
+     * It checks if URI belongs the instance
+     *
+     * @param $uri
+     *
+     * @return bool
+     */
+    public function checkUri($uri)
+    {
+        /** @var UriProvider $uriProvider */
+        $uriProvider = $this->getUriProviderService();
+        $validInstanceLink = $uriProvider->provide();
+
+//        print_r($uri);
+//        echo '    ';
+//        print_r($validInstanceLink);
+//        echo PHP_EOL;
+
+        return Uri::getDomain($uri) === Uri::getDomain($validInstanceLink);
+    }
+
+    /**
+     * Validates body content to avoid unexpected behavior
+     */
+    public function validateUris()
+    {
+        $body = $this->getBody();
+
+        $validateUriFunction = [$this, 'checkUri'];
+
+        $invalid = 0;
+
+        array_walk_recursive($body, static function ($item, $key) use ($validateUriFunction, &$invalid) {
+            if (in_array($key, self::PROTECTED_FIELDS, true) && !$validateUriFunction($item)) {
+                $invalid++;
+            }
+        });
+
+        return !$invalid;
+    }
+
+    /**
+     * Validates body content to avoid unexpected behavior
+     * Runs various validation rules
+     */
+    public function validate()
+    {
+        if (!$this->validateUris()) {
+            throw new common_Exception(__('Several resources URIs do not belong to the instance where the test was passed'));
+        }
     }
 
     /**
@@ -127,5 +192,10 @@ class JsonOfflineTestParser implements OfflineTestParserInterface
         }
 
         return false;
+    }
+
+    protected function getUriProviderService()
+    {
+        return $this->getServiceLocator()->get(UriProvider::SERVICE_ID);
     }
 }
