@@ -52,4 +52,10 @@ interface OfflineTestParserInterface
      * @return mixed
      */
     public function getTestConfig($key);
+
+    /**
+     * Returns true if test was interrupted by user
+     * @return bool
+     */
+    public function isInterrupted();
 }
