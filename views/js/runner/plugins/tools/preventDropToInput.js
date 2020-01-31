@@ -54,28 +54,37 @@ define([
             var testRunner = self.getTestRunner();
 
             this.getTestRunner()
-                .after('renderitem', function () {
+                .after('renderitem', function renderItem() {
                     var config = _.defaults((self.getConfig() || {}), _defaults);
                     var $items = testRunner.getAreaBroker().getContentArea().find(config.selector);
-                    var disabled = [];
+                    var disabled = {};
 
                     $(config.draggableSelector)
                         .off('.preventdropimg')
-                        .on(namespaceHelper.namespaceAll('dragstart', 'preventdropimg'), function (event) {
+                        .on(namespaceHelper.namespaceAll('dragstart', 'preventdropimg'), function handleDragStart(e) {
+                            /**
+                             * Workaround for Mozilla browser:
+                             * In some cases the `dragend` event doesn't fire.
+                             * We set event.dataTransfer.setDragImage in order to force it to be fired
+                             */
+                            var target = e.originalEvent.target;
+                            e.originalEvent.dataTransfer.setData("text/plain", target.id);
+                            e.originalEvent.dataTransfer.setDragImage(target, 0, 0);
+
                             _.forEach($items, function (el, key) {
                                 var $el = $(el);
                                 disabled[key] = !!$el.prop('disabled');
                                 $el.prop('disabled', true);
                             });
                         })
-                        .on(namespaceHelper.namespaceAll('dragend', 'preventdropimg'), function (event) {
+                        .on(namespaceHelper.namespaceAll('dragend', 'preventdropimg'), function handleDragEnd() {
                             _.forEach($items, function (el, key) {
                                 var $el = $(el);
                                 $el.prop('disabled', disabled[key]);
                             });
-                            disabled = [];
+                            disabled = {};
                         });
-                }).on('destroy', function() {
+                }).on('destroy', function destroy() {
                     var config = _.defaults((self.getConfig() || {}), _defaults);
                     $(config.draggableSelector).off('.preventdropimg');
                 });

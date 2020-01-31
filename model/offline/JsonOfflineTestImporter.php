@@ -21,7 +21,12 @@
 
 namespace oat\taoTestRunnerPlugins\model\offline;
 
+use common_Exception;
+use common_exception_Error;
+use common_exception_InvalidArgumentType;
 use common_report_Report as Report;
+use core_kernel_classes_Class;
+use Exception;
 use oat\oatbox\filesystem\File;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
@@ -74,16 +79,15 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
      */
     public function getForm()
     {
-        return (new OfflineTestImportForm(null))
-            ->getForm();
+        return (new OfflineTestImportForm(null))->getForm();
     }
 
     /**
-     * @param \core_kernel_classes_Class $class
+     * @param core_kernel_classes_Class $class
      * @param Form|array $form
      * @param string|null $userId owner of the resource
      * @return Report
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
      */
     public function import($class, $form, $userId = null)
     {
@@ -103,7 +107,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
                     $this->setOfflineParser(JsonOfflineTestParser::class, $uploadedFile);
                     break;
                 default:
-                    throw new \common_Exception(__('Invalid MimeType of file'));
+                    throw new common_Exception(__('Invalid MimeType of file'));
                     break;
             }
 
@@ -117,7 +121,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
             ]);
             $this->report->add($successReport);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->report = Report::createFailure(__('Fail to import test actions with message: '. $e->getMessage()));
         }
 
@@ -180,22 +184,26 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
     {
         if (!$this->offlineParser) {
             $this->offlineParser = new $type($uploadedFile);
+            $this->offlineParser->setServiceLocator($this->getServiceLocator());
         }
+
         return $this;
     }
 
     /**
-     * @throws \common_Exception
-     * @throws \common_exception_InvalidArgumentType
+     * @throws common_Exception
+     * @throws common_exception_InvalidArgumentType
      */
     protected function importActions()
     {
         $parsedSession = $this->getOfflineParser();
 
+        $parsedSession->validate(); // validating data in the file before moving forward
+
         $data = $parsedSession->getActionsQueue();
 
         if (!$data) {
-            throw new \common_Exception(__('Cannot find any actions for importing.'));
+            throw new common_Exception(__('Cannot find any actions for importing.'));
         }
 
         $input[] = [
@@ -207,7 +215,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
         $deliveryExecution = $this->getProxyService()->getDeliveryExecution($parsedSession->getSessionId());
 
         if ($deliveryExecution->getState()->getUri() !== DeliveryExecutionInterface::STATE_ACTIVE) {
-            throw new \common_Exception(__('Delivery execution %s is not active state.', $deliveryExecution->getIdentifier()));
+            throw new common_Exception(__('Delivery execution %s is not active state.', $deliveryExecution->getIdentifier()));
         }
 
         /** @var QtiRunnerServiceContext $serviceContext */

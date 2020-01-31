@@ -1,4 +1,10 @@
 <?php
+
+use oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerFeatureService;
+use oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins;
+use oat\taoTestRunnerPlugins\scripts\install\SetDebounceDelayConfig;
+use oat\taoTestRunnerPlugins\scripts\update\Updater;
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +28,7 @@ return array(
     'label' => 'Manage test runner plugins',
     'description' =>  "Manage test runner's plugins",
     'license' => 'GPL-2.0',
-    'version' => '2.13.0',
+    'version' => '2.14.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => array(
         'tao'            => '>=31.0.0',
@@ -35,14 +41,14 @@ return array(
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#taoTestRunnerPluginsManager', array('ext' => 'taoTestRunnerPlugins')),
     ),
-    'update' => 'oat\\taoTestRunnerPlugins\\scripts\\update\\Updater',
+    'update' => Updater::class,
     'install' => [
         'rdf' => array(
         ),
         'php' => [
-            \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerPlugins::class,
-            \oat\taoTestRunnerPlugins\scripts\install\RegisterTestRunnerFeatureService::class,
-            \oat\taoTestRunnerPlugins\scripts\install\SetDebounceDelayConfig::class
+            RegisterTestRunnerPlugins::class,
+            RegisterTestRunnerFeatureService::class,
+            SetDebounceDelayConfig::class
         ]
     ],
     'uninstall' => [
@@ -54,12 +60,12 @@ return array(
     ),
     'constants' => array(
         # views directory
-        "DIR_VIEWS" => dirname(__FILE__) . DIRECTORY_SEPARATOR . "views" . DIRECTORY_SEPARATOR,
+        'DIR_VIEWS' => __DIR__ . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR,
 
         #BASE URL (usually the domain root)
         'BASE_URL' => ROOT_URL . 'taoTestRunnerPlugins/',
     ),
     'extra' => array(
-        'structures' => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml',
+        'structures' => __DIR__ . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR . 'structures.xml',
     )
 );
