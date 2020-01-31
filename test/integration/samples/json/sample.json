@@ -163,7 +163,7 @@
     }
   },
   "testConfig": {
-    "exitUrl": "http://sample.local/taoDelivery/DeliveryServer/index",
+    "exitUrl": "http://sample/taoDelivery/DeliveryServer/index",
     "testDefinition": "http://sample/first.rdf#i1544535042652725",
     "testCompilation": "http://sample/first.rdf#i1544535107181528-|http://sample/first.rdf#i1544535107965629+",
     "serviceCallId": "http://sample/first.rdf#i154661273822140",
@@ -200,12 +200,12 @@
       "prevObject": {
         "0": {
           "location": {
-            "href": "http://sample.local/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+            "href": "http://sample/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
             "ancestorOrigins": {},
-            "origin": "http://sample.local",
+            "origin": "http://sample",
             "protocol": "http:",
-            "host": "sample.local",
-            "hostname": "sample.local",
+            "host": "sample",
+            "hostname": "sample",
             "port": "",
             "pathname": "/taoDelivery/DeliveryServer/runDeliveryExecution",
             "search": "?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
@@ -215,12 +215,12 @@
         },
         "context": {
           "location": {
-            "href": "http://sample.local/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+            "href": "http://sample/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
             "ancestorOrigins": {},
-            "origin": "http://sample.local",
+            "origin": "http://sample",
             "protocol": "http:",
-            "host": "sample.local",
-            "hostname": "sample.local",
+            "host": "sample",
+            "hostname": "sample",
             "port": "",
             "pathname": "/taoDelivery/DeliveryServer/runDeliveryExecution",
             "search": "?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
@@ -232,12 +232,12 @@
       },
       "context": {
         "location": {
-          "href": "http://sample.local/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
+          "href": "http://sample/taoDelivery/DeliveryServer/runDeliveryExecution?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",
           "ancestorOrigins": {},
-          "origin": "http://sample.local",
+          "origin": "http://sample",
           "protocol": "http:",
-          "host": "sample.local",
-          "hostname": "sample.local",
+          "host": "sample",
+          "hostname": "sample",
           "port": "",
           "pathname": "/taoDelivery/DeliveryServer/runDeliveryExecution",
           "search": "?deliveryExecution=http%3A%2F%2Fsample%2Ffirst.rdf%23i154661273822140",

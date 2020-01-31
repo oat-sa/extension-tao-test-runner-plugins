@@ -21,7 +21,10 @@
 
 namespace oat\taoTestRunnerPlugins\model\offline;
 
+use common_Exception;
 use oat\generis\Helper\SystemHelper;
+use tao_helpers_form_FormFactory;
+use tao_helpers_form_xhtml_Form;
 
 /**
  * Class OfflineTestImportForm
@@ -32,16 +35,17 @@ class OfflineTestImportForm extends \tao_helpers_form_FormContainer
 
     /**
      * @return mixed|void
-     * @throws \common_Exception
+     * @throws common_Exception
      */
     protected function initForm()
     {
-        $this->form = new \tao_helpers_form_xhtml_Form('export');
-        $submitElt = \tao_helpers_form_FormFactory::getElement('upload', 'Free');
+        $this->form = new tao_helpers_form_xhtml_Form('export');
+
+        $submitElt = tao_helpers_form_FormFactory::getElement('upload', 'Free');
         $submitElt->setValue('<a href="#" class="form-submitter btn-success small"><span class="icon-import"></span> ' . __('Upload') . '</a>');
+
         $this->form->setActions([$submitElt], 'bottom');
         $this->form->setActions([], 'top');
-
     }
 
     /**
@@ -51,25 +55,25 @@ class OfflineTestImportForm extends \tao_helpers_form_FormContainer
      */
     protected function initElements()
     {
-        $descElt = \tao_helpers_form_FormFactory::getElement('offline_desc', 'Free');
+        $descElt = tao_helpers_form_FormFactory::getElement('offline_desc', 'Free');
         $descElt->setValue(__('Import a test sent to you by an offline test taker.'));
         $this->form->addElement($descElt);
 
         //create file upload form box
-        $fileElt = \tao_helpers_form_FormFactory::getElement('source', 'AsyncFile');
+        $fileElt = tao_helpers_form_FormFactory::getElement('source', 'AsyncFile');
         if (isset($_POST['import_sent_file'])) {
-            $fileElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty'));
+            $fileElt->addValidator(tao_helpers_form_FormFactory::getValidator('NotEmpty'));
         } else {
-            $fileElt->addValidator(\tao_helpers_form_FormFactory::getValidator('NotEmpty', ['message' => '']));
+            $fileElt->addValidator(tao_helpers_form_FormFactory::getValidator('NotEmpty', ['message' => '']));
         }
         $fileElt->addValidators(array(
-            \tao_helpers_form_FormFactory::getValidator('FileSize', ['max' => SystemHelper::getFileUploadLimit()]),
-            \tao_helpers_form_FormFactory::getValidator('FileMimeType', ['mimetype' => ['application/json', 'text/plain'], 'extension' => ['json']]),
+            tao_helpers_form_FormFactory::getValidator('FileSize', ['max' => SystemHelper::getFileUploadLimit()]),
+            tao_helpers_form_FormFactory::getValidator('FileMimeType', ['mimetype' => ['application/json', 'text/plain'], 'extension' => ['json']]),
         ));
 
         $this->form->addElement($fileElt);
 
-        $fileSentElt = \tao_helpers_form_FormFactory::getElement('import_sent_file', 'Hidden');
+        $fileSentElt = tao_helpers_form_FormFactory::getElement('import_sent_file', 'Hidden');
         $fileSentElt->setValue(1);
         $this->form->addElement($fileSentElt);
     }

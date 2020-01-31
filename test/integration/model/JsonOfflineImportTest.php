@@ -19,6 +19,7 @@
  */
 
 use League\Flysystem\FileExistsException;
+use oat\generis\model\kernel\uri\UriProvider;
 use oat\oatbox\filesystem\File;
 use oat\tao\model\upload\UploadService;
 use oat\tao\test\TaoPhpUnitTestRunner;
@@ -171,11 +172,15 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
         $qtiCommunicationService = $this->prophesize(QtiCommunicationService::class);
         $qtiCommunicationService->processInput($serviceContext, $this->getMockData())->willReturn(true);
 
+        $uriProvider = $this->prophesize(UriProvider::class);
+        $uriProvider->provide()->willReturn('http://sample/first.rdf#i1544535042650000');
+
         return $this->getServiceLocatorMock([
             ServiceProxy::SERVICE_ID => $prophecy,
             QtiRunnerService::SERVICE_ID => $qtiRunnerService,
             UploadService::SERVICE_ID => $upload,
-            QtiCommunicationService::SERVICE_ID => $qtiCommunicationService
+            QtiCommunicationService::SERVICE_ID => $qtiCommunicationService,
+            UriProvider::SERVICE_ID => $uriProvider
         ]);
     }
     /**
