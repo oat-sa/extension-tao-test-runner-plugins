@@ -142,20 +142,26 @@ define([
             var prohibitedKeyDebounce;
 
             function prevent(event) {
+                if ($(event.target).closest('textarea, input, [contenteditable]')) {
+                    return;
+                }
                 event.stopPropagation();
                 event.preventDefault();
                 testRunner.trigger('prohibited-key', event.type);
             }
 
             registerEvent(window, 'copy', prevent);
+            registerEvent(window, 'cut', prevent);
             registerEvent(window, 'paste', prevent);
 
             _.forEach(shortcuts, function(shortcut) {
-                prohibitedKeyFunc = function() {
-                    testRunner.trigger('prohibited-key', shortcut.label);
+                prohibitedKeyFunc = function(event) {
+                    if (!$(event.target).closest(':input').length) {
+                        testRunner.trigger('prohibited-key', shortcut.label);
+                    }
                 };
                 prohibitedKeyDebounce = _.debounce(prohibitedKeyFunc, config.debounceDelay, { leading : true, trailing : false});
-                shortcutHelper.add(shortcut.key, prohibitedKeyDebounce);
+                shortcutHelper.add(shortcut.key, prohibitedKeyDebounce, {avoidInput: true});
             });
 
             testRunner.on('destroy', function() {
