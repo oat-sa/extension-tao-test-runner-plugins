@@ -146,16 +146,16 @@ define([
              * @param numTry
              */
             function insistentSender(traceData, numTry = 0) {
-                if (numTry > 5) {
+                if (numTry >= 5) {
                     // stop tries
                     return;
                 }
                 testRunner.getProxy()
                   .sendVariables(traceData, true)
                   .catch(function () {
-                      setTimeout(function () {
+                      _.delay(function () {
                           insistentSender(traceData, ++numTry);
-                      }, 300);
+                      }, 250);
                   });
             }
 

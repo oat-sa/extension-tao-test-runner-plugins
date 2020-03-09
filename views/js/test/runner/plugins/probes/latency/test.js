@@ -129,10 +129,12 @@ define([
             getProxy: function() {
                 return {
                     sendVariables: function(trace) {
-                        var traceData = _.indexBy(probeData, function(entry) {
-                            return (entry.marker ? entry.marker + '-' : '') + entry.type + '-' + entry.id;
+                        return new Promise(function() {
+                            var traceData = _.indexBy(probeData, function(entry) {
+                                return (entry.marker ? entry.marker + '-' : '') + entry.type + '-' + entry.id;
+                            });
+                            assert.deepEqual(trace, traceData, 'The trace data should have been provided');
                         });
-                        assert.deepEqual(trace, traceData, 'The trace data should have been provided');
                     }
                 };
             },
@@ -229,7 +231,9 @@ define([
         var testRunner = eventifier({
             getProxy: function() {
                 return {
-                    sendVariables: function() {}
+                    sendVariables: function() {
+                        return new Promise();
+                    }
                 };
             },
             getTestMap() {
@@ -285,6 +289,58 @@ define([
 
                 testRunner.trigger('exit');
             }, 250);
+        }, 250);
+    });
+
+    QUnit.test('insistentSender', function (assert) {
+        var ready = assert.async();
+        var rejectedCount = 0;
+        var testRunner = eventifier({
+            getProxy: function() {
+                return {
+                    sendVariables: function() {
+                        return new Promise(function (resolve, reject) {
+                            var timer;
+                            rejectedCount++;
+                            if (rejectedCount === 5) {
+                                assert.ok(true, 'Rejected 5 times');
+                                timer = setTimeout(function() { ready(); }, 400);
+                            }
+                            if (rejectedCount > 5) {
+                                clearTimeout(timer);
+                                assert.ok(false, 'Rejected more than 5 times');
+                                ready();
+                            }
+                            reject();
+                        });
+                    }
+                };
+            },
+            getTestMap() {
+                return testMap;
+            },
+            getTestContext: function() {
+                return testContext;
+            },
+            getProbeOverseer: function() {
+                return {
+                    add: function(probe) {},
+                    flush: function() {
+                        assert.ok(true, 'Flushing the probes data');
+                        return Promise.resolve(['qunit_data']);
+                    }
+                };
+            }
+        });
+
+        assert.expect(4);
+
+        testRunner.after('exit', function() {
+            assert.ok(true, 'Test runner exited');
+        });
+        assert.equal(latency.init(testRunner, []), latency, 'Initializing the probes');
+        _.delay(function() {
+            testRunner.trigger('exit');
         }, 250);
     });
 
