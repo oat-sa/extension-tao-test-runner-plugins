@@ -129,11 +129,12 @@ define([
             getProxy: function() {
                 return {
                     sendVariables: function(trace) {
-                        return new Promise(function() {
+                        return new Promise(function(resolve) {
                             var traceData = _.indexBy(probeData, function(entry) {
                                 return (entry.marker ? entry.marker + '-' : '') + entry.type + '-' + entry.id;
                             });
                             assert.deepEqual(trace, traceData, 'The trace data should have been provided');
+                            resolve();
                         });
                     }
                 };
@@ -232,7 +233,9 @@ define([
             getProxy: function() {
                 return {
                     sendVariables: function() {
-                        return new Promise();
+                        return new Promise(function (resolve) {
+                            resolve();
+                        });
                     }
                 };
             },
