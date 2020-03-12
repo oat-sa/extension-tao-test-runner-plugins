@@ -59,8 +59,10 @@ define([
     }
 
     function handleCopyEvent(event) {
-        overrideClipboard(event.clipboardData);
-        event.preventDefault();
+        if (event.clipboardData.files.length > 0) { // Image
+            overrideClipboard(event.clipboardData);
+            event.preventDefault();
+        };
     }
 
     function overrideClipboard(clipboardData) {
