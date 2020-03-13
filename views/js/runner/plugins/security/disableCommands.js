@@ -63,7 +63,17 @@ define([
      * A list of shortcuts to enabled inside input fields.
      * @type {Array}
      */
-    var enabledInInput = ['backspace'];
+    var enabledInInput = [
+        'backspace',
+        "Meta+C",
+        "Meta+V",
+        "Meta+Alt+V",
+        "Meta+Shift+Alt+V",
+        "Meta+X",
+        "Ctrl+c",
+        "Ctrl+v",
+        "Ctrl+x",
+    ];
 
     /**
      * The default configuration if nothing
@@ -164,7 +174,7 @@ define([
                 prohibitedKeyFunc = function(event) {
                     if (!inputEnabled || !$(event.target).closest(':input').length) {
                         event.preventDefault();
-                        testRunner.trigger('prohibited-key', shortcut.label);
+                        testRunner.trigger('prohibited-key', shortcut.label, {avoidInput: true});
                     }
                 };
                 prohibitedKeyDebounce = _.debounce(prohibitedKeyFunc, config.debounceDelay, { leading : true, trailing : false});

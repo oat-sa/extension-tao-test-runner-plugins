@@ -141,6 +141,25 @@ define([
             var probeOverseer = testRunner.getProbeOverseer();
 
             /**
+             * Increase stability
+             * @param traceData
+             * @param numTry
+             */
+            function insistentSender(traceData, numTry = 0) {
+                if (numTry >= 5) {
+                    // stop tries
+                    return;
+                }
+                testRunner.getProxy()
+                  .sendVariables(traceData, true)
+                  .catch(function () {
+                      _.delay(function () {
+                          insistentSender(traceData, ++numTry);
+                      }, 250);
+                  });
+            }
+
+            /**
              * Send latency data
              */
             function sendVariables() {
@@ -156,9 +175,9 @@ define([
                             }
                             traceData[id] = entry;
                         });
+
                         //and send them
-                        testRunner.getProxy()
-                            .sendVariables(traceData, true);
+                        insistentSender(traceData);
                     }
                     return data;
                 });
