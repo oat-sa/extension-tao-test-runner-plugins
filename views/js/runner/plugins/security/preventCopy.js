@@ -140,9 +140,45 @@ define([
             var testRunner = this.getTestRunner();
             var prohibitedKeyFunc;
             var prohibitedKeyDebounce;
+            var isIe = typeof window.clipboardData !== 'undefined';
 
-            function prevent(event) {
-                if ($(event.target).closest('textarea, input, [contenteditable]')) {
+            function replaceSelection(target, newValue) {
+                var oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
+                var caretPosition = target.selectionStart;
+                var p1 = target.value.substring(0,caretPosition);
+                var p2 = target.value.substring(caretPosition+oldValue.length,target.value.length);
+                var pa = newValue;  //new item
+                target.value = p1 + pa + p2;
+                target.selectionStart = caretPosition + newValue.length;
+                target.selectionEnd = caretPosition + newValue.length;
+                target.focus();
+            }
+            function onCopyCut(event) {
+                var target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+                var text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
+                if (target) {
+                    if (isIe) {
+                        window.clipboardData.setData('Text', '');
+                    } else {
+                        event.clipboardData.setData('text/plain', '');
+                    }
+                    event.preventDefault();
+                    if (event.type === 'cut') {
+                        replaceSelection(target, '');
+                    }
+                    $(target).attr('data-clipboard', text);
+                    return;
+                }
+                event.stopPropagation();
+                event.preventDefault();
+                testRunner.trigger('prohibited-key', event.type);
+            }
+            function onPaste(event) {
+                var target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+                var text = $(target).attr('data-clipboard') || '';
+                if (target) {
+                    event.preventDefault();
+                    replaceSelection(target, text);
                     return;
                 }
                 event.stopPropagation();
@@ -150,9 +186,9 @@ define([
                 testRunner.trigger('prohibited-key', event.type);
             }
 
-            registerEvent(window, 'copy', prevent);
-            registerEvent(window, 'cut', prevent);
-            registerEvent(window, 'paste', prevent);
+            registerEvent(window, 'copy', onCopyCut);
+            registerEvent(window, 'cut', onCopyCut);
+            registerEvent(window, 'paste', onPaste);
 
             _.forEach(shortcuts, function(shortcut) {
                 prohibitedKeyFunc = function(event) {
@@ -165,8 +201,9 @@ define([
             });
 
             testRunner.on('destroy', function() {
-                unregisterEvent(window, 'copy', prevent);
-                unregisterEvent(window, 'paste', prevent);
+                unregisterEvent(window, 'copy', onCopyCut);
+                unregisterEvent(window, 'cut', onCopyCut);
+                unregisterEvent(window, 'paste', onPaste);
 
                 _.forEach(shortcuts, function(shortcut) {
                     shortcutHelper.remove(shortcut.key);
