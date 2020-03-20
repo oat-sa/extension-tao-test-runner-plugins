@@ -140,19 +140,52 @@ define([
             var testRunner = this.getTestRunner();
             var prohibitedKeyFunc;
             var prohibitedKeyDebounce;
+            const isIe = typeof window.clipboardData !== 'undefined';
 
-            function prevent(event) {
-                if ($(event.target).closest('textarea, input, [contenteditable]')) {
-                    return;
-                }
-                event.stopPropagation();
+            function replaceSelection(target, newValue) {
+                const oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
+                const caretPosition = target.selectionStart;
+                const textBegin = target.value.substring(0, caretPosition);
+                const textEnd = target.value.substring(caretPosition + oldValue.length, target.value.length);
+                target.value = textBegin + newValue + textEnd;
+                target.selectionStart = caretPosition + newValue.length;
+                target.selectionEnd = caretPosition + newValue.length;
+                target.focus();
+            }
+            function onCopyCut(event) {
                 event.preventDefault();
-                testRunner.trigger('prohibited-key', event.type);
+                const target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+                if (target) {
+                    const text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
+                    if (isIe) {
+                        window.clipboardData.setData('Text', '');
+                    } else {
+                        event.clipboardData.setData('text/plain', '');
+                    }
+                    if (event.type === 'cut') {
+                        replaceSelection(target, '');
+                    }
+                    $(target).attr('data-clipboard', text);
+                } else {
+                    event.stopPropagation();
+                    testRunner.trigger('prohibited-key', event.type);
+                }
+            }
+            function onPaste(event) {
+                event.preventDefault();
+                const target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+                if (target) {
+                    const text = $(target).attr('data-clipboard') || '';
+                    replaceSelection(target, text);
+                } else {
+                    event.stopPropagation();
+                    testRunner.trigger('prohibited-key', event.type);
+                }
             }
 
-            registerEvent(window, 'copy', prevent);
-            registerEvent(window, 'cut', prevent);
-            registerEvent(window, 'paste', prevent);
+            registerEvent(window, 'copy', onCopyCut);
+            registerEvent(window, 'cut', onCopyCut);
+            registerEvent(window, 'paste', onPaste);
 
             _.forEach(shortcuts, function(shortcut) {
                 prohibitedKeyFunc = function(event) {
@@ -165,8 +198,9 @@ define([
             });
 
             testRunner.on('destroy', function() {
-                unregisterEvent(window, 'copy', prevent);
-                unregisterEvent(window, 'paste', prevent);
+                unregisterEvent(window, 'copy', onCopyCut);
+                unregisterEvent(window, 'cut', onCopyCut);
+                unregisterEvent(window, 'paste', onPaste);
 
                 _.forEach(shortcuts, function(shortcut) {
                     shortcutHelper.remove(shortcut.key);
