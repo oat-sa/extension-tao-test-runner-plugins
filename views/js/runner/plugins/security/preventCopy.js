@@ -143,10 +143,10 @@ define([
             var isIe = typeof window.clipboardData !== 'undefined';
 
             function replaceSelection(target, newValue) {
-                var oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
-                var caretPosition = target.selectionStart;
-                var textBegin = target.value.substring(0, caretPosition);
-                var textEnd = target.value.substring(caretPosition + oldValue.length, target.value.length);
+                const oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
+                const caretPosition = target.selectionStart;
+                const textBegin = target.value.substring(0, caretPosition);
+                const textEnd = target.value.substring(caretPosition + oldValue.length, target.value.length);
                 target.value = textBegin + newValue + textEnd;
                 target.selectionStart = caretPosition + newValue.length;
                 target.selectionEnd = caretPosition + newValue.length;
@@ -154,9 +154,9 @@ define([
             }
             function onCopyCut(event) {
                 event.preventDefault();
-                var target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+                const target = $(event.target).closest('textarea, input, [contenteditable]')[0];
                 if (target) {
-                    var text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
+                    const text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
                     if (isIe) {
                         window.clipboardData.setData('Text', '');
                     } else {
@@ -173,9 +173,9 @@ define([
             }
             function onPaste(event) {
                 event.preventDefault();
-                var target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+                const target = $(event.target).closest('textarea, input, [contenteditable]')[0];
                 if (target) {
-                    var text = $(target).attr('data-clipboard') || '';
+                    const text = $(target).attr('data-clipboard') || '';
                     replaceSelection(target, text);
                 } else {
                     event.stopPropagation();
