@@ -140,7 +140,7 @@ define([
             var testRunner = this.getTestRunner();
             var prohibitedKeyFunc;
             var prohibitedKeyDebounce;
-            var isIe = typeof window.clipboardData !== 'undefined';
+            const isIe = typeof window.clipboardData !== 'undefined';
 
             function replaceSelection(target, newValue) {
                 const oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
