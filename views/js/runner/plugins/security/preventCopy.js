@@ -145,45 +145,42 @@ define([
             function replaceSelection(target, newValue) {
                 var oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
                 var caretPosition = target.selectionStart;
-                var p1 = target.value.substring(0,caretPosition);
-                var p2 = target.value.substring(caretPosition+oldValue.length,target.value.length);
-                var pa = newValue;  //new item
-                target.value = p1 + pa + p2;
+                var textBegin = target.value.substring(0, caretPosition);
+                var textEnd = target.value.substring(caretPosition + oldValue.length, target.value.length);
+                target.value = textBegin + newValue + textEnd;
                 target.selectionStart = caretPosition + newValue.length;
                 target.selectionEnd = caretPosition + newValue.length;
                 target.focus();
             }
             function onCopyCut(event) {
+                event.preventDefault();
                 var target = $(event.target).closest('textarea, input, [contenteditable]')[0];
-                var text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
                 if (target) {
+                    var text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
                     if (isIe) {
                         window.clipboardData.setData('Text', '');
                     } else {
                         event.clipboardData.setData('text/plain', '');
                     }
-                    event.preventDefault();
                     if (event.type === 'cut') {
                         replaceSelection(target, '');
                     }
                     $(target).attr('data-clipboard', text);
-                    return;
+                } else {
+                    event.stopPropagation();
+                    testRunner.trigger('prohibited-key', event.type);
                 }
-                event.stopPropagation();
-                event.preventDefault();
-                testRunner.trigger('prohibited-key', event.type);
             }
             function onPaste(event) {
-                var target = $(event.target).closest('textarea, input, [contenteditable]')[0];
-                var text = $(target).attr('data-clipboard') || '';
-                if (target) {
-                    event.preventDefault();
-                    replaceSelection(target, text);
-                    return;
-                }
-                event.stopPropagation();
                 event.preventDefault();
-                testRunner.trigger('prohibited-key', event.type);
+                var target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+                if (target) {
+                    var text = $(target).attr('data-clipboard') || '';
+                    replaceSelection(target, text);
+                } else {
+                    event.stopPropagation();
+                    testRunner.trigger('prohibited-key', event.type);
+                }
             }
 
             registerEvent(window, 'copy', onCopyCut);
