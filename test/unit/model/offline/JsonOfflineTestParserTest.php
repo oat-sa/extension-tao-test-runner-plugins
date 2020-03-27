@@ -31,7 +31,7 @@ class JsonOfflineTestParserTest extends TestCase
     /** @var PHPUnit_Framework_MockObject_MockObject|File */
     private $fileMock;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
