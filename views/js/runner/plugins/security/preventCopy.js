@@ -197,15 +197,23 @@ define([
                 shortcutHelper.add(shortcut.key, prohibitedKeyDebounce, {avoidInput: true});
             });
 
-            testRunner.on('destroy', function() {
-                unregisterEvent(window, 'copy', onCopyCut);
-                unregisterEvent(window, 'cut', onCopyCut);
-                unregisterEvent(window, 'paste', onPaste);
+            testRunner
+                .on('renderitem', function () {
+                    testRunner
+                        .getAreaBroker()
+                        .getContentArea()
+                        .find('textarea, input, [contenteditable]')
+                        .attr('data-clipboard', '');
+                })
+                .on('destroy', function() {
+                    unregisterEvent(window, 'copy', onCopyCut);
+                    unregisterEvent(window, 'cut', onCopyCut);
+                    unregisterEvent(window, 'paste', onPaste);
 
-                _.forEach(shortcuts, function(shortcut) {
-                    shortcutHelper.remove(shortcut.key);
+                    _.forEach(shortcuts, function(shortcut) {
+                        shortcutHelper.remove(shortcut.key);
+                    });
                 });
-            })
         }
     });
 });
