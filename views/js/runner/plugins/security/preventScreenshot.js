@@ -20,33 +20,34 @@ define([
     'jquery',
     'i18n',
     'taoTests/runner/plugin'
-], function ($, __, pluginFactory) {
+], ($, __, pluginFactory) => {
     'use strict';
 
     /**
      * Identify the current platform
      * @type {String}
      */
-    var platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
+    const platform = navigator.platform.indexOf('Mac') < 0 ? 'win' : 'mac';
 
     //do not remove these comments, this is used to generate the translation in .po file
     // __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.');
-    var printScreenPauseMessage = 'The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.';
-    var printScreenMessage = __('Attempt to print screen.');
+    const printScreenPauseMessage = 'The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.';
+    const printScreenMessage = __('Attempt to print screen.');
+
     /**
      * Sniff Internet Explorer which is the only browser to implement window.clipboardData
      * @type {Boolean}
      */
-    var isIe = typeof window.clipboardData !== 'undefined';
+    const isIe = typeof window.clipboardData !== 'undefined';
 
     /**
      * On windows, this is what we will attempt to put in the clipboard on a copy event
      * @type {String}
      */
-    var overrideContent = ' ';
+    const overrideContent = ' ';
 
 
-    function triggerCopyEvent() {
+    const triggerCopyEvent = () => {
         if (isIe) {
             document.designMode = 'on'; // IE won't actually trigger the 'copy' event without this
         }
@@ -58,14 +59,14 @@ define([
         }
     }
 
-    function handleCopyEvent(event) {
+    const handleCopyEvent = event => {
         if (event.clipboardData.files.length > 0) { // Image
             overrideClipboard(event.clipboardData);
             event.preventDefault();
-        };
+        }
     }
 
-    function overrideClipboard(clipboardData) {
+    const overrideClipboard = clipboardData => {
         if (isIe) {
             window.clipboardData.setData('Text', overrideContent);
         } else {
@@ -93,21 +94,19 @@ define([
          * @returns {Promise} to resolve async delegation
          */
         install: function install() {
-            var testRunner = this.getTestRunner();
-
             // For mac - blur on Cmd+Shift
             if (platform === 'mac') {
                 $(window)
-                .on('keydown' + '.' + this.getName(), function (e) {
+                .on('keydown' + '.' + this.getName(), e => {
                     if (e.metaKey && e.shiftKey) {
-                        $('body').css('filter', 'blur(20px)');
+                        $('body').css('filter', 'blur(20px)')
                     }
                 })
                 // Note - When user hits Cmd+Shift+4, they must press any key
                 // to remove blur (that is not Cmd+Shift)
-                .on('keyup' + '.' + this.getName(), function (e) {
+                .on('keyup' + '.' + this.getName(), e => {
                     if (!e.metaKey || !e.shiftKey) {
-                        $('body').css('filter', '');
+                        $('body').css('filter', '')
                     }
                 });
             }
@@ -120,13 +119,13 @@ define([
                 $(window).on(`keyup.${this.getName()}`, e => {
                     if (e.key === 'PrintScreen') {
                         triggerCopyEvent();
-                        const context = testRunner.getTestContext();
-                        const options = testRunner.getOptions();
-                        //@deprecated securePauseStateRequired, use options.sectionPayse or options.proctored
-                        const forcePause = typeof options.sectionPause === 'boolean' ?
-                            options.sectionPause :
-                            (options.proctored || context.securePauseStateRequired);
-
+                        const testRunner = this.getTestRunner();
+                        const {securePauseStateRequired} = testRunner.getTestContext();
+                        const {sectionPause, proctored} = testRunner.getOptions();
+                        //@deprecated securePauseStateRequired, use options.sectionPause or options.proctored
+                        const forcePause = typeof sectionPause === 'boolean'
+                            ? sectionPause
+                            : (proctored || securePauseStateRequired);
 
                         testRunner.trigger('prohibited-key', 'PrintScreen');
 
