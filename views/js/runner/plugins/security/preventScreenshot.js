@@ -94,19 +94,23 @@ define([
          * @returns {Promise} to resolve async delegation
          */
         install: function install() {
+            const $body = $('body');
+            const blur = () => $body.css('filter', 'blur(20px)');
+            const unBlur = () => $body.css('filter', '');
+
             // For mac - blur on Cmd+Shift
             if (platform === 'mac') {
                 $(window)
                 .on('keydown' + '.' + this.getName(), e => {
                     if (e.metaKey && e.shiftKey) {
-                        $('body').css('filter', 'blur(20px)')
+                        blur();
                     }
                 })
                 // Note - When user hits Cmd+Shift+4, they must press any key
                 // to remove blur (that is not Cmd+Shift)
                 .on('keyup' + '.' + this.getName(), e => {
                     if (!e.metaKey || !e.shiftKey) {
-                        $('body').css('filter', '')
+                        unBlur();
                     }
                 });
             }
