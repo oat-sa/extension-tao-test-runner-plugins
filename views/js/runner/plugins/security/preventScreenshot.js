@@ -20,7 +20,7 @@ define([
     'jquery',
     'i18n',
     'taoTests/runner/plugin'
-], ($, __, pluginFactory) => {
+], function ($, __, pluginFactory) {
     'use strict';
 
     /**
