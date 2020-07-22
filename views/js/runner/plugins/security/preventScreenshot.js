@@ -81,18 +81,18 @@ define([
     }
 
     const preventScreenshot = testRunner => {
-        if (!isPauseForced(testRunner)) {
-            return focusOnFakeInput();
-        }
+        focusOnFakeInput();
 
-        testRunner.trigger('pause', {
-            message: __(printScreenPauseMessage),
-            reasons: {
-                category: 'examinee',
-                subCategory: 'behaviour'
-            },
-            originalMessage: printScreenPauseMessage
-        });
+        if (isPauseForced(testRunner)) {
+            testRunner.trigger('pause', {
+                message: __(printScreenPauseMessage),
+                reasons: {
+                    category: 'examinee',
+                    subCategory: 'behaviour'
+                },
+                originalMessage: printScreenPauseMessage
+            });
+        }
     }
 
     /**
