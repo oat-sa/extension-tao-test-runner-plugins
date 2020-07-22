@@ -32,7 +32,6 @@ define([
     //do not remove these comments, this is used to generate the translation in .po file
     // __('The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.');
     const printScreenPauseMessage = 'The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment.';
-    const printScreenMessage = __('Attempt to print screen.');
 
     /**
      * Sniff Internet Explorer which is the only browser to implement window.clipboardData
@@ -46,6 +45,9 @@ define([
      */
     const overrideContent = ' ';
 
+    const $body = $('body');
+    const blur = () => $body.css('filter', 'blur(20px)');
+    const unBlur = () => $body.css('filter', '');
 
     const triggerCopyEvent = () => {
         if (isIe) {
@@ -59,19 +61,38 @@ define([
         }
     }
 
-    const handleCopyEvent = event => {
-        if (event.clipboardData.files.length > 0) { // Image
-            overrideClipboard(event.clipboardData);
-            event.preventDefault();
-        }
+    const focusOnFakeInput = () => {
+        const input = document.createElement('input');
+        input.setAttribute('value', overrideContent);
+        document.body.appendChild(input);
+        input.select();
+        triggerCopyEvent();
+        document.body.removeChild(input);
     }
 
-    const overrideClipboard = clipboardData => {
-        if (isIe) {
-            window.clipboardData.setData('Text', overrideContent);
-        } else {
-            clipboardData.setData('text/plain', overrideContent);
+    const isPauseForced = testRunner => {
+        //@deprecated securePauseStateRequired, use options.sectionPause or options.proctored
+        const {securePauseStateRequired} = testRunner.getTestContext();
+        const {sectionPause, proctored} = testRunner.getOptions();
+
+        return typeof sectionPause === 'boolean'
+            ? sectionPause
+            : (proctored || securePauseStateRequired);
+    }
+
+    const preventScreenshot = testRunner => {
+        if (!isPauseForced(testRunner)) {
+            return focusOnFakeInput();
         }
+
+        testRunner.trigger('pause', {
+            message: __(printScreenPauseMessage),
+            reasons: {
+                category: 'examinee',
+                subCategory: 'behaviour'
+            },
+            originalMessage: printScreenPauseMessage
+        });
     }
 
     /**
@@ -94,57 +115,33 @@ define([
          * @returns {Promise} to resolve async delegation
          */
         install: function install() {
-            const $body = $('body');
-            const blur = () => $body.css('filter', 'blur(20px)');
-            const unBlur = () => $body.css('filter', '');
+            const testRunner = this.getTestRunner();
 
             // For mac - blur on Cmd+Shift
             if (platform === 'mac') {
                 $(window)
-                .on('keydown' + '.' + this.getName(), e => {
+                .on(`keydown.${this.getName()}`, e => {
                     if (e.metaKey && e.shiftKey) {
                         blur();
                     }
                 })
                 // Note - When user hits Cmd+Shift+4, they must press any key
                 // to remove blur (that is not Cmd+Shift)
-                .on('keyup' + '.' + this.getName(), e => {
+                .on(`keyup.${this.getName()}`, e => {
                     if (!e.metaKey || !e.shiftKey) {
                         unBlur();
                     }
-                });
+                })
+                .on('focus', unBlur)
+                .on('click', unBlur);
             }
 
             // Windows - pause on PrtScn
             else if (platform === 'win') {
-                // will override, if possible, anything put into the clipboard after a copy event (whether manually or automatically triggered)
-                document.addEventListener('copy', handleCopyEvent);
-
                 $(window).on(`keyup.${this.getName()}`, e => {
                     if (e.key === 'PrintScreen') {
-                        triggerCopyEvent();
-                        const testRunner = this.getTestRunner();
-                        const {securePauseStateRequired} = testRunner.getTestContext();
-                        const {sectionPause, proctored} = testRunner.getOptions();
-                        //@deprecated securePauseStateRequired, use options.sectionPause or options.proctored
-                        const forcePause = typeof sectionPause === 'boolean'
-                            ? sectionPause
-                            : (proctored || securePauseStateRequired);
-
                         testRunner.trigger('prohibited-key', 'PrintScreen');
-
-                        if ( forcePause ) {
-                            testRunner.trigger('pause', {
-                                message: __(printScreenPauseMessage),
-                                reasons: {
-                                    category: 'examinee',
-                                    subCategory: 'behaviour'
-                                },
-                                originalMessage: printScreenPauseMessage
-                            });
-                        } else {
-                            testRunner.trigger('warning', printScreenMessage);
-                        }
+                        preventScreenshot(testRunner);
                     }
                 });
             }
@@ -152,9 +149,6 @@ define([
 
         destroy: function destroy() {
             $(window).off('.' + this.getName());
-            if (platform === 'win') {
-                document.removeEventListener('copy', handleCopyEvent);
-            }
         }
     });
 });
