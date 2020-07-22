@@ -117,6 +117,26 @@ define([
         }
     }
 
+    function toKeyCode(combination) {
+        var keys = combination.split('+');
+        var keyCode = 0;
+
+        _.forEach(keys, function (key) {
+            switch (key) {
+                case 'Ctrl':
+                case 'Meta':
+                    keyCode += CKEDITOR.CTRL;
+                    break;
+                default:
+                   if (key.length === 1) {
+                       keyCode += key.toUpperCase().charCodeAt(0);
+                   }
+            }
+        });
+
+        return keyCode;
+    }
+
     /**
      * Creates the preventCopy plugin.
      * Prevents the user to copy any content.
@@ -141,6 +161,20 @@ define([
             var prohibitedKeyFunc;
             var prohibitedKeyDebounce;
             const isIe = typeof window.clipboardData !== 'undefined';
+
+            function setUpIframeEvents(){
+                var editors = window.CKEDITOR && window.CKEDITOR.instances || [];
+
+                _.forEach(editors, function (editor) {
+                    editor.on('key', function (e) {
+                        _.forEach(shortcuts, function (shortcut) {
+                            if (e.data.keyCode === toKeyCode(shortcut.key)) {
+                                return e.cancel();
+                            }
+                        });
+                    });
+                });
+            }
 
             function replaceSelection(target, newValue) {
                 const oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
@@ -199,6 +233,7 @@ define([
 
             testRunner
                 .on('renderitem', function () {
+                    setUpIframeEvents();
                     testRunner
                         .getAreaBroker()
                         .getContentArea()
