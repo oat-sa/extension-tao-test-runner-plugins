@@ -58,9 +58,9 @@ define([
 
     /**
      * The list of shortcuts to intercept, based on current platform
-     * @type {Array}
+     * @type {Object}
      */
-    var shortcuts = [];
+    var shortcuts = {};
 
     /**
      * Identify the current platform
@@ -81,7 +81,7 @@ define([
     /** Refine the list of shortcuts to only get those that are relevant with the current platform **/
     _.forEach(allShortcuts, function(shortcut) {
         if (shortcut.platform.indexOf(platform) >= 0) {
-            shortcuts.push(shortcut);
+            shortcuts[toKeyCode(shortcut.key)] = shortcut;
         }
     });
 
@@ -125,7 +125,7 @@ define([
             switch (key) {
                 case 'Ctrl':
                 case 'Meta':
-                    keyCode += CKEDITOR.CTRL;
+                    keyCode += 1114112; // @see CKEDITOR.CTRL
                     break;
                 default:
                    if (key.length === 1) {
@@ -167,11 +167,19 @@ define([
 
                 _.forEach(editors, function (editor) {
                     editor.on('key', function (e) {
-                        _.forEach(shortcuts, function (shortcut) {
-                            if (e.data.keyCode === toKeyCode(shortcut.key)) {
-                                return e.cancel();
-                            }
-                        });
+                        var keyCode = e.data.keyCode;
+
+                        if (keyCode & CKEDITOR.SHIFT) {
+                            keyCode -= CKEDITOR.SHIFT;
+                        }
+
+                        if (keyCode & CKEDITOR.ALT) {
+                            keyCode -= CKEDITOR.ALT;
+                        }
+
+                        if (shortcuts[keyCode]) {
+                            e.cancel();
+                        }
                     });
 
                     var cutButton = editor.container.find('.cke_button__cut').$
