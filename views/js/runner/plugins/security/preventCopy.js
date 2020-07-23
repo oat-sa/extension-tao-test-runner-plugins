@@ -182,7 +182,7 @@ define([
                         }
                     });
 
-                    var cutButton = editor.container.find('.cke_button__cut').$
+                    var cutButton = editor.container.find('.cke_button__cut').$;
 
                     if (cutButton.length) {
                         $(cutButton[0]).closest('.cke_toolgroup').remove();
