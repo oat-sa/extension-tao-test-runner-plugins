@@ -64,6 +64,7 @@ define([
     const focusOnFakeInput = () => {
         const input = document.createElement('input');
         input.setAttribute('value', overrideContent);
+        input.classList.add('allow-copy');
         document.body.appendChild(input);
         input.select();
         triggerCopyEvent();
