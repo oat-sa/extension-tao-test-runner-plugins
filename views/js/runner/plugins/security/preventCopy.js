@@ -169,10 +169,12 @@ define([
                     editor.on('key', function (e) {
                         var keyCode = e.data.keyCode;
 
+                        // noinspection JSBitwiseOperatorUsage
                         if (keyCode & CKEDITOR.SHIFT) {
                             keyCode -= CKEDITOR.SHIFT;
                         }
 
+                        // noinspection JSBitwiseOperatorUsage
                         if (keyCode & CKEDITOR.ALT) {
                             keyCode -= CKEDITOR.ALT;
                         }
@@ -201,9 +203,15 @@ define([
                 target.focus();
             }
             function onCopyCut(event) {
-                event.preventDefault();
                 const target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+
                 if (target) {
+                    const $target = $(target);
+
+                    if ($target.hasClass('allow-copy')) {
+                        return;
+                    }
+
                     const text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
                     if (isIe) {
                         window.clipboardData.setData('Text', '');
@@ -213,11 +221,14 @@ define([
                     if (event.type === 'cut') {
                         replaceSelection(target, '');
                     }
-                    $(target).attr('data-clipboard', text);
+
+                    $target.attr('data-clipboard', text);
                 } else {
                     event.stopPropagation();
                     testRunner.trigger('prohibited-key', event.type);
                 }
+
+                event.preventDefault();
             }
             function onPaste(event) {
                 event.preventDefault();
