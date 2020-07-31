@@ -58,9 +58,9 @@ define([
 
     /**
      * The list of shortcuts to intercept, based on current platform
-     * @type {Array}
+     * @type {Object}
      */
-    var shortcuts = [];
+    var shortcuts = {};
 
     /**
      * Identify the current platform
@@ -81,7 +81,7 @@ define([
     /** Refine the list of shortcuts to only get those that are relevant with the current platform **/
     _.forEach(allShortcuts, function(shortcut) {
         if (shortcut.platform.indexOf(platform) >= 0) {
-            shortcuts.push(shortcut);
+            shortcuts[toKeyCode(shortcut.key)] = shortcut;
         }
     });
 
@@ -117,6 +117,26 @@ define([
         }
     }
 
+    function toKeyCode(combination) {
+        var keys = combination.split('+');
+        var keyCode = 0;
+
+        _.forEach(keys, function (key) {
+            switch (key) {
+                case 'Ctrl':
+                case 'Meta':
+                    keyCode += 1114112; // @see CKEDITOR.CTRL
+                    break;
+                default:
+                   if (key.length === 1) {
+                       keyCode += key.toUpperCase().charCodeAt(0);
+                   }
+            }
+        });
+
+        return keyCode;
+    }
+
     /**
      * Creates the preventCopy plugin.
      * Prevents the user to copy any content.
@@ -142,6 +162,36 @@ define([
             var prohibitedKeyDebounce;
             const isIe = typeof window.clipboardData !== 'undefined';
 
+            function setUpIframeEvents(){
+                var editors = window.CKEDITOR && window.CKEDITOR.instances || [];
+
+                _.forEach(editors, function (editor) {
+                    editor.on('key', function (e) {
+                        var keyCode = e.data.keyCode;
+
+                        // noinspection JSBitwiseOperatorUsage
+                        if (keyCode & CKEDITOR.SHIFT) {
+                            keyCode -= CKEDITOR.SHIFT;
+                        }
+
+                        // noinspection JSBitwiseOperatorUsage
+                        if (keyCode & CKEDITOR.ALT) {
+                            keyCode -= CKEDITOR.ALT;
+                        }
+
+                        if (shortcuts[keyCode]) {
+                            e.cancel();
+                        }
+                    });
+
+                    var cutButton = editor.container.find('.cke_button__cut').$;
+
+                    if (cutButton.length) {
+                        $(cutButton[0]).closest('.cke_toolgroup').remove();
+                    }
+                });
+            }
+
             function replaceSelection(target, newValue) {
                 const oldValue = target.value.toString().substring(target.selectionStart, target.selectionEnd);
                 const caretPosition = target.selectionStart;
@@ -153,9 +203,15 @@ define([
                 target.focus();
             }
             function onCopyCut(event) {
-                event.preventDefault();
                 const target = $(event.target).closest('textarea, input, [contenteditable]')[0];
+
                 if (target) {
+                    const $target = $(target);
+
+                    if ($target.hasClass('allow-copy')) {
+                        return;
+                    }
+
                     const text = target.value.toString().substring(target.selectionStart, target.selectionEnd);
                     if (isIe) {
                         window.clipboardData.setData('Text', '');
@@ -165,11 +221,14 @@ define([
                     if (event.type === 'cut') {
                         replaceSelection(target, '');
                     }
-                    $(target).attr('data-clipboard', text);
+
+                    $target.attr('data-clipboard', text);
                 } else {
                     event.stopPropagation();
                     testRunner.trigger('prohibited-key', event.type);
                 }
+
+                event.preventDefault();
             }
             function onPaste(event) {
                 event.preventDefault();
@@ -199,6 +258,7 @@ define([
 
             testRunner
                 .on('renderitem', function () {
+                    setUpIframeEvents();
                     testRunner
                         .getAreaBroker()
                         .getContentArea()
