@@ -106,7 +106,8 @@ define([
      * Check for iOS platform
      * @type {Boolean}
      */
-    var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+    var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform) ||
+        (navigator.userAgent.includes('Mac') && 'ontouchend' in document); // iPad on iOS 13 detection
 
     /**
      * Checks if the page has been embedded inside a frame
