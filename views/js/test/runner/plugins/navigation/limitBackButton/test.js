@@ -107,7 +107,11 @@ define([
             limitBackButtonPluginFactory
         ]);
 
-        runner.itemRunner = eventifier();
+        runner.itemRunner = eventifier({
+            getResponses() {
+                return {};
+            }
+        });
 
         runner.on('init', () => {
             const previous = runner.getPlugin('previous');
@@ -194,7 +198,11 @@ define([
             limitBackButtonPluginFactory
         ]);
 
-        runner.itemRunner = eventifier();
+        runner.itemRunner = eventifier({
+            getResponses() {
+                return {};
+            }
+        });
 
         runner.on('init', () => {
             const previous = runner.getPlugin('previous');
@@ -241,6 +249,116 @@ define([
             })
             .trigger('loaditem', 'item1')
             .trigger('renderitem.item1', 'item1');
+
+        })
+        .on('error', err => {
+            assert.ok(false, err.message);
+            done();
+        })
+        .init();
+    });
+
+    QUnit.test('disabled back on answered item', assert => {
+        const store = {};
+        let previousButtonEnabled = true;
+        const done = assert.async();
+
+        assert.expect(6);
+
+        runnerFactory.registerProvider('limitBackMock', {
+            name: 'limitBackMock',
+            loadAreaBroker(){
+                return {
+                    getContainer(){
+                        return $('#qunit-fixtures');
+                    }
+                };
+            },
+            loadProxy(){ },
+            loadTestStore(){
+                return {
+                    getStore() {
+                        return Promise.resolve({
+                            getItem(key){
+                                return Promise.resolve(store[key]);
+                            },
+                            setItem(key, value){
+                                store[key] = value;
+                                return Promise.resolve(true);
+                            }
+                        });
+                    }
+                };
+            },
+            init(){ }
+        });
+
+        const runner = runnerFactory('limitBackMock', [
+            pluginFactory({
+                name : 'previous',
+                init(){},
+                enable(){
+                    previousButtonEnabled = true;
+                },
+                disable(){
+                    previousButtonEnabled = false;
+                }
+            }),
+            limitBackButtonPluginFactory
+        ]);
+
+        runner.itemRunner = eventifier({
+            getResponses() {
+                return { RESPONSE1: { base: null }, RESPONSE2: { base: { string: 'foo' } } };
+            },
+            _item: {
+                responses: {
+                    responsedeclaration1: {
+                        identifier: 'RESPONSE1',
+                        serial: 'responsedeclaration1',
+                        qtiClass: 'responseDeclaration',
+                        attributes: {
+                            identifier: 'RESPONSE1',
+                            cardinality: 'single',
+                            baseType: 'string'
+                        },
+                        defaultValue: []
+                    },
+                    responsedeclaration2: {
+                        identifier: 'RESPONSE2',
+                        serial: 'responsedeclaration2',
+                        qtiClass: 'responseDeclaration',
+                        attributes: {
+                            identifier: 'RESPONSE2',
+                            cardinality: 'single',
+                            baseType: 'string'
+                        },
+                        defaultValue: []
+                    }
+                },
+            },
+        });
+
+        runner.on('init', () => {
+            const previous = runner.getPlugin('previous');
+            const limitBackButton = runner.getPlugin('limitBackButton');
+
+            assert.equal(typeof previous, 'object');
+            assert.equal(typeof limitBackButton, 'object');
+
+            assert.equal(previousButtonEnabled, true, 'The back button is enabled');
+            assert.equal(typeof store['item1'], 'undefined', 'The item value is not yet stored');
+
+            runner.after('renderitem', () => {
+                runner.off('renderitem');
+                setTimeout(() => {
+                    assert.equal(previousButtonEnabled, false, 'The back button is disabled');
+                    assert.equal(store['item1'], true, 'The item value is stored');
+                    done();
+                }, 5);
+            })
+            .trigger('loaditem', 'item1')
+            .trigger('renderitem', 'item1');
 
         })
         .on('error', err => {
