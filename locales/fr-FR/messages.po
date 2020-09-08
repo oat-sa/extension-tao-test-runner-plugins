@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint132\n"
-"PO-Revision-Date: 2020-07-03T10:21:55\n"
+"Project-Id-Version: TAO 3.4.0-sprint136\n"
+"PO-Revision-Date: 2020-09-08T11:34:28\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: fr-FR\n"
@@ -35,9 +35,6 @@ msgid "Assessment Item"
 msgstr ""
 
 msgid "Attempt to navigate to another window or tab."
-msgstr ""
-
-msgid "Attempt to print screen."
 msgstr ""
 
 msgid "Cannot find any actions for importing."
