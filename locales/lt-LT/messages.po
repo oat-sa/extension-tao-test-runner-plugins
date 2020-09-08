@@ -4,9 +4,9 @@ msgstr ""
 "PO-Revision-Date: 2020-09-08T11:34:28\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: fr-FR\n"
+"Language: lt-LT\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: fr-FR\n"
+"targetLanguage: lt-LT\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
@@ -35,7 +35,7 @@ msgid "Assessment Item"
 msgstr ""
 
 msgid "Attempt to navigate to another window or tab."
-msgstr ""
+msgstr "Bandymas pereiti į kitą langą arba naršyklės kortelę."
 
 msgid "Cannot find any actions for importing."
 msgstr ""
@@ -83,10 +83,10 @@ msgid "Test could not be launched. Test must always be launched in a full screen
 msgstr ""
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
-msgstr "L'évaluation a été suspendue en raison d'une tentative de navigation vers une autre fenêtre ou un autre tab. Veuillez contacter votre surveillant ou administrateur pour reprendre votre évaluation."
+msgstr ""
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
-msgstr "L'évaluation a été suspendue en raison d'une tentative d'impression à l'écran. Veuillez contacter votre surveillant ou administrateur pour reprendre votre évaluation."
+msgstr ""
 
 msgid "The connection seems to be back, please proceed"
 msgstr ""
@@ -95,7 +95,7 @@ msgid "The download will be available in <strong>%d</strong> seconds"
 msgstr ""
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr ""
+msgstr "Šis testas yra atliekamas tik padidintas visame ekrane"
 
 msgid "Upload"
 msgstr ""
