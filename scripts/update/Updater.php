@@ -301,7 +301,7 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('2.12.0', '2.15.2');
-        
+
         //Updater files are deprecated. Please use migrations.
         //See: https://github.com/oat-sa/generis/wiki/Tao-Update-Process
 
