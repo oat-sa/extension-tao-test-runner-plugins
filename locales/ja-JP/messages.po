@@ -1,0 +1,114 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint117\n"
+"PO-Revision-Date: 2020-09-22T16:02:17\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ja-JP\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: ja-JP\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid ""
+msgstr ""
+
+msgid "%s actions were successfully imported"
+msgstr "%s actions were successfully imported"
+
+msgid "%s deliveries were updated"
+msgstr "%s deliveries were updated"
+
+msgid "%s deliveries will be updated"
+msgstr "%s deliveries will be updated"
+
+msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
+msgstr "全学生が一斉に次のセクションに入ります。部屋の管理者が次のセクションを始めるまで、静かにリラックスしてください。"
+
+msgid "Assessment ended. Please email the downloaded file to complete the process."
+msgstr "査定を終了しました。ダウンロードしたファイルをメールで送っていただければ完了です。"
+
+msgid "Assessment Item"
+msgstr "アセスメントアイテム"
+
+msgid "Attempt to navigate to another window or tab."
+msgstr "別のウィンドウまたはタブに移動しようとします。"
+
+msgid "Attempt to print screen."
+msgstr "画面の印刷をしています。"
+
+msgid "Cannot find any actions for importing."
+msgstr "インポートのためのアクションが見つかりません。"
+
+msgid "Delivery execution %s is not active state."
+msgstr "配信実行 %s はアクティブ状態ではありません。"
+
+msgid "Download & End Assessment"
+msgstr "ダウンロード＆テスト終了"
+
+msgid "Fail to import test actions with message: "
+msgstr "メッセージ付きのテストアクションのインポートに失敗しました。"
+
+msgid "Import a test sent to you by an offline test taker."
+msgstr "オフラインの受験者から送られてきたテストをインポートします。"
+
+msgid "Invalid MimeType of file"
+msgstr "Invalid MimeType of file"
+
+msgid "JSON with test actions"
+msgstr "JSON with test actions"
+
+msgid "Migrate to use delivery features to control security plugins"
+msgstr "Migrate to use delivery features to control security plugins"
+
+msgid "or"
+msgstr "or"
+
+msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
+msgstr "接続の復旧を試みる間、待ち続けてください。または、手動で提出するファイルをダウンロードしてテストを終了することもできます。"
+
+msgid "Please wait while we try to restore the connection."
+msgstr "接続の復旧を試みますので、しばらくお待ちください。"
+
+msgid "Test actions imported successfully. Imported execution %s"
+msgstr "テスト・アクションが正常にインポートされました。インポートされた実行 %s"
+
+msgid "Test actions importing"
+msgstr "インポートするテストアクション"
+
+msgid "Test could not be launched. Test must always be launched in a full screen mode."
+msgstr "テストを起動できませんでした。テストは常に全画面モードで起動する必要があります。"
+
+msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
+msgstr "別のウィンドウまたはタブに移動しようとしたため、評価が一時停止されました。評価を再開するには、担当のプロクターまたは管理者に連絡してください。"
+
+msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
+msgstr "画面を印刷しようとしたため、評価が一時停止されました。評価を再開するには、担当のプロクターまたは管理者に連絡してください。"
+
+msgid "The connection seems to be back, please proceed"
+msgstr "接続が戻ったようですので、お進みください"
+
+msgid "The download will be available in <strong>%d</strong> seconds"
+msgstr "ダウンロードは<strong>%d</strong>秒で利用可能になります。"
+
+msgid "This test needs to be taken in full screen mode (%s)."
+msgstr "このテストは、全画面モード(%s)で受験する必要があります。"
+
+msgid "Upload"
+msgstr "アップロード"
+
+msgid "Upload offline test"
+msgstr "オフラインテストのアップロード"
+
+msgid "You are encountering a connectivity loss. The test has been suspended."
+msgstr "接続障害が発生しています テストは中断されています。"
+
+msgid "You are encountering a prolonged connectivity loss."
+msgstr "長時間の接続障害が発生しています。"
+
+msgid "You are encountering a prolonged connectivity loss. "
+msgstr "長時間の接続障害が発生しています。"
+
