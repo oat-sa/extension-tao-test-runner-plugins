@@ -266,6 +266,8 @@ define([
                                     startFullScreenChangeObserver();
                                 }
                             });
+                        }, {
+                            focus: 'ok'
                         });
                     }
                 }
