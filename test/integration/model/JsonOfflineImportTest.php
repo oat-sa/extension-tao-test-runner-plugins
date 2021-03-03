@@ -38,9 +38,18 @@ use qtism\common\enums\Cardinality;
 use qtism\runtime\common\OutcomeVariable;
 use qtism\runtime\tests\AssessmentTestSession;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use oat\oatbox\filesystem\FileSystemService;
+
 
 class JsonOfflineImportTest extends TaoPhpUnitTestRunner
 {
+    public function testGetForm()
+    {
+        $importer = new JsonOfflineTestImporter();
+        $importer->setServiceLocator($this->getMockServiceLocator());
+        $this->assertInstanceOf(tao_helpers_form_xhtml_Form::class, $importer->getForm());
+    }
+
     /**
      * @dataProvider importDataProvider
      *
@@ -170,17 +179,19 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
             'http://sample/first.rdf#i154661273822141'
         )->willReturn($serviceContext);
         $qtiCommunicationService = $this->prophesize(QtiCommunicationService::class);
-        $qtiCommunicationService->processInput($serviceContext, $this->getMockData())->willReturn(true);
+        $qtiCommunicationService->processInput($serviceContext, $this->getMockData())->willReturn([]);
 
         $uriProvider = $this->prophesize(UriProvider::class);
         $uriProvider->provide()->willReturn('http://sample/first.rdf#i1544535042650000');
+        $filesystemService = $this->createMock(FileSystemService::class);
 
         return $this->getServiceLocatorMock([
             ServiceProxy::SERVICE_ID => $prophecy,
             QtiRunnerService::SERVICE_ID => $qtiRunnerService,
             UploadService::SERVICE_ID => $upload,
             QtiCommunicationService::SERVICE_ID => $qtiCommunicationService,
-            UriProvider::SERVICE_ID => $uriProvider
+            UriProvider::SERVICE_ID => $uriProvider,
+            FileSystemService::SERVICE_ID => $filesystemService
         ]);
     }
     /**
