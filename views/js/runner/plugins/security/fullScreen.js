@@ -223,8 +223,14 @@ define([
          * Initializes the plugin (called during runner's init)
          */
         init: function init() {
-            var testRunner = this.getTestRunner();
-            var waitingForUser = false;
+            const testRunner = this.getTestRunner();
+            const dialogParams = {};
+            const config = this.getConfig();
+            let waitingForUser = false;
+
+            if (config && config.focus) {
+                dialogParams.focus = config.focus;
+            }
 
             // Check if plugin can be allowed
             function isAllowed() {
@@ -243,7 +249,7 @@ define([
                 testRunner.trigger('disablenav disabletools');
             }
 
-            function alertUser(alertOptions) {
+            function alertUser() {
                 if (!waitingForUser) {
                     if (fullScreenSupported) {
                         waitingForUser = true;
@@ -253,7 +259,7 @@ define([
 
                             if (reason === 'esc') {
                                 waitingForUser = false;
-                                return alertUser(alertOptions);
+                                return alertUser();
                             }
 
                             requestFullScreen();
@@ -266,7 +272,7 @@ define([
                                     startFullScreenChangeObserver();
                                 }
                             });
-                        }, alertOptions);
+                        }, dialogParams);
                     }
                 }
             }
@@ -282,20 +288,10 @@ define([
                 isFullScreen = checkFullScreen();
                 if (!isFullScreen) {
                     leaveFullScreen(testRunner);
-                    alertUser(getAlertOptions());
+                    alertUser();
                 } else {
                     enterFullScreen(testRunner);
                 }
-            }
-
-            function getAlertOptions() {
-                let alertOptions = null;
-
-                try {
-                    alertOptions = testRunner.getPlugin('dialog').getConfig().alert;
-                } catch (e) {}
-
-                return alertOptions;
             }
 
             if (isAllowed()) {
@@ -340,13 +336,13 @@ define([
 
                     if (!isFullScreen) {
                         leaveFullScreen(testRunner);
-                        alertUser(getAlertOptions());
+                        alertUser();
                     } else if (!fullScreenSupported) {
                         startFullScreenChangeObserver();
                     }
                     testRunner.off('renderitem.fullscreen');
                 })
-                
+
             } else {
                 this.disable();
             }
