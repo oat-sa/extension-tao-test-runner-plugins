@@ -243,7 +243,7 @@ define([
                 testRunner.trigger('disablenav disabletools');
             }
 
-            function alertUser() {
+            function alertUser(alertOptions) {
                 if (!waitingForUser) {
                     if (fullScreenSupported) {
                         waitingForUser = true;
@@ -253,7 +253,7 @@ define([
 
                             if (reason === 'esc') {
                                 waitingForUser = false;
-                                return alertUser();
+                                return alertUser(alertOptions);
                             }
 
                             requestFullScreen();
@@ -266,9 +266,7 @@ define([
                                     startFullScreenChangeObserver();
                                 }
                             });
-                        }, {
-                            focus: 'ok'
-                        });
+                        }, alertOptions);
                     }
                 }
             }
@@ -284,10 +282,20 @@ define([
                 isFullScreen = checkFullScreen();
                 if (!isFullScreen) {
                     leaveFullScreen(testRunner);
-                    alertUser();
+                    alertUser(getAlertOptions());
                 } else {
                     enterFullScreen(testRunner);
                 }
+            }
+
+            function getAlertOptions() {
+                let alertOptions = null;
+
+                try {
+                    alertOptions = testRunner.getPlugin('dialog').getConfig().alert;
+                } catch (e) {}
+
+                return alertOptions;
             }
 
             if (isAllowed()) {
@@ -329,9 +337,10 @@ define([
                 // in testRunner in function initTestRunnerNavigation of keyNavigation
                 testRunner.after('renderitem.fullscreen', function() {
                     isFullScreen = checkFullScreen();
+
                     if (!isFullScreen) {
                         leaveFullScreen(testRunner);
-                        alertUser();
+                        alertUser(getAlertOptions());
                     } else if (!fullScreenSupported) {
                         startFullScreenChangeObserver();
                     }
