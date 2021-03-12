@@ -23,7 +23,8 @@ define([
     'lodash',
     'i18n',
     'taoTests/runner/plugin',
-    'taoQtiTest/runner/config/states'
+    'taoQtiTest/runner/config/states',
+    'css!taoTestRunnerPluginsCss/fullscreen'
 ], function (_, __, pluginFactory, states) {
     'use strict';
 
@@ -335,7 +336,7 @@ define([
                     }
                     testRunner.off('renderitem.fullscreen');
                 })
-                
+
             } else {
                 this.disable();
             }
