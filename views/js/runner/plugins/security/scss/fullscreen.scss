@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+/* MSIE scrollbars behavior on zoom in fullscreen mode */
+.fullscreen {
+    .content-wrap {
+        -ms-overflow-y: auto;
+    }
+}
