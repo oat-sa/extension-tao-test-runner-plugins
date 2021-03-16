@@ -79,7 +79,7 @@ class JsonOfflineTestImporter implements \tao_models_classes_import_ImportHandle
      */
     public function getForm()
     {
-        return (new OfflineTestImportForm(null))->getForm();
+        return (new OfflineTestImportForm([]))->getForm();
     }
 
     /**

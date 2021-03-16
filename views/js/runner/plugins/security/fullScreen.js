@@ -224,8 +224,14 @@ define([
          * Initializes the plugin (called during runner's init)
          */
         init: function init() {
-            var testRunner = this.getTestRunner();
-            var waitingForUser = false;
+            const testRunner = this.getTestRunner();
+            const dialogParams = {};
+            const config = this.getConfig();
+            let waitingForUser = false;
+
+            if (config && config.focus) {
+                dialogParams.focus = config.focus;
+            }
 
             // Check if plugin can be allowed
             function isAllowed() {
@@ -267,7 +273,7 @@ define([
                                     startFullScreenChangeObserver();
                                 }
                             });
-                        });
+                        }, dialogParams);
                     }
                 }
             }
@@ -328,6 +334,7 @@ define([
                 // in testRunner in function initTestRunnerNavigation of keyNavigation
                 testRunner.after('renderitem.fullscreen', function() {
                     isFullScreen = checkFullScreen();
+
                     if (!isFullScreen) {
                         leaveFullScreen(testRunner);
                         alertUser();
