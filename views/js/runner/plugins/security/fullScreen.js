@@ -24,7 +24,7 @@ define([
     'i18n',
     'taoTests/runner/plugin',
     'taoQtiTest/runner/config/states',
-    'css!taoTestRunnerPluginsCss/fullscreen'
+    'css!taoTestRunnerPlugins/runner/plugins/security/css/fullscreen'
 ], function (_, __, pluginFactory, states) {
     'use strict';
 
