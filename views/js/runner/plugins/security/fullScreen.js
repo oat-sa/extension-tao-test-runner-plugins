@@ -23,7 +23,8 @@ define([
     'lodash',
     'i18n',
     'taoTests/runner/plugin',
-    'taoQtiTest/runner/config/states'
+    'taoQtiTest/runner/config/states',
+    'css!taoTestRunnerPlugins/runner/plugins/security/css/fullscreen'
 ], function (_, __, pluginFactory, states) {
     'use strict';
 

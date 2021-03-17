@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "fullscreen.css",
+	"sources": [
+		"../scss/fullscreen.scss"
+	],
+	"names": [],
+	"mappings": "AAGA,AACI,WADO,CACP,aAAa,AAAC,CACV,cAAc,CAAE,IAAI,CACvB"
+}
