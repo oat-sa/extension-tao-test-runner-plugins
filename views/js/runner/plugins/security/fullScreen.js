@@ -119,11 +119,19 @@ define([
     }
 
     /**
+     * Checks if IE11
+     * @returns {Boolean}
+     */
+    function isIE11() {
+        return !!window.MSInputMethodContext && !!document.documentMode;
+    }
+
+    /**
      * Checks if the full screen mode is already active
      * @returns {Boolean}
      */
     function checkFullScreen() {
-        if (fullScreenProperty in doc) {
+        if (fullScreenProperty in doc && !isIE11()) {
             return !!doc[fullScreenProperty];
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
@@ -251,31 +259,51 @@ define([
             }
 
             function alertUser() {
-                if (!waitingForUser) {
-                    if (fullScreenSupported) {
-                        waitingForUser = true;
-                        stopFullScreenChangeObserver();
-                        disableItem();
-                        testRunner.trigger('alert.fullscreen', message, function(reason) {
+                if (!waitingForUser && fullScreenSupported) {
+                    waitingForUser = true;
+                    stopFullScreenChangeObserver();
+                    disableItem();
 
-                            if (reason === 'esc') {
-                                waitingForUser = false;
-                                return alertUser();
-                            }
-
-                            requestFullScreen();
-
-                            _.defer(function() {
-                                waitingForUser = false;
-                                enableItem();
-
-                                if (!fullScreenSupported) {
-                                    startFullScreenChangeObserver();
-                                }
-                            });
-                        }, dialogParams);
+                    if(isIE11()) {
+                        testRunner.trigger('alert.fullscreen', message, userAlertCallbackIE11, dialogParams);
+                    } else if (fullScreenSupported) {
+                        testRunner.trigger('alert.fullscreen', message, userAlerCallback, dialogParams);
                     }
                 }
+            }
+            function userAlertCallbackIE11(reason) {
+                if (reason === 'esc') {
+                    waitingForUser = false;
+                    return alertUser();
+                }
+
+                _.defer(function() {
+                    waitingForUser = false;
+
+                    if(!checkFullScreen()) {
+                        alertUser();
+                    } else {
+                        enableItem();
+                    }
+                });
+            }
+
+            function userAlerCallback(reason) {
+                if (reason === 'esc') {
+                    waitingForUser = false;
+                    return alertUser();
+                }
+
+                requestFullScreen();
+
+                _.defer(function() {
+                    waitingForUser = false;
+                    enableItem();
+
+                    if (!fullScreenSupported) {
+                        startFullScreenChangeObserver();
+                    }
+                });
             }
 
             function doPause() {
@@ -292,6 +320,7 @@ define([
                     alertUser();
                 } else {
                     enterFullScreen(testRunner);
+                    testRunner.trigger('closedialog.fullscreen');
                 }
             }
 
@@ -310,6 +339,9 @@ define([
                 testRunner
                     .on('exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
+                        if(isIE11()) {
+                            window.removeEventListener('resize', handleFullScreenChange);
+                        }
                         leaveFullScreen(testRunner);
                         exitFullScreen();
                     });
@@ -328,6 +360,10 @@ define([
 
                 // listen either to the native or the change event created in the observer above
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
+
+                if(isIE11()) {
+                    window.addEventListener('resize', handleFullScreenChange);
+                }
 
                 // first check should be done after 'renderitem' event
                 // because current focused element will be blured, to reinitialize keyboard navigation
