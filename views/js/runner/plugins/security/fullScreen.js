@@ -123,7 +123,7 @@ define([
      * @returns {Boolean}
      */
     function isIE11() {
-        return !!window.MSInputMethodContext && !!document.documentMode;
+        return Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
     }
 
     /**
