@@ -71,6 +71,7 @@ define([
      * @type {String}
      */
     var message = __("This test needs to be taken in full screen mode (%s).", shortcut);
+    var messageIE11 = __("The assessment must be taken in fullscreen. Please press %s to activate it.", shortcut);
 
     /**
      * The error message displayed when the test is not launched in full screen mode, or cannot be.
@@ -235,6 +236,7 @@ define([
             const testRunner = this.getTestRunner();
             const dialogParams = {};
             const config = this.getConfig();
+            const throttledHandleFullScreenChange = _.debounce(handleFullScreenChange, 250);
             let waitingForUser = false;
 
             if (config && config.focus) {
@@ -264,8 +266,12 @@ define([
                     stopFullScreenChangeObserver();
                     disableItem();
 
-                    const callback = isIE11() ? userAlertCallbackIE11 : userAlerCallback;
-                    testRunner.trigger('alert.fullscreen', message, callback, dialogParams);
+                    if(isIE11()) {
+                        testRunner.trigger('alert.fullscreen', messageIE11, userAlertCallbackIE11, dialogParams);
+                    } else {
+                        testRunner.trigger('alert.fullscreen', message, userAlerCallback, dialogParams);
+                    }
+
                 }
             }
             function userAlertCallbackIE11(reason) {
@@ -337,7 +343,7 @@ define([
                     .on('exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
                         if(isIE11()) {
-                            window.removeEventListener('resize', handleFullScreenChange);
+                            window.removeEventListener('resize', throttledHandleFullScreenChange);
                         }
                         leaveFullScreen(testRunner);
                         exitFullScreen();
@@ -359,7 +365,7 @@ define([
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
 
                 if(isIE11()) {
-                    window.addEventListener('resize', handleFullScreenChange);
+                    window.addEventListener('resize', throttledHandleFullScreenChange);
                 }
 
                 // first check should be done after 'renderitem' event
