@@ -280,10 +280,10 @@ define([
                 _.defer(function() {
                     waitingForUser = false;
 
-                    if(!checkFullScreen()) {
-                        alertUser();
-                    } else {
+                    if(checkFullScreen()) {
                         enableItem();
+                    } else {
+                        alertUser();
                     }
                 });
             }
