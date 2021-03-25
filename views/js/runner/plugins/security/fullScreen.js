@@ -264,11 +264,8 @@ define([
                     stopFullScreenChangeObserver();
                     disableItem();
 
-                    if(isIE11()) {
-                        testRunner.trigger('alert.fullscreen', message, userAlertCallbackIE11, dialogParams);
-                    } else if (fullScreenSupported) {
-                        testRunner.trigger('alert.fullscreen', message, userAlerCallback, dialogParams);
-                    }
+                    const callback = isIE11() ? userAlertCallbackIE11 : userAlerCallback;
+                    testRunner.trigger('alert.fullscreen', message, callback, dialogParams);
                 }
             }
             function userAlertCallbackIE11(reason) {
