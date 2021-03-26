@@ -234,13 +234,21 @@ define([
          */
         init: function init() {
             const testRunner = this.getTestRunner();
-            const dialogParams = {};
+            let dialogParams = {};
             const config = this.getConfig();
             const throttledHandleFullScreenChange = _.debounce(handleFullScreenChange, 250);
             let waitingForUser = false;
 
             if (config && config.focus) {
                 dialogParams.focus = config.focus;
+            }
+
+            if(isIE11()) {
+                dialogParams.buttons = {
+                    labels: {
+                        ok: __('Cancel')
+                    }
+                };
             }
 
             // Check if plugin can be allowed
