@@ -234,7 +234,7 @@ define([
          */
         init: function init() {
             const testRunner = this.getTestRunner();
-            let dialogParams = {};
+            const dialogParams = {};
             const config = this.getConfig();
             const throttledHandleFullScreenChange = _.debounce(handleFullScreenChange, 250);
             let waitingForUser = false;
