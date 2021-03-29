@@ -277,7 +277,7 @@ define([
                     if(isIE11()) {
                         testRunner.trigger('alert.fullscreen', messageIE11, userAlertCallbackIE11, dialogParams);
                     } else {
-                        testRunner.trigger('alert.fullscreen', message, userAlerCallback, dialogParams);
+                        testRunner.trigger('alert.fullscreen', message, userAlertCallback, dialogParams);
                     }
 
                 }
@@ -299,7 +299,7 @@ define([
                 });
             }
 
-            function userAlerCallback(reason) {
+            function userAlertCallback(reason) {
                 if (reason === 'esc') {
                     waitingForUser = false;
                     return alertUser();
