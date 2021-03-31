@@ -97,6 +97,9 @@ msgstr ""
 msgid "This test needs to be taken in full screen mode (%s)."
 msgstr ""
 
+msgid "The assessment must be taken in fullscreen. Please press %s to activate it."
+msgstr ""
+
 msgid "Upload"
 msgstr ""
 
