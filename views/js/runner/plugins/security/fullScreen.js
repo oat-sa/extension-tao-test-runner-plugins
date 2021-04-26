@@ -19,7 +19,7 @@
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
  * @author dieter <dieter@taotesting.com>
  */
- define([
+define([
     'lodash',
     'i18n',
     'taoTests/runner/plugin',
