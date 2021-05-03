@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint136\n"
-"PO-Revision-Date: 2020-09-08T11:34:28\n"
+"Project-Id-Version: TAO 3.4.0-sprint153\n"
+"PO-Revision-Date: 2021-04-26T13:55:26\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: en-US\n"
@@ -95,9 +95,6 @@ msgid "The download will be available in <strong>%d</strong> seconds"
 msgstr ""
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr ""
-
-msgid "The assessment must be taken in fullscreen. Please press %s to activate it."
 msgstr ""
 
 msgid "Upload"
