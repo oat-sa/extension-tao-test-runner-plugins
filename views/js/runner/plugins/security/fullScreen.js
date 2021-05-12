@@ -124,7 +124,9 @@ define([
      */
     function checkFullScreen() {
         if (fullScreenProperty in doc) {
-            return !!doc[fullScreenProperty];
+            const genericFullScreen = !!doc[fullScreenProperty];
+            const mozWebkitFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
+            return genericFullScreen || mozWebkitFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
             return (screen.availHeight || screen.height - 30) <= window.innerHeight;
@@ -250,13 +252,29 @@ define([
                 testRunner.trigger('disablenav disabletools');
             }
 
+            function handleResizeToFullScreenChange() {
+                // force close popup: fullscreen actions are handled in alertUser()
+                if (checkFullScreen()) {
+                    $('.modal-bg').click();
+                }
+            }
+            function startWebkitF11FullScreenChangeObserver() {
+                window.addEventListener('resize', handleResizeToFullScreenChange);
+            }
+            function stopWebkitF11FullScreenChangeObserver() {
+                window.removeEventListener('resize', handleResizeToFullScreenChange);
+            }
+
             function alertUser() {
                 if (!waitingForUser) {
                     if (fullScreenSupported) {
                         waitingForUser = true;
                         stopFullScreenChangeObserver();
                         disableItem();
+                        startWebkitF11FullScreenChangeObserver();
+
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
+                            stopWebkitF11FullScreenChangeObserver();
 
                             if (reason === 'esc') {
                                 waitingForUser = false;
