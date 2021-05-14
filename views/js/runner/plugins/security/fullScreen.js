@@ -61,6 +61,12 @@ define([
     var changeObserverHandler;
 
     /**
+     * Flag that mirrors visibility of full screen alert
+     * @type {Boolean}
+     */
+    var isFullScreenAlert = false;
+
+    /**
      * The keyboard shortcut to active the full screen mode.
      * @type {String}
      */
@@ -253,10 +259,16 @@ define([
             }
 
             function handleResizeToFullScreenChange() {
-                // force close popup: fullscreen actions are handled in alertUser()
-                if (checkFullScreen()) {
-                    $('.modal-bg').click();
-                }
+                // defer handler execution to process fullscreen state before calvculate checkFullScreen()
+                _.defer(function(){
+                    if (checkFullScreen()) {
+                        // force close popup: fullscreen actions are handled in alertUser()
+                        isFullScreenAlert && $('.modal-bg').click();
+                    } else {
+                        !isFullScreenAlert && alertUser();
+                    }
+                })
+
             }
             function startWebkitF11FullScreenChangeObserver() {
                 window.addEventListener('resize', handleResizeToFullScreenChange);
@@ -271,10 +283,12 @@ define([
                         waitingForUser = true;
                         stopFullScreenChangeObserver();
                         disableItem();
-                        startWebkitF11FullScreenChangeObserver();
 
+                        isFullScreenAlert = true;
+                        // startWebkitF11FullScreenChangeObserver();
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
-                            stopWebkitF11FullScreenChangeObserver();
+                            isFullScreenAlert = false;
+                            // stopWebkitF11FullScreenChangeObserver();
 
                             if (reason === 'esc') {
                                 waitingForUser = false;
@@ -328,6 +342,7 @@ define([
                 testRunner
                     .on('exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
+                        stopWebkitF11FullScreenChangeObserver();
                         leaveFullScreen(testRunner);
                         exitFullScreen();
                     });
@@ -346,6 +361,7 @@ define([
 
                 // listen either to the native or the change event created in the observer above
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
+                startWebkitF11FullScreenChangeObserver();
 
                 // first check should be done after 'renderitem' event
                 // because current focused element will be blured, to reinitialize keyboard navigation
