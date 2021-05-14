@@ -285,10 +285,8 @@ define([
                         disableItem();
 
                         isFullScreenAlert = true;
-                        // startWebkitF11FullScreenChangeObserver();
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
                             isFullScreenAlert = false;
-                            // stopWebkitF11FullScreenChangeObserver();
 
                             if (reason === 'esc') {
                                 waitingForUser = false;
