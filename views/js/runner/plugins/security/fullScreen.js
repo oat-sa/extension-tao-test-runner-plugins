@@ -63,12 +63,6 @@ define([
     var changeObserverHandler;
 
     /**
-     * Flag that mirrors visibility of full screen alert
-     * @type {Boolean}
-     */
-    var isFullScreenAlert = false;
-
-    /**
      * The keyboard shortcut to active the full screen mode.
      * @type {String}
      */
@@ -292,9 +286,7 @@ define([
                         stopFullScreenChangeObserver();
                         disableItem();
 
-                        isFullScreenAlert = true;
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
-                            isFullScreenAlert = false;
 
                             if (reason === 'esc') {
                                 waitingForUser = false;
