@@ -23,13 +23,15 @@ define([
     'lodash',
     'i18n',
     'taoTests/runner/plugin',
+    /* 'core/logger', // uncomment to enable fullscreen request denied logging */
     'taoQtiTest/runner/config/states',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/fullscreen'
-], function (_, __, pluginFactory, states) {
+], function (_, __, pluginFactory, /* loggerFactory, */ states) {
     'use strict';
 
     var doc = document;
     var docElem = doc.documentElement;
+    /* var logger = loggerFactory('testRunnerPlugins/fullScreen'); // uncomment to enable fullscreen request denied logging */
 
     /**
      * CSS class name to adjust the full screen mode
@@ -130,9 +132,9 @@ define([
      */
     function checkFullScreen() {
         if (fullScreenProperty in doc) {
-            const genericFullScreen = !!doc[fullScreenProperty];
-            const mozWebkitFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
-            return genericFullScreen || mozWebkitFullScreen;
+            const isGenericFullScreen = !!doc[fullScreenProperty];
+            const isSizeFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
+            return isGenericFullScreen || isSizeFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
             return (screen.availHeight || screen.height - 30) <= window.innerHeight;
@@ -145,7 +147,10 @@ define([
     function requestFullScreen() {
         if (docElem.requestFullscreen) {
             // HTML5 compliant browsers
-            docElem.requestFullscreen();
+            docElem.requestFullscreen().catch(function (e) {
+                /* logger.warn(e) || // uncomment to enable fullscreen request denied logging */
+                console.warn(e && e.message);
+            });
         } else if (docElem.msRequestFullscreen) {
             // Internet Explorer 11
             docElem.msRequestFullscreen();
@@ -258,23 +263,26 @@ define([
                 testRunner.trigger('disablenav disabletools');
             }
 
-            function handleResizeToFullScreenChange() {
-                // defer handler execution to process fullscreen state before calvculate checkFullScreen()
+            function handleFullScreenChange() {
+                // defer handler execution to process fullscreen state before calculate checkFullScreen()
                 _.defer(function(){
-                    if (checkFullScreen()) {
+                    isFullScreen = checkFullScreen();
+                    if (isFullScreen) {
+                        enterFullScreen(testRunner);
                         // force close popup: fullscreen actions are handled in alertUser()
-                        isFullScreenAlert && $('.modal-bg').click();
+                        testRunner.trigger('closedialog.fullscreen');
                     } else {
-                        !isFullScreenAlert && alertUser();
+                        leaveFullScreen(testRunner);
+                        alertUser();
                     }
                 })
-
             }
+            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
             function startWebkitF11FullScreenChangeObserver() {
-                window.addEventListener('resize', handleResizeToFullScreenChange);
+                window.addEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
             function stopWebkitF11FullScreenChangeObserver() {
-                window.removeEventListener('resize', handleResizeToFullScreenChange);
+                window.removeEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
 
             function alertUser() {
@@ -312,16 +320,6 @@ define([
                 var context = testRunner.getTestContext();
                 if (context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
                     testRunner.trigger('pause', {reason: launchError});
-                }
-            }
-
-            function handleFullScreenChange() {
-                isFullScreen = checkFullScreen();
-                if (!isFullScreen) {
-                    leaveFullScreen(testRunner);
-                    alertUser();
-                } else {
-                    enterFullScreen(testRunner);
                 }
             }
 
