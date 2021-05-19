@@ -255,8 +255,8 @@ define([
             }
 
             function handleFullScreenChange() {
-                // defer handler execution to process fullscreen state before calculate checkFullScreen()
-                _.defer(function(){
+                // delay handler execution to process fullscreen state before calculate checkFullScreen()
+                _.delay(function(){
                     isFullScreen = checkFullScreen();
                     if (isFullScreen) {
                         enterFullScreen(testRunner);
@@ -266,7 +266,7 @@ define([
                         leaveFullScreen(testRunner);
                         alertUser();
                     }
-                })
+                }, 100);
             }
             const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
             function startWebkitF11FullScreenChangeObserver() {
