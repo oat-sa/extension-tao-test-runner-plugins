@@ -23,15 +23,13 @@ define([
     'lodash',
     'i18n',
     'taoTests/runner/plugin',
-    /* 'core/logger', // uncomment to enable fullscreen request denied logging */
     'taoQtiTest/runner/config/states',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/fullscreen'
-], function (_, __, pluginFactory, /* loggerFactory, */ states) {
+], function (_, __, pluginFactory, states) {
     'use strict';
 
     var doc = document;
     var docElem = doc.documentElement;
-    /* var logger = loggerFactory('testRunnerPlugins/fullScreen'); // uncomment to enable fullscreen request denied logging */
 
     /**
      * CSS class name to adjust the full screen mode
@@ -142,7 +140,6 @@ define([
         if (docElem.requestFullscreen) {
             // HTML5 compliant browsers
             docElem.requestFullscreen().catch(function (e) {
-                /* logger.warn(e) || // uncomment to enable fullscreen request denied logging */
                 console.warn(e && e.message);
             });
         } else if (docElem.msRequestFullscreen) {
