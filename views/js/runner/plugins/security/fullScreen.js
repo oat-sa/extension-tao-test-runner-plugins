@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2016 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2016-2021 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien.conan@vesperiagroup.com>
@@ -71,7 +71,6 @@ define([
      * @type {String}
      */
     var message = __("This test needs to be taken in full screen mode (%s).", shortcut);
-    var messageIE11 = __("The assessment must be taken in fullscreen. Please press %s to activate it.", shortcut);
 
     /**
      * The error message displayed when the test is not launched in full screen mode, or cannot be.
@@ -120,20 +119,14 @@ define([
     }
 
     /**
-     * Checks if IE11
-     * @returns {Boolean}
-     */
-    function isIE11() {
-        return Boolean(window.MSInputMethodContext) && Boolean(document.documentMode);
-    }
-
-    /**
      * Checks if the full screen mode is already active
      * @returns {Boolean}
      */
     function checkFullScreen() {
-        if (fullScreenProperty in doc && !isIE11()) {
-            return !!doc[fullScreenProperty];
+        if (fullScreenProperty in doc) {
+            const isGenericFullScreen = !!doc[fullScreenProperty];
+            const isSizeFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
+            return isGenericFullScreen || isSizeFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
             return (screen.availHeight || screen.height - 30) <= window.innerHeight;
@@ -146,7 +139,9 @@ define([
     function requestFullScreen() {
         if (docElem.requestFullscreen) {
             // HTML5 compliant browsers
-            docElem.requestFullscreen();
+            docElem.requestFullscreen().catch(function (e) {
+                console.warn(e && e.message);
+            });
         } else if (docElem.msRequestFullscreen) {
             // Internet Explorer 11
             docElem.msRequestFullscreen();
@@ -236,19 +231,10 @@ define([
             const testRunner = this.getTestRunner();
             const dialogParams = {};
             const config = this.getConfig();
-            const throttledHandleFullScreenChange = _.debounce(handleFullScreenChange, 250);
             let waitingForUser = false;
 
             if (config && config.focus) {
                 dialogParams.focus = config.focus;
-            }
-
-            if(isIE11()) {
-                dialogParams.buttons = {
-                    labels: {
-                        ok: __('Cancel')
-                    }
-                };
             }
 
             // Check if plugin can be allowed
@@ -268,70 +254,61 @@ define([
                 testRunner.trigger('disablenav disabletools');
             }
 
-            function alertUser() {
-                if (!waitingForUser && fullScreenSupported) {
-                    waitingForUser = true;
-                    stopFullScreenChangeObserver();
-                    disableItem();
-
-                    if(isIE11()) {
-                        testRunner.trigger('alert.fullscreen', messageIE11, userAlertCallbackIE11, dialogParams);
+            function handleFullScreenChange() {
+                // delay handler execution to process fullscreen state before calculate checkFullScreen()
+                _.delay(function(){
+                    isFullScreen = checkFullScreen();
+                    if (isFullScreen) {
+                        enterFullScreen(testRunner);
+                        // force close popup: fullscreen actions are handled in alertUser()
+                        testRunner.trigger('closedialog.fullscreen');
                     } else {
-                        testRunner.trigger('alert.fullscreen', message, userAlertCallback, dialogParams);
-                    }
-
-                }
-            }
-            function userAlertCallbackIE11(reason) {
-                if (reason === 'esc') {
-                    waitingForUser = false;
-                    return alertUser();
-                }
-
-                _.defer(function() {
-                    waitingForUser = false;
-
-                    if(checkFullScreen()) {
-                        enableItem();
-                    } else {
+                        leaveFullScreen(testRunner);
                         alertUser();
                     }
-                });
+                }, 100);
+            }
+            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
+            function startWebkitF11FullScreenChangeObserver() {
+                window.addEventListener('resize', throttledHandleResizeToFullScreenChange);
+            }
+            function stopWebkitF11FullScreenChangeObserver() {
+                window.removeEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
 
-            function userAlertCallback(reason) {
-                if (reason === 'esc') {
-                    waitingForUser = false;
-                    return alertUser();
-                }
+            function alertUser() {
+                if (!waitingForUser) {
+                    if (fullScreenSupported) {
+                        waitingForUser = true;
+                        stopFullScreenChangeObserver();
+                        disableItem();
 
-                requestFullScreen();
+                        testRunner.trigger('alert.fullscreen', message, function(reason) {
 
-                _.defer(function() {
-                    waitingForUser = false;
-                    enableItem();
+                            if (reason === 'esc') {
+                                waitingForUser = false;
+                                return alertUser();
+                            }
 
-                    if (!fullScreenSupported) {
-                        startFullScreenChangeObserver();
+                            requestFullScreen();
+
+                            _.defer(function() {
+                                waitingForUser = false;
+                                enableItem();
+
+                                if (!fullScreenSupported) {
+                                    startFullScreenChangeObserver();
+                                }
+                            });
+                        }, dialogParams);
                     }
-                });
+                }
             }
 
             function doPause() {
                 var context = testRunner.getTestContext();
                 if (context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
                     testRunner.trigger('pause', {reason: launchError});
-                }
-            }
-
-            function handleFullScreenChange() {
-                isFullScreen = checkFullScreen();
-                if (!isFullScreen) {
-                    leaveFullScreen(testRunner);
-                    alertUser();
-                } else {
-                    enterFullScreen(testRunner);
-                    testRunner.trigger('closedialog.fullscreen');
                 }
             }
 
@@ -350,9 +327,7 @@ define([
                 testRunner
                     .on('exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
-                        if(isIE11()) {
-                            window.removeEventListener('resize', throttledHandleFullScreenChange);
-                        }
+                        stopWebkitF11FullScreenChangeObserver();
                         leaveFullScreen(testRunner);
                         exitFullScreen();
                     });
@@ -371,10 +346,7 @@ define([
 
                 // listen either to the native or the change event created in the observer above
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
-
-                if(isIE11()) {
-                    window.addEventListener('resize', throttledHandleFullScreenChange);
-                }
+                startWebkitF11FullScreenChangeObserver();
 
                 // first check should be done after 'renderitem' event
                 // because current focused element will be blured, to reinitialize keyboard navigation
