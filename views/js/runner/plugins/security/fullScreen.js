@@ -124,7 +124,9 @@ define([
      */
     function checkFullScreen() {
         if (fullScreenProperty in doc) {
-            return !!doc[fullScreenProperty];
+            const isGenericFullScreen = !!doc[fullScreenProperty];
+            const isSizeFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
+            return isGenericFullScreen || isSizeFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
             return (screen.availHeight || screen.height - 30) <= window.innerHeight;
@@ -137,7 +139,9 @@ define([
     function requestFullScreen() {
         if (docElem.requestFullscreen) {
             // HTML5 compliant browsers
-            docElem.requestFullscreen();
+            docElem.requestFullscreen().catch(function (e) {
+                console.warn(e && e.message);
+            });
         } else if (docElem.msRequestFullscreen) {
             // Internet Explorer 11
             docElem.msRequestFullscreen();
@@ -250,12 +254,35 @@ define([
                 testRunner.trigger('disablenav disabletools');
             }
 
+            function handleFullScreenChange() {
+                // delay handler execution to process fullscreen state before calculate checkFullScreen()
+                _.delay(function(){
+                    isFullScreen = checkFullScreen();
+                    if (isFullScreen) {
+                        enterFullScreen(testRunner);
+                        // force close popup: fullscreen actions are handled in alertUser()
+                        testRunner.trigger('closedialog.fullscreen');
+                    } else {
+                        leaveFullScreen(testRunner);
+                        alertUser();
+                    }
+                }, 100);
+            }
+            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
+            function startWebkitF11FullScreenChangeObserver() {
+                window.addEventListener('resize', throttledHandleResizeToFullScreenChange);
+            }
+            function stopWebkitF11FullScreenChangeObserver() {
+                window.removeEventListener('resize', throttledHandleResizeToFullScreenChange);
+            }
+
             function alertUser() {
                 if (!waitingForUser) {
                     if (fullScreenSupported) {
                         waitingForUser = true;
                         stopFullScreenChangeObserver();
                         disableItem();
+
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
 
                             if (reason === 'esc') {
@@ -285,16 +312,6 @@ define([
                 }
             }
 
-            function handleFullScreenChange() {
-                isFullScreen = checkFullScreen();
-                if (!isFullScreen) {
-                    leaveFullScreen(testRunner);
-                    alertUser();
-                } else {
-                    enterFullScreen(testRunner);
-                }
-            }
-
             if (isAllowed()) {
                 // when the runner has just started and the full screen prompt is still displayed, disable the item
                 testRunner.after('renderitem.fullscreen', function() {
@@ -310,6 +327,7 @@ define([
                 testRunner
                     .on('exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
+                        stopWebkitF11FullScreenChangeObserver();
                         leaveFullScreen(testRunner);
                         exitFullScreen();
                     });
@@ -328,6 +346,7 @@ define([
 
                 // listen either to the native or the change event created in the observer above
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
+                startWebkitF11FullScreenChangeObserver();
 
                 // first check should be done after 'renderitem' event
                 // because current focused element will be blured, to reinitialize keyboard navigation
