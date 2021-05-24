@@ -266,9 +266,9 @@ define([
                         leaveFullScreen(testRunner);
                         alertUser();
                     }
-                }, 100);
+                }, 75);
             }
-            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
+            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 25);
             function startWebkitF11FullScreenChangeObserver() {
                 window.addEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
