@@ -123,13 +123,15 @@ define([
      * @returns {Boolean}
      */
     function checkFullScreen() {
+        const screenSizeGap = 30;
         if (fullScreenProperty in doc) {
             const isGenericFullScreen = !!doc[fullScreenProperty];
-            const isSizeFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
+            const isSizeFullScreen = Math.abs (screen.width - window.outerWidth) < screenSizeGap
+                && Math.abs (screen.height - window.outerHeight) < screenSizeGap;
             return isGenericFullScreen || isSizeFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
-            return (screen.availHeight || screen.height - 30) <= window.innerHeight;
+            return (screen.availHeight || screen.height - screenSizeGap) <= window.innerHeight;
         }
     }
 
@@ -266,9 +268,9 @@ define([
                         leaveFullScreen(testRunner);
                         alertUser();
                     }
-                }, 75);
+                }, 100);
             }
-            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 25);
+            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
             function startWebkitF11FullScreenChangeObserver() {
                 window.addEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
