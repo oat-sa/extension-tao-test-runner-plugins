@@ -123,9 +123,12 @@ define([
      * @returns {Boolean}
      */
     function checkFullScreen() {
+
         if (fullScreenProperty in doc) {
             const isGenericFullScreen = !!doc[fullScreenProperty];
-            const isSizeFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
+            const screenSizeGap = 16;
+            const isSizeFullScreen = Math.abs (screen.width - window.outerWidth) <= screenSizeGap
+                && Math.abs (screen.height - window.outerHeight) <= screenSizeGap;
             return isGenericFullScreen || isSizeFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
