@@ -83,19 +83,19 @@ define([
      * @type {String}
      */
     var fullScreenProperty = doc.exitFullscreen && 'fullscreenElement' ||
-                             doc.msExitFullscreen && 'msFullscreenElement' ||
-                             doc.mozCancelFullScreen && 'mozFullScreen' ||
-                             doc.webkitExitFullscreen && 'webkitIsFullScreen';
+        doc.msExitFullscreen && 'msFullscreenElement' ||
+        doc.mozCancelFullScreen && 'mozFullScreen' ||
+        doc.webkitExitFullscreen && 'webkitIsFullScreen';
 
     /**
      * Name of the event triggered when the full screen state is changed
      * @type {String}
      */
     var fullScreenEventName = 'onfullscreenchange' in doc && 'fullscreenchange' ||
-                              'onmsfullscreenchange' in doc && 'MSFullscreenChange' ||
-                              'onmozfullscreenchange' in doc && 'mozfullscreenchange' ||
-                              'onwebkitfullscreenchange' in doc && 'webkitfullscreenchange' ||
-                              'myfullscreenchange';
+        'onmsfullscreenchange' in doc && 'MSFullscreenChange' ||
+        'onmozfullscreenchange' in doc && 'mozfullscreenchange' ||
+        'onwebkitfullscreenchange' in doc && 'webkitfullscreenchange' ||
+        'myfullscreenchange';
 
     /**
      * Checks the full screen mode support
@@ -123,10 +123,13 @@ define([
      * @returns {Boolean}
      */
     function checkFullScreen() {
+
         if (fullScreenProperty in doc) {
-            const genericFullScreen = !!doc[fullScreenProperty];
-            const mozWebkitFullScreen = screen.width === window.outerWidth && screen.height === window.outerHeight;
-            return genericFullScreen || mozWebkitFullScreen;
+            const isGenericFullScreen = !!doc[fullScreenProperty];
+            const screenSizeGap = 16;
+            const isSizeFullScreen = Math.abs (screen.width - window.outerWidth) <= screenSizeGap
+                && Math.abs (screen.height - window.outerHeight) <= screenSizeGap;
+            return isGenericFullScreen || isSizeFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
             return (screen.availHeight || screen.height - 30) <= window.innerHeight;
@@ -139,7 +142,9 @@ define([
     function requestFullScreen() {
         if (docElem.requestFullscreen) {
             // HTML5 compliant browsers
-            docElem.requestFullscreen();
+            docElem.requestFullscreen().catch(function (e) {
+                console.warn(e && e.message);
+            });
         } else if (docElem.msRequestFullscreen) {
             // Internet Explorer 11
             docElem.msRequestFullscreen();
@@ -252,17 +257,26 @@ define([
                 testRunner.trigger('disablenav disabletools');
             }
 
-            function handleResizeToFullScreenChange() {
-                // force close popup: fullscreen actions are handled in alertUser()
-                if (checkFullScreen()) {
-                    $('.modal-bg').click();
-                }
+            function handleFullScreenChange() {
+                // delay handler execution to process fullscreen state before calculate checkFullScreen()
+                _.delay(function(){
+                    isFullScreen = checkFullScreen();
+                    if (isFullScreen) {
+                        enterFullScreen(testRunner);
+                        // force close popup: fullscreen actions are handled in alertUser()
+                        testRunner.trigger('closedialog.fullscreen');
+                    } else {
+                        leaveFullScreen(testRunner);
+                        alertUser();
+                    }
+                }, 100);
             }
+            const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
             function startWebkitF11FullScreenChangeObserver() {
-                window.addEventListener('resize', handleResizeToFullScreenChange);
+                window.addEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
             function stopWebkitF11FullScreenChangeObserver() {
-                window.removeEventListener('resize', handleResizeToFullScreenChange);
+                window.removeEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
 
             function alertUser() {
@@ -271,10 +285,8 @@ define([
                         waitingForUser = true;
                         stopFullScreenChangeObserver();
                         disableItem();
-                        startWebkitF11FullScreenChangeObserver();
 
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
-                            stopWebkitF11FullScreenChangeObserver();
 
                             if (reason === 'esc') {
                                 waitingForUser = false;
@@ -303,16 +315,6 @@ define([
                 }
             }
 
-            function handleFullScreenChange() {
-                isFullScreen = checkFullScreen();
-                if (!isFullScreen) {
-                    leaveFullScreen(testRunner);
-                    alertUser();
-                } else {
-                    enterFullScreen(testRunner);
-                }
-            }
-
             if (isAllowed()) {
                 // when the runner has just started and the full screen prompt is still displayed, disable the item
                 testRunner.after('renderitem.fullscreen', function() {
@@ -328,6 +330,7 @@ define([
                 testRunner
                     .on('exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
+                        stopWebkitF11FullScreenChangeObserver();
                         leaveFullScreen(testRunner);
                         exitFullScreen();
                     });
@@ -346,6 +349,7 @@ define([
 
                 // listen either to the native or the change event created in the observer above
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
+                startWebkitF11FullScreenChangeObserver();
 
                 // first check should be done after 'renderitem' event
                 // because current focused element will be blured, to reinitialize keyboard navigation
