@@ -126,7 +126,7 @@ define([
 
         if (fullScreenProperty in doc) {
             const isGenericFullScreen = !!doc[fullScreenProperty];
-            const screenSizeGap = 16;
+            const screenSizeGap = 16 / window.devicePixelRatio;
             const isSizeFullScreen = Math.abs (screen.width - window.outerWidth) <= screenSizeGap
                 && Math.abs (screen.height - window.outerHeight) <= screenSizeGap;
             return isGenericFullScreen || isSizeFullScreen;
