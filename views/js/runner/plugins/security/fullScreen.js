@@ -328,7 +328,7 @@ define([
                 });
 
                 testRunner
-                    .on('exit', function() {
+                    .on('finish leave exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
                         stopWebkitF11FullScreenChangeObserver();
                         leaveFullScreen(testRunner);
