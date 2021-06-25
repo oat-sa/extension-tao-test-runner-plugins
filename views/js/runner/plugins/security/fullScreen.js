@@ -165,8 +165,8 @@ define([
             doc.exitFullscreen();
         } else if (doc.mozCancelFullScreen) { /* Firefox */
             doc.mozCancelFullScreen();
-        } else if (doc.webkitCancelFullscreen) { /* Chrome, Safari and Opera */
-            doc.webkitCancelFullscreen();
+        } else if (doc.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+            doc.webkitExitFullscreen();
         } else if (doc.msExitFullscreen) { /* IE/Edge */
             doc.msExitFullscreen();
         }
