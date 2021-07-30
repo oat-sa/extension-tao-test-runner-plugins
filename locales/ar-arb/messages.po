@@ -1,0 +1,113 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint160\n"
+"PO-Revision-Date: 2021-07-27T12:35:59\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ar-arb\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: ar-arb\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "%s actions were successfully imported"
+msgstr "تم استيراد٪ s من الإجراءات بنجاح"
+
+msgid "%s deliveries were updated"
+msgstr "تم تحديث٪ s من التسليمات"
+
+msgid "%s deliveries will be updated"
+msgstr "سيتم تحديث٪ s تسليم"
+
+msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
+msgstr "سيبدأ جميع الطلاب القسم التالي في نفس الوقت. يرجى الاسترخاء بهدوء حتى يبدأ مشرف القاعة الجزء التالي."
+
+msgid "Assessment ended. Please email the downloaded file to complete the process."
+msgstr "انتهى التقييم. يرجى إرسال الملف الذي تم تنزيله بالبريد الإلكتروني لإكمال العملية."
+
+msgid "Assessment Item"
+msgstr "بند التقييم"
+
+msgid "Attempt to navigate to another window or tab."
+msgstr "حاول الانتقال إلى نافذة أو علامة تبويب أخرى."
+
+msgid "Cannot find any actions for importing."
+msgstr "لا يمكن العثور على أي إجراءات للاستيراد."
+
+msgid "Delivery execution %s is not active state."
+msgstr "تنفيذ التسليم٪ s ليس حالة نشطة."
+
+msgid "Download & End Assessment"
+msgstr "تنزيل وإنهاء التقييم"
+
+msgid "Fail to import test actions with message: "
+msgstr "فشل استيراد إجراءات الرائز عن طريق المراسلة "
+
+msgid "Import a test sent to you by an offline test taker."
+msgstr "قم باستيراد الرائز تم إرساله إليك بواسطة أحد المتقدمين للرائز دون الربط بالإنترنت."
+
+msgid "Invalid MimeType of file"
+msgstr "MimeType ملف غير مضبوط"
+
+msgid "JSON with test actions"
+msgstr "JSON مع إجراءات الرائز"
+
+msgid "Migrate to use delivery features to control security plugins"
+msgstr "الترحيل لاستخدام ميزات التسليم للتحكم في المكونات الإضافية للأمان"
+
+msgid "or"
+msgstr "أو"
+
+msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
+msgstr "الرجاء متابعة الانتظار بينما نحاول استعادة الاتصال. بدلاً من ذلك ، يمكنك إنهاء هذا  الرائز عن طريق تنزيله كملف يتعين عليك إرساله يدويًا."
+
+msgid "Please wait while we try to restore the connection."
+msgstr "الرجاء الانتظار بينما نحاول استعادة الاتصال."
+
+msgid "Several resources URIs do not belong to the instance where the test was passed"
+msgstr "لا تنتمي عدة موارد URI إلى المثيل الذي تم فيه اجتياز الرائز"
+
+msgid "Test actions imported successfully. Imported execution %s"
+msgstr "تم استيراد إجراءات الاختبار بنجاح. تنفيذ مستورد٪ s"
+
+msgid "Test actions importing"
+msgstr "اختبار استيراد الإجراءات"
+
+msgid "Test could not be launched. Test must always be launched in a full screen mode."
+msgstr "لا يمكن بدء الاختبار. يجب دائمًا تشغيل الاختبار في وضعية ملء الشاشة."
+
+msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
+msgstr "تم إيقاف التقييم مؤقتًا بسبب محاولة الانتقال إلى نافذة أو علامة تبويب أخرى. يرجى الاتصال بالمراقب أو المسؤول لاستئناف التقييم."
+
+msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
+msgstr "تم إيقاف التقييم مؤقتًا بسبب محاولة طباعة الشاشة. يرجى الاتصال بالمراقب أو المسؤول لاستئناف التقييم."
+
+msgid "The connection seems to be back, please proceed"
+msgstr "يبدو أن الاتصال قد عاد ، يرجى المتابعة"
+
+msgid "The download will be available in <strong>%d</strong> seconds"
+msgstr "سيكون التنزيل متاحًا في غضون <strong>٪ d </strong> ثانية"
+
+msgid "This test needs to be taken in full screen mode (%s)."
+msgstr "يجب إجراء هذا الاختبار في وضع ملء الشاشة (٪ s)."
+
+msgid "The assessment must be taken in fullscreen. Please press %s to activate it."
+msgstr "يجب إجراء التقييم في وضع ملء الشاشة. الرجاء الضغط على٪ s لتنشيطه."
+
+msgid "Upload"
+msgstr "تحميل"
+
+msgid "Upload offline test"
+msgstr "تحميل الرائز في وضعية عدم الربط بالأنترنيت"
+
+msgid "You are encountering a connectivity loss. The test has been suspended."
+msgstr "أنت تواجه فقدان الاتصال. تم تعليق الرائز."
+
+msgid "You are encountering a prolonged connectivity loss."
+msgstr "أنت تواجه فقدان الاتصال. تم تعليق الرائز."
+
+msgid "You are encountering a prolonged connectivity loss. "
+msgstr "أنت تواجه فقدان اتصال مطول "
