@@ -288,7 +288,7 @@ define([
 
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
 
-                            if (reason === 'esc') {
+                            if (reason === 'escape') {
                                 waitingForUser = false;
                                 return alertUser();
                             }
