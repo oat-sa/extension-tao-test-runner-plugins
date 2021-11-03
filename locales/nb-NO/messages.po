@@ -1,0 +1,114 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 2021.10\n"
+"PO-Revision-Date: 2021-10-27T12:41:18\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: nb-NO\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: nb-NO\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid ""
+msgstr ""
+
+msgid "%s actions were successfully imported"
+msgstr "%s handlinger ble importert"
+
+msgid "%s deliveries were updated"
+msgstr "%s besvarelser ble oppdatert"
+
+msgid "%s deliveries will be updated"
+msgstr "%s besvarelser vil bli oppdatert"
+
+msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
+msgstr ""
+
+msgid "Assessment ended. Please email the downloaded file to complete the process."
+msgstr "Vurderingen ble avsluttet. Send den nedlastede filen på e -post for å fullføre prosessen."
+
+msgid "Assessment Item"
+msgstr "Vurderingsoppgave"
+
+msgid "Attempt to navigate to another window or tab."
+msgstr "Prøv å navigere til et annet vindu eller fane."
+
+msgid "Cannot find any actions for importing."
+msgstr "Finner ingen mulighet for å importere."
+
+msgid "Delivery execution %s is not active state."
+msgstr "Kan ikke levere besvarelsen."
+
+msgid "Download & End Assessment"
+msgstr "Last ned og avslutt vurdering"
+
+msgid "Fail to import test actions with message: "
+msgstr "Kunne ikke importere prøven med følgende melding: "
+
+msgid "Import a test sent to you by an offline test taker."
+msgstr "Importer en prøve sendt deg av en elev ikke som har nettilgang."
+
+msgid "Invalid MimeType of file"
+msgstr "Ugyldig MimeType fil"
+
+msgid "JSON with test actions"
+msgstr "JSON med prøver"
+
+msgid "Migrate to use delivery features to control security plugins"
+msgstr "Migrer for å bruke leveringsfunksjoner for å kontrollere sikkerhetsplugins"
+
+msgid "or"
+msgstr "eller"
+
+msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
+msgstr "Vennligst vent mens vi prøver å gjenopprette tilkoblingen. Alternativt kan du avslutte prøven ved å laste den ned som en fil som du må levere manuelt."
+
+msgid "Please wait while we try to restore the connection."
+msgstr "Vent mens vi prøver å gjenopprette tilkoblingen."
+
+msgid "Several resources URIs do not belong to the instance where the test was passed"
+msgstr "Flere ressurs -URIer tilhører ikke forekomsten der testen ble gjennomført"
+
+msgid "Test actions imported successfully. Imported execution %s"
+msgstr "Prøvehandlinger ble importert. Importert kjøring %s"
+
+msgid "Test actions importing"
+msgstr "Prøver importeres"
+
+msgid "Test could not be launched. Test must always be launched in a full screen mode."
+msgstr "Prøven kunne ikke startes. Prøven må alltid startes i fullskjermsmodus."
+
+msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
+msgstr "Vurderingen er satt på pause på grunn av et forsøk på å navigere til et annet vindu eller fane. Ta kontakt med administrator for å gjenoppta vurderingen."
+
+msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
+msgstr "Vurderingen er satt på pause på grunn av et forsøk på skjermdump. Ta kontakt med administrator for å gjenoppta vurderingen."
+
+msgid "The connection seems to be back, please proceed"
+msgstr "Nettilkoblingen ser ut til å være tilbake. Prøv igjen"
+
+msgid "The download will be available in <strong>%d</strong> seconds"
+msgstr "Nedlastingen vil være tilgjengelig om <strong>%d </strong> sekunder"
+
+msgid "This test needs to be taken in full screen mode (%s)."
+msgstr "Denne testen må tas i fullskjermsmodus (%s)."
+
+msgid "Upload"
+msgstr "Last opp"
+
+msgid "Upload offline test"
+msgstr "Last opp prøve uten nettilgang"
+
+msgid "You are encountering a connectivity loss. The test has been suspended."
+msgstr "Du har mistet nettilgangen. Prøven ble lukket."
+
+msgid "You are encountering a prolonged connectivity loss."
+msgstr "Du har mistet nettilgangen."
+
+msgid "You are encountering a prolonged connectivity loss. "
+msgstr "Du har mistet nettilgangen."
+
