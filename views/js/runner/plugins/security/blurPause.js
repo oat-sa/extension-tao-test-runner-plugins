@@ -86,10 +86,13 @@ define([
             var doPause = function doPause() {
                 const context = testRunner.getTestContext();
                 const options = testRunner.getOptions();
-                //@deprecated securePauseStateRequired, use options.sectionPayse or options.proctored
-                const forcePause = typeof options.sectionPause === 'boolean' ?
-                    options.sectionPause :
-                    (options.proctored || context.securePauseStateRequired);
+                const getDefined = (...list) => list.find(value => 'undefined' !== typeof value);
+                const sectionPause = getDefined(options.sectionPause, context.options && context.options.sectionPause);
+                //@deprecated securePauseStateRequired, use options.sectionPause or options.proctored
+                const forcePause =
+                    typeof sectionPause === 'boolean'
+                        ? sectionPause
+                        : options.proctored || context.securePauseStateRequired;
 
                 if (!bluring && context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
                     bluring = true;
