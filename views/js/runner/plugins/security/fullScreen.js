@@ -288,7 +288,9 @@ define([
 
                         testRunner.trigger('alert.fullscreen', message, function(reason) {
 
-                            if (reason === 'escape') {
+                            // prevent the alert dialog from being permanently closed by 'Escape' key
+                            // support 2 reason variants for compatibility with external or internal event triggers
+                            if (reason === 'escape' || reason === 'esc') {
                                 waitingForUser = false;
                                 return alertUser();
                             }
