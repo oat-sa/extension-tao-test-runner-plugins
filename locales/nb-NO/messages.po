@@ -74,7 +74,7 @@ msgid "Several resources URIs do not belong to the instance where the test was p
 msgstr "Flere ressurs -URIer tilhører ikke forekomsten der testen ble gjennomført"
 
 msgid "Test actions imported successfully. Imported execution %s"
-msgstr "Prøvehandlinger ble importert. Importert kjøring %s"
+msgstr "Prøver ble importert. Importert kjøring %s"
 
 msgid "Test actions importing"
 msgstr "Prøver importeres"
@@ -110,5 +110,5 @@ msgid "You are encountering a prolonged connectivity loss."
 msgstr "Du har mistet nettilgangen."
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr "Du har mistet nettilgangen."
+msgstr "Du har mistet nettilgangen "
 
