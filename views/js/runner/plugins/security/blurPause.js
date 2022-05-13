@@ -172,19 +172,36 @@ define([
                 });
             };
 
-            //look for status changes on the main window
-            pageStatus
-                .on('blur hide', function handleWindowFocusLoose(){
-                    mainFocus = false;
+            /**
+             * Handles focus loose of page
+             */
+            const handleWindowFocusLoose = () => {
+                mainFocus = false;
 
-                    _.defer(function(){
-                        if(!innerFocus && !ckEditorFocus){
-                            //the main window has lost the focus and the focus isn't on an inner window
-                            doPause();
-                        }
-                    });
+                _.defer(() => {
+                    if (!innerFocus && !ckEditorFocus) {
+                        //the main window has lost the focus and the focus isn't on an inner window
+                        doPause();
+                    }
+                });
+            };
+            let visibleBackTimeoutDelayMs = 200;
+            let visibleBackTimeout;
+
+            // look for status changes on the main window
+            pageStatus
+                .on('blur', handleWindowFocusLoose)
+                .on('hide', () => {
+                    /**
+                        Timeout is the fix of TR-4031, because safari window visibility changes to false
+                        for a moment when the window goes into fullscreen.
+                    */
+                    visibleBackTimeout = setTimeout(handleWindowFocusLoose, visibleBackTimeoutDelayMs);
                 })
-                .on('focus', function handleWindowFocus(){
+                .on('show', () => {
+                    clearTimeout(visibleBackTimeout);
+                })
+                .on('focus', () => {
                     mainFocus = true;
                 });
 
