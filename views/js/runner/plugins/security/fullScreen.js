@@ -236,6 +236,10 @@ define([
             const config = this.getConfig();
             let waitingForUser = false;
 
+            const debouncedFocusListener = _.debounce(() => {
+                handleFullScreenChange();
+            }, 50, { leading: false, trailing: true });
+
             if (config && config.focus) {
                 dialogParams.focus = config.focus;
             }
@@ -271,12 +275,23 @@ define([
                     }
                 }, 100);
             }
+
             const throttledHandleResizeToFullScreenChange = _.throttle(handleFullScreenChange, 50);
+
             function startWebkitF11FullScreenChangeObserver() {
                 window.addEventListener('resize', throttledHandleResizeToFullScreenChange);
             }
+
             function stopWebkitF11FullScreenChangeObserver() {
                 window.removeEventListener('resize', throttledHandleResizeToFullScreenChange);
+            }
+
+            function addFocusListener() {
+                window.addEventListener('focus', debouncedFocusListener);
+            }
+
+            function removeFocusListener() {
+                window.removeEventListener('focus', debouncedFocusListener);
             }
 
             function alertUser() {
@@ -333,6 +348,7 @@ define([
                     .on('finish leave exit', function() {
                         doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
                         stopWebkitF11FullScreenChangeObserver();
+                        removeFocusListener();
                         leaveFullScreen(testRunner);
                         exitFullScreen();
                     });
@@ -352,6 +368,7 @@ define([
                 // listen either to the native or the change event created in the observer above
                 doc.addEventListener(fullScreenEventName, handleFullScreenChange);
                 startWebkitF11FullScreenChangeObserver();
+                addFocusListener();
 
                 // first check should be done after 'renderitem' event
                 // because current focused element will be blured, to reinitialize keyboard navigation
