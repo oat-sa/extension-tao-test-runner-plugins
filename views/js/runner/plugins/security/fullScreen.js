@@ -238,7 +238,7 @@ define([
 
             const debouncedFocusListener = _.debounce(() => {
                 handleFullScreenChange();
-            }, 50, { leading: false, trailing: true });
+            }, 50);
 
             if (config && config.focus) {
                 dialogParams.focus = config.focus;
