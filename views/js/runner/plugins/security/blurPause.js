@@ -185,21 +185,31 @@ define([
                     }
                 });
             };
-            let visibleBackTimeoutDelayMs = 200;
-            let visibleBackTimeout;
+
+            let isWindowResizing = false;
+            const resizeEndListener = _.debounce(() => {
+                isWindowResizing = false;
+            }, 50);
+            const resizeStartListener = _.debounce(() => {
+                isWindowResizing = true;
+            }, 50, { leading: true, trailing: false });
+
+            function addResizeListeners() {
+                window.addEventListener('resize', resizeStartListener);
+                window.addEventListener('resize', resizeEndListener);
+            }
+
+            function removeResizeListeners() {
+                window.removeEventListener('resize', resizeStartListener);
+                window.removeEventListener('resize', resizeEndListener);
+            }
 
             // look for status changes on the main window
             pageStatus
-                .on('blur', handleWindowFocusLoose)
-                .on('hide', () => {
-                    /**
-                        Timeout is the fix of TR-4031, because safari window visibility changes to false
-                        for a moment when the window goes into fullscreen.
-                    */
-                    visibleBackTimeout = setTimeout(handleWindowFocusLoose, visibleBackTimeoutDelayMs);
-                })
-                .on('show', () => {
-                    clearTimeout(visibleBackTimeout);
+                .on('blur', () => {
+                    if (!isWindowResizing) {
+                        handleWindowFocusLoose();
+                    }
                 })
                 .on('focus', () => {
                     mainFocus = true;
@@ -210,7 +220,9 @@ define([
                 //needs to detect when the scratchpad creates it's iframe
                 .on('plugin-loaded.scratchpad', handleIframesFocus)
                 .on('renderitem', handleIframesFocus)
+                .after('renderitem', addResizeListeners)
                 .on('unloaditem', function(){
+                    removeResizeListeners();
                     innerFocus = false;
                     ckEditorFocus = false;
                 });
