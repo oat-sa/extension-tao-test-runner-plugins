@@ -172,19 +172,46 @@ define([
                 });
             };
 
-            //look for status changes on the main window
-            pageStatus
-                .on('blur hide', function handleWindowFocusLoose(){
-                    mainFocus = false;
+            /**
+             * Handles focus loose of page
+             */
+            const handleWindowFocusLoose = () => {
+                mainFocus = false;
 
-                    _.defer(function(){
-                        if(!innerFocus && !ckEditorFocus){
-                            //the main window has lost the focus and the focus isn't on an inner window
-                            doPause();
-                        }
-                    });
+                _.defer(() => {
+                    if (!innerFocus && !ckEditorFocus) {
+                        //the main window has lost the focus and the focus isn't on an inner window
+                        doPause();
+                    }
+                });
+            };
+
+            let isWindowResizing = false;
+            const resizeEndListener = _.debounce(() => {
+                isWindowResizing = false;
+            }, 50);
+            const resizeStartListener = _.debounce(() => {
+                isWindowResizing = true;
+            }, 50, { leading: true, trailing: false });
+
+            function addResizeListeners() {
+                window.addEventListener('resize', resizeStartListener);
+                window.addEventListener('resize', resizeEndListener);
+            }
+
+            function removeResizeListeners() {
+                window.removeEventListener('resize', resizeStartListener);
+                window.removeEventListener('resize', resizeEndListener);
+            }
+
+            // look for status changes on the main window
+            pageStatus
+                .on('blur', () => {
+                    if (!isWindowResizing) {
+                        handleWindowFocusLoose();
+                    }
                 })
-                .on('focus', function handleWindowFocus(){
+                .on('focus', () => {
                     mainFocus = true;
                 });
 
@@ -193,7 +220,9 @@ define([
                 //needs to detect when the scratchpad creates it's iframe
                 .on('plugin-loaded.scratchpad', handleIframesFocus)
                 .on('renderitem', handleIframesFocus)
+                .after('renderitem', addResizeListeners)
                 .on('unloaditem', function(){
+                    removeResizeListeners();
                     innerFocus = false;
                     ckEditorFocus = false;
                 });
