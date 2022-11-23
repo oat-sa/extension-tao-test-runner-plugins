@@ -161,7 +161,7 @@ define([
      * Exit fullscreen mode
      */
     function exitFullScreen() {
-        if (doc.exitFullscreen) {
+        if (doc.exitFullscreen && doc.fullscreenElement !== null) {
             doc.exitFullscreen();
         } else if (doc.mozCancelFullScreen) { /* Firefox */
             doc.mozCancelFullScreen();
