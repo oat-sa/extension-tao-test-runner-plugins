@@ -84,8 +84,8 @@ define([
             };
 
             var doPause = function doPause() {
-                const context = testRunner.getTestContext();
-                const options = testRunner.getOptions();
+                const context = testRunner.getTestContext() || {};
+                const options = testRunner.getOptions() || {};
                 const getDefined = (...list) => list.find(value => 'undefined' !== typeof value);
                 const sectionPause = getDefined(options.sectionPause, context.options && context.options.sectionPause);
                 //@deprecated securePauseStateRequired, use options.sectionPause or options.proctored
