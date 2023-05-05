@@ -1,0 +1,122 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: tao-3x\n"
+"PO-Revision-Date: 2023-04-21 15:46\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: pt\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: pt-BR\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-3x\n"
+"X-Crowdin-Project-ID: 582145\n"
+"X-Crowdin-Language: pt-BR\n"
+"X-Crowdin-File: /taoTestRunnerPlugins/locales/pt-BR/messages.po\n"
+"X-Crowdin-File-ID: 1785\n"
+"Language-Team: Portuguese, Brazilian\n"
+
+msgid ""
+msgstr ""
+""
+
+msgid "%s actions were successfully imported"
+msgstr "%s configurações foram importadas com sucesso"
+
+msgid "%s deliveries were updated"
+msgstr "%s entregas foram atualizadas"
+
+msgid "%s deliveries will be updated"
+msgstr "%s entregas serão atualizadas"
+
+msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
+msgstr "Todos os alunos começarão a próxima seção ao mesmo tempo. Por favor fique silenciosamente até que a supervisionadora da sala inicie a próxima seção."
+
+msgid "Assessment ended. Please email the downloaded file to complete the process."
+msgstr "Avaliação terminada. Por favor, envie um e-mail para o arquivo baixado para concluir o processo."
+
+msgid "Assessment Item"
+msgstr "Item de Avaliação"
+
+msgid "Attempt to navigate to another window or tab."
+msgstr "Tentativa de navegar para outra janela ou guia."
+
+msgid "Cannot find any actions for importing."
+msgstr "Não foi possível encontrar nenhuma ação para importação."
+
+msgid "Delivery execution %s is not active state."
+msgstr "A execução de entrega %s não está ativa."
+
+msgid "Download & End Assessment"
+msgstr "Baixar e Finalizar Avaliação"
+
+msgid "Fail to import test actions with message: "
+msgstr "Falha ao importar ações do teste com mensagem: "
+
+msgid "Import a test sent to you by an offline test taker."
+msgstr "Importar um teste enviado para você por um testador off-line."
+
+msgid "Invalid MimeType of file"
+msgstr "MimeType de arquivo inválido"
+
+msgid "JSON with test actions"
+msgstr "JSON com ações de teste"
+
+msgid "Migrate to use delivery features to control security plugins"
+msgstr "Migre para usar os recursos de entrega para controlar plugins de segurança"
+
+msgid "or"
+msgstr "ou"
+
+msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
+msgstr "Por favor, continue esperando enquanto tentamos restaurar a conexão. Como alternativa, você pode terminar este teste baixando-o como um arquivo que você terá que enviar manualmente."
+
+msgid "Please wait while we try to restore the connection."
+msgstr "Por favor, aguarde enquanto tentamos restaurar a conexão."
+
+msgid "Several resources URIs do not belong to the instance where the test was passed"
+msgstr "Vários recursos URIs não pertencem à instância onde o teste foi passado"
+
+msgid "Test actions imported successfully. Imported execution %s"
+msgstr "Ações de teste importadas com sucesso. Execução %s importada"
+
+msgid "Test actions importing"
+msgstr "Testar ações de importação"
+
+msgid "Test could not be launched. Test must always be launched in a full screen mode."
+msgstr "O teste não pôde ser iniciado. O teste deve ser sempre iniciado em modo de tela cheia."
+
+msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
+msgstr "A avaliação foi pausada devido a uma tentativa de navegar para outra janela ou guia. Por favor, entre em contato com seu perfil ou administrador para retomar sua avaliação."
+
+msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
+msgstr "A avaliação foi pausada devido a uma tentativa de imprimir tela. Por favor, entre em contato com seu perfil ou administrador para retomar sua avaliação."
+
+msgid "The connection seems to be back, please proceed"
+msgstr "A conexão parece estar de volta, por favor prossiga"
+
+msgid "The download will be available in <strong>%d</strong> seconds"
+msgstr "O download estará disponível em <strong>%d</strong> segundos"
+
+msgid "This test needs to be taken in full screen mode (%s)."
+msgstr "Este teste precisa ser executado em modo de tela cheia (%s)."
+
+msgid "Upload"
+msgstr "Carregar"
+
+msgid "Upload offline test"
+msgstr "Carregar teste offline"
+
+msgid "You are encountering a connectivity loss. The test has been suspended."
+msgstr "Você está encontrando uma perda de conectividade. O teste foi suspenso."
+
+msgid "You are encountering a prolonged connectivity loss."
+msgstr "Você está enfrentando uma perda de conectividade prolongada."
+
+msgid "You are encountering a prolonged connectivity loss. "
+msgstr "Você está enfrentando uma perda de conectividade prolongada. "
+
