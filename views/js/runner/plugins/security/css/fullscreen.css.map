@@ -1,9 +1,1 @@
-{
-	"version": 3,
-	"file": "fullscreen.css",
-	"sources": [
-		"../scss/fullscreen.scss"
-	],
-	"names": [],
-	"mappings": "AAGA,AACI,WADO,CACP,aAAa,AAAC,CACV,cAAc,CAAE,IAAI,CACvB"
-}
+{"version":3,"sourceRoot":"","sources":["../scss/fullscreen.scss"],"names":[],"mappings":"AAII,0BACI","file":"fullscreen.css"}
