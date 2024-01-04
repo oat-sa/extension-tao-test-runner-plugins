@@ -22,10 +22,11 @@
 define([
     'lodash',
     'i18n',
+    'jquery',
     'taoTests/runner/plugin',
     'taoQtiTest/runner/config/states',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/fullscreen'
-], function (_, __, pluginFactory, states) {
+], function (_, __, $, pluginFactory, states) {
     'use strict';
 
     var doc = document;
@@ -47,7 +48,7 @@ define([
      * Time interval to watch full screen change, for older browsers
      * @type {Number}
      */
-    var changeInterval = 2000;  // every 2 seconds
+    var changeInterval = 2000; // every 2 seconds
 
     /**
      * Flag that represents the current state of the full screen mode
@@ -70,7 +71,7 @@ define([
      * The message displayed to explain the test must be taken in full screen mode.
      * @type {String}
      */
-    var message = __("This test needs to be taken in full screen mode (%s).", shortcut);
+    var message = __('This test needs to be taken in full screen mode (%s).', shortcut);
 
     /**
      * The error message displayed when the test is not launched in full screen mode, or cannot be.
@@ -82,20 +83,22 @@ define([
      * Name of the property to check in order to detect whether the full screen mode is active
      * @type {String}
      */
-    var fullScreenProperty = doc.exitFullscreen && 'fullscreenElement' ||
-                             doc.msExitFullscreen && 'msFullscreenElement' ||
-                             doc.mozCancelFullScreen && 'mozFullScreen' ||
-                             doc.webkitExitFullscreen && 'webkitIsFullScreen';
+    var fullScreenProperty =
+        (doc.exitFullscreen && 'fullscreenElement') ||
+        (doc.msExitFullscreen && 'msFullscreenElement') ||
+        (doc.mozCancelFullScreen && 'mozFullScreen') ||
+        (doc.webkitExitFullscreen && 'webkitIsFullScreen');
 
     /**
      * Name of the event triggered when the full screen state is changed
      * @type {String}
      */
-    var fullScreenEventName = 'onfullscreenchange' in doc && 'fullscreenchange' ||
-                              'onmsfullscreenchange' in doc && 'MSFullscreenChange' ||
-                              'onmozfullscreenchange' in doc && 'mozfullscreenchange' ||
-                              'onwebkitfullscreenchange' in doc && 'webkitfullscreenchange' ||
-                              'myfullscreenchange';
+    var fullScreenEventName =
+        ('onfullscreenchange' in doc && 'fullscreenchange') ||
+        ('onmsfullscreenchange' in doc && 'MSFullscreenChange') ||
+        ('onmozfullscreenchange' in doc && 'mozfullscreenchange') ||
+        ('onwebkitfullscreenchange' in doc && 'webkitfullscreenchange') ||
+        'myfullscreenchange';
 
     /**
      * Checks the full screen mode support
@@ -107,7 +110,8 @@ define([
      * Check for iOS platform
      * @type {Boolean}
      */
-    var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform) ||
+    var iOS =
+        (!!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)) ||
         (navigator.userAgent.includes('Mac') && 'ontouchend' in document); // iPad on iOS 13 detection
 
     /**
@@ -123,12 +127,12 @@ define([
      * @returns {Boolean}
      */
     function checkFullScreen() {
-
         if (fullScreenProperty in doc) {
             const isGenericFullScreen = !!doc[fullScreenProperty];
             const screenSizeGap = 16 / window.devicePixelRatio;
-            const isSizeFullScreen = Math.abs (screen.width - window.outerWidth) <= screenSizeGap
-                && Math.abs (screen.height - window.outerHeight) <= screenSizeGap;
+            const isSizeFullScreen =
+                Math.abs(screen.width - window.outerWidth) <= screenSizeGap &&
+                Math.abs(screen.height - window.outerHeight) <= screenSizeGap;
             return isGenericFullScreen || isSizeFullScreen;
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
@@ -163,11 +167,14 @@ define([
     function exitFullScreen() {
         if (doc.exitFullscreen && doc.fullscreenElement) {
             doc.exitFullscreen();
-        } else if (doc.mozCancelFullScreen) { /* Firefox */
+        } else if (doc.mozCancelFullScreen) {
+            /* Firefox */
             doc.mozCancelFullScreen();
-        } else if (doc.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+        } else if (doc.webkitExitFullscreen) {
+            /* Chrome, Safari and Opera */
             doc.webkitExitFullscreen();
-        } else if (doc.msExitFullscreen) { /* IE/Edge */
+        } else if (doc.msExitFullscreen) {
+            /* IE/Edge */
             doc.msExitFullscreen();
         }
     }
@@ -208,7 +215,6 @@ define([
             }
 
             isFullScreen = isFS;
-
         }, changeInterval);
     }
 
@@ -224,7 +230,6 @@ define([
      * Forces the test runner to be only used in full screen mode.
      */
     return pluginFactory({
-
         name: 'fullScreen',
 
         /**
@@ -235,6 +240,7 @@ define([
             const dialogParams = {};
             const config = this.getConfig();
             let waitingForUser = false;
+            let fileUploadActivated = false;
 
             const debouncedFocusListener = _.debounce(() => {
                 handleFullScreenChange();
@@ -246,7 +252,7 @@ define([
 
             // Check if plugin can be allowed
             function isAllowed() {
-                // Since iOS platform restrict keyboard usage in full sreen mode,
+                // Since iOS platform restrict keyboard usage in full screen mode,
                 // do not allow plugin on iOS devices
                 return !iOS;
             }
@@ -263,7 +269,7 @@ define([
 
             function handleFullScreenChange() {
                 // delay handler execution to process fullscreen state before calculate checkFullScreen()
-                _.delay(function(){
+                _.delay(function () {
                     isFullScreen = checkFullScreen();
                     if (isFullScreen) {
                         enterFullScreen(testRunner);
@@ -271,7 +277,10 @@ define([
                         testRunner.trigger('closedialog.fullscreen');
                     } else {
                         leaveFullScreen(testRunner);
-                        alertUser();
+                        //omit leave fullscreen message when leaving fullscreen mode initiated by file upload dialog
+                        if (!fileUploadActivated) {
+                            alertUser();
+                        }
                     }
                 }, 100);
             }
@@ -301,26 +310,30 @@ define([
                         stopFullScreenChangeObserver();
                         disableItem();
 
-                        testRunner.trigger('alert.fullscreen', message, function(reason) {
-
-                            // prevent the alert dialog from being permanently closed by 'Escape' key
-                            // support 2 reason variants for compatibility with external or internal event triggers
-                            if (reason === 'escape' || reason === 'esc') {
-                                waitingForUser = false;
-                                return alertUser();
-                            }
-
-                            requestFullScreen();
-
-                            _.defer(function() {
-                                waitingForUser = false;
-                                enableItem();
-
-                                if (!fullScreenSupported) {
-                                    startFullScreenChangeObserver();
+                        testRunner.trigger(
+                            'alert.fullscreen',
+                            message,
+                            function (reason) {
+                                // prevent the alert dialog from being permanently closed by 'Escape' key
+                                // support 2 reason variants for compatibility with external or internal event triggers
+                                if (reason === 'escape' || reason === 'esc') {
+                                    waitingForUser = false;
+                                    return alertUser();
                                 }
-                            });
-                        }, dialogParams);
+
+                                requestFullScreen();
+
+                                _.defer(function () {
+                                    waitingForUser = false;
+                                    enableItem();
+
+                                    if (!fullScreenSupported) {
+                                        startFullScreenChangeObserver();
+                                    }
+                                });
+                            },
+                            dialogParams
+                        );
                     }
                 }
             }
@@ -328,40 +341,37 @@ define([
             function doPause() {
                 var context = testRunner.getTestContext();
                 if (context.state <= states.testSession.interacting && !testRunner.getState('finish')) {
-                    testRunner.trigger('pause', {reason: launchError});
+                    testRunner.trigger('pause', { reason: launchError });
                 }
             }
 
             if (isAllowed()) {
                 // when the runner has just started and the full screen prompt is still displayed, disable the item
-                testRunner.after('renderitem.fullscreen', function() {
+                testRunner.after('renderitem.fullscreen', function () {
                     testRunner.off('renderitem.fullscreen');
 
-                    _.defer(function() {
+                    _.defer(function () {
                         if (waitingForUser) {
                             disableItem();
                         }
                     });
                 });
 
-                testRunner
-                    .on('finish leave exit', function() {
-                        doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
-                        stopWebkitF11FullScreenChangeObserver();
-                        removeFocusListener();
-                        leaveFullScreen(testRunner);
-                        exitFullScreen();
-                    });
+                testRunner.on('finish leave exit', function () {
+                    doc.removeEventListener(fullScreenEventName, handleFullScreenChange);
+                    stopWebkitF11FullScreenChangeObserver();
+                    removeFocusListener();
+                    leaveFullScreen(testRunner);
+                    exitFullScreen();
+                });
 
                 // checks for frame embedding
                 if (isFrameEmbedded()) {
                     // breaks the init process here as the test must be paused
-                    return testRunner.on('init', function() {
+                    return testRunner.on('init', function () {
                         waitingForUser = true;
                         disableItem();
-                        testRunner
-                            .trigger('unsecured-launch')
-                            .trigger('alert.fullscreen', launchError, doPause);
+                        testRunner.trigger('unsecured-launch').trigger('alert.fullscreen', launchError, doPause);
                     });
                 }
 
@@ -373,7 +383,7 @@ define([
                 // first check should be done after 'renderitem' event
                 // because current focused element will be blured, to reinitialize keyboard navigation
                 // in testRunner in function initTestRunnerNavigation of keyNavigation
-                testRunner.after('renderitem.fullscreen', function() {
+                testRunner.after('renderitem.fullscreen', function () {
                     isFullScreen = checkFullScreen();
 
                     if (!isFullScreen) {
@@ -383,8 +393,22 @@ define([
                         startFullScreenChangeObserver();
                     }
                     testRunner.off('renderitem.fullscreen');
-                })
+                });
 
+                const exitFromFileSelection = () => {
+                    fileUploadActivated = false;
+                    window.removeEventListener('focus', exitFromFileSelection);
+                };
+                const handleFileUploadClick = () => {
+                    fileUploadActivated = true;
+                    window.addEventListener('focus', exitFromFileSelection);
+                };
+                testRunner.after('renderitem.fileupload', function () {
+                    $("input[type='file']").on('click', handleFileUploadClick);
+                });
+                testRunner.before('unloaditem.fileupload', function () {
+                    $("input[type='file']").off('click', handleFileUploadClick);
+                });
             } else {
                 this.disable();
             }
