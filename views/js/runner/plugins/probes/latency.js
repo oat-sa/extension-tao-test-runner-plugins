@@ -288,7 +288,7 @@ define([
             if (_.isEmpty(name) || !_.isString(name)) {
                 throw new TypeError('A capture processor have a valid name');
             }
-            captureProcessors = _.omitBy(captureProcessors, name);
+            captureProcessors = _.omit(captureProcessors, name);
             return this;
         }
     };
