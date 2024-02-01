@@ -64,7 +64,7 @@ define([
                 return new Promise(function(resolve, reject){
                     if(context.options.sectionPause &&
                         previousSection && section && section.id !== previousSection.id &&
-                        item && _.contains(item.categories, sectionPauseCategory) ) {
+                        item && _.includes(item.categories, sectionPauseCategory) ) {
 
                         testRunner
                             // when the pause has been taken into account, the runner will end the session
