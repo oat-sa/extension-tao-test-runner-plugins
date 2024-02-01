@@ -129,7 +129,7 @@ define([
             getProxy: function() {
                 return {
                     sendVariables: function(trace) {
-                        var traceData = _.indexBy(probeData, function(entry) {
+                        var traceData = _.keyBy(probeData, function(entry) {
                             return (entry.marker ? entry.marker + '-' : '') + entry.type + '-' + entry.id;
                         });
                         assert.deepEqual(trace, traceData, 'The trace data should have been provided');
