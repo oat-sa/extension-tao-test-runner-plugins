@@ -18,7 +18,6 @@
  *
  */
 
-use League\Flysystem\FileExistsException;
 use oat\generis\model\kernel\uri\UriProvider;
 use oat\oatbox\filesystem\File;
 use oat\tao\model\upload\UploadService;
@@ -56,7 +55,6 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
      * @param $sampleFile
      * @param $expectedDeliveryExecutionStatus
      *
-     * @throws FileExistsException
      * @throws common_Exception
      * @throws common_exception_Error
      */
@@ -105,7 +103,6 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
      * @param $path
      *
      * @return File
-     * @throws FileExistsException
      * @throws common_Exception
      */
     protected function getTempFileToUpload($path)
