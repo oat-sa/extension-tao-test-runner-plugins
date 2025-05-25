@@ -128,6 +128,8 @@ define([
      */
     function checkFullScreen() {
         if (fullScreenProperty in doc) {
+            // doc[fullscreenProperty] is only non-null when the fullscreen API was used to go fullscreen,
+            // but null if the user made the window fullscreen at the OS level (e.g. F11)
             const isGenericFullScreen = !!doc[fullScreenProperty];
             if (isGenericFullScreen) {
                 return true;
@@ -152,7 +154,7 @@ define([
         let getIsWindowHeightFullScreen = () => screen.height - window.outerHeight <= screenHeightMaxGap;
 
         // Case: hidden taskbar on Windows, Chromebook
-        if (screen.height === screen.availHeight && !window.navigator.userAgent.match(/ipad|iphone/i)) {
+        if (!iOS && screen.height === screen.availHeight) {
             // Switch to innerHeight calculation, so a maximised browser window is not mistaken for a fullscreen window.
             // Note that the browser console can reduce innerHeight, but always by more than the max gap, so not a problem.
             getIsWindowHeightFullScreen = () => screen.height - window.innerHeight <= screenHeightMaxGap;
