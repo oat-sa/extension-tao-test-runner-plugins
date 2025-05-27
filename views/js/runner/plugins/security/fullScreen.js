@@ -154,7 +154,7 @@ define([
         let getIsWindowHeightFullScreen = () => screen.height - window.outerHeight <= screenHeightMaxGap;
 
         // Case: hidden taskbar on Windows, Chromebook
-        if (!iOS && screen.height === screen.availHeight) {
+        if (screen.height === screen.availHeight) {
             // Switch to innerHeight calculation, so a maximised browser window is not mistaken for a fullscreen window.
             // Note that the browser console can reduce innerHeight, but always by more than the max gap, so not a problem.
             getIsWindowHeightFullScreen = () => screen.height - window.innerHeight <= screenHeightMaxGap;
