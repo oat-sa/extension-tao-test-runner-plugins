@@ -128,16 +128,38 @@ define([
      */
     function checkFullScreen() {
         if (fullScreenProperty in doc) {
+            // doc[fullscreenProperty] is only non-null when the fullscreen API was used to go fullscreen,
+            // but null if the user made the window fullscreen at the OS level (e.g. F11)
             const isGenericFullScreen = !!doc[fullScreenProperty];
-            const screenSizeGap = 16 / window.devicePixelRatio;
-            const isSizeFullScreen =
-                Math.abs(screen.width - window.outerWidth) <= screenSizeGap &&
-                Math.abs(screen.height - window.outerHeight) <= screenSizeGap;
-            return isGenericFullScreen || isSizeFullScreen;
+            if (isGenericFullScreen) {
+                return true;
+            }
+            return checkWindowSizeFullScreen();
         } else {
             // when the browser does not implement the full screen API, arbitrary checks if the full screen mode is active
             return (screen.availHeight || screen.height - 30) <= window.innerHeight;
         }
+    }
+
+    /**
+     * Checks if the browser window has the dimensions of the full screen (or close enough)
+     * @returns {Boolean}
+     */
+    function checkWindowSizeFullScreen() {
+        // 16px accounts for some browsers (Chrome, Edge) which when fullscreened report a window.outerHeight or outerWidth not quite up to the screen edges
+        let screenWidthMaxGap = 16 / window.devicePixelRatio;
+        let screenHeightMaxGap = 16 / window.devicePixelRatio;
+
+        const getIsWindowWidthFullScreen = () => screen.width - window.outerWidth <= screenWidthMaxGap;
+        let getIsWindowHeightFullScreen = () => screen.height - window.outerHeight <= screenHeightMaxGap;
+
+        // Case: hidden taskbar on Windows, Chromebook
+        if (screen.height === screen.availHeight) {
+            // Switch to innerHeight calculation, so a maximised browser window is not mistaken for a fullscreen window.
+            // Note that the browser console can reduce innerHeight, but always by more than the max gap, so not a problem.
+            getIsWindowHeightFullScreen = () => screen.height - window.innerHeight <= screenHeightMaxGap;
+        }
+        return getIsWindowWidthFullScreen() && getIsWindowHeightFullScreen();
     }
 
     /**
