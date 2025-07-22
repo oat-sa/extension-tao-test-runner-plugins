@@ -258,6 +258,9 @@ define([
          * Initializes the plugin (called during runner's init)
          */
         init: function init() {
+			//TEMP
+			return;
+			
             const testRunner = this.getTestRunner();
             const dialogParams = {};
             const config = this.getConfig();
