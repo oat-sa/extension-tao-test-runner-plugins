@@ -1,0 +1,22 @@
+@charset "UTF-8";
+
+.tao-wmark {
+    pointer-events: none;
+    overflow: hidden;
+    position: fixed;
+    z-index: 120000; /* InlineChoiceInteraction dropdown is 109999 */
+
+    & > div {
+        opacity: 0.3;
+        color: black;
+        font-size: 10px;
+        line-height: 9em;
+        transform: rotate(-45deg) translateX(calc(-100vh / 1.4));
+        transform-origin: top left;
+        white-space-collapse: preserve;
+        font-family: monospace !important;
+        width: calc((100vw + 100vh) / 1.4);
+        height: auto;
+        overflow: visible;
+    }
+}
