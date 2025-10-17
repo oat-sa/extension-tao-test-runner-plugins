@@ -36,6 +36,11 @@ define([
          */
         hashAlgorithm: 'SHA-1',
         /**
+         * 'background' | 'foreground' | 'circle'
+         * @type {String}
+         */
+        type: 'background',
+        /**
          * Override default watermark styles
          * @type {String}
          * @example `opacity: 0.1; font-size: 20px; letter-spacing: 5px`
@@ -48,10 +53,17 @@ define([
          */
         textPartLength: 10,
         /**
-         * Visually, these text parts will be separated by sequence of N spaces
+         * Visually, these text parts will be separated by sequence of N spaces.
+         * Recommended: `15` if 'foreground', `3` if 'background', `1` if 'circle.
          *  @type {Number}
          */
-        separatorsLength: 15
+        separatorsLength: 3
+    };
+
+    const watermarkTypes = {
+        foreground: 'foreground',
+        background: 'background',
+        circle: 'circle'
     };
 
     /**
@@ -63,8 +75,6 @@ define([
 
         install: function install() {
             this.$watermark = null;
-
-            this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
 
             /**
              * @returns {Boolean}
@@ -110,9 +120,56 @@ define([
                     }
                     return str;
                 });
+
+            /**
+             * Render a text long enough to cover the expected area
+             * @param {jQuery} $watermarkContent
+             */
+            this.renderText = ($watermarkContent, text) => {
+                for (let i = 0; i < 10; i++) {
+                    const actualHeight = $watermarkContent.get(0).offsetHeight;
+                    const expectedHeight = window.innerWidth + window.innerHeight; //enough to cover any degree of rotate
+                    if (actualHeight < expectedHeight) {
+                        const repeatedText = text.repeat(200);
+                        $watermarkContent.get(0).textContent += repeatedText;
+                    } else {
+                        break;
+                    }
+                }
+            };
+
+            /**
+             * Render text on a circular path
+             * @param {jQuery} $watermarkContent
+             */
+            this.renderCircle = ($watermarkContent, text) => {
+                $watermarkContent.html('');
+
+                const repeatedText = text.repeat(100); //TODO: enough to cover
+
+                const contentEl = $watermarkContent.get(0);
+                const boxSize = Math.trunc(Math.min(contentEl.offsetWidth, contentEl.offsetHeight));
+                const fontSizePropVal = getComputedStyle(contentEl).getPropertyValue('font-size');
+
+                const s = Math.trunc(boxSize / 2); // half of box size
+                const f = parseInt(fontSizePropVal) || 10; //font size
+                const r = s - f; // radius
+                const circlePath = `M ${s},${f} A ${r},${r} 0 1,1 ${s},${s + r} A ${r},${r} 0 1,1 ${s},${f}`;
+
+                const $svg = $(
+                    `<svg width="${boxSize}" height="${boxSize}" viewBox="0 0 ${boxSize} ${boxSize}" xmlns="http://www.w3.org/2000/svg">` +
+                        `<!-- <defs> --><path id="circlePath" fill="none" stroke="none" d="${circlePath}" /><!-- </defs> -->` +
+                        `<text><textPath href="#circlePath"></textPath></text>` +
+                        '</svg>'
+                );
+                $svg.find('textPath').get(0).textContent = repeatedText;
+                $watermarkContent.append($svg);
+            };
         },
 
         init: function init() {
+            this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
+
             const testRunner = this.getTestRunner();
 
             testRunner.on(`loaditem.${this.getName()}`, () => {
@@ -128,7 +185,7 @@ define([
         show: function show() {
             const $appendTo = this.getAreaBroker().getContainer().find('.content-wrapper');
 
-            this.$watermark = $('<div class="tao-wmark"><div></div></div>');
+            this.$watermark = $(`<div class="tao-wmark ${this.pluginConfig.type}"><div></div></div>`);
             const $watermarkContent = this.$watermark.children().first();
 
             if (this.pluginConfig.style) {
@@ -148,16 +205,10 @@ define([
                                     .join(';')
                             );
 
-                            //render inside it a text long enough to cover the expected area
-                            for (let i = 0; i < 10; i++) {
-                                const actualHeight = $watermarkContent.get(0).offsetHeight;
-                                const expectedHeight = (window.innerWidth + window.innerHeight) / 1.4; //45deg rotate
-                                if (actualHeight < expectedHeight) {
-                                    const repeatedText = text.repeat(200);
-                                    $watermarkContent.get(0).textContent += repeatedText;
-                                } else {
-                                    break;
-                                }
+                            if (this.pluginConfig.type === watermarkTypes.circle) {
+                                this.renderCircle($watermarkContent, text);
+                            } else {
+                                this.renderText($watermarkContent, text);
                             }
                         }),
                     100
