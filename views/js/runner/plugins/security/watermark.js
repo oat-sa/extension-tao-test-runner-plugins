@@ -40,7 +40,7 @@ define([
          * 'background' | 'foreground' | 'circle'
          * @type {String}
          */
-        type: 'circle',
+        type: 'background',
         /**
          * Override default watermark styles
          * @type {String}
@@ -58,7 +58,7 @@ define([
          * Recommended: `15` if 'foreground', `3` if 'background', `1` if 'circle.
          *  @type {Number}
          */
-        separatorsLength: 1,
+        separatorsLength: 3,
 
         /**
          * Enable/disable watermark in the runtime.
@@ -68,6 +68,7 @@ define([
         unlock: {
             enabled: true, //default: false
             triggerWord: 'WMK',
+            tempShowToolbarButton: true, // TEMP, choose either toolbar button or trigger word. Also toolbar button is separate, can be for other plugins
             algorithm: 'SHA-512',
             //"password", default: ''
             hash: 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86'
@@ -189,24 +190,21 @@ define([
              * @param {string} val
              * @returns {Promise<string>}
              */
-            this.validateUnlock = val =>
+            let validateUnlock = val =>
                 digest(val, this.pluginConfig.unlock.algorithm).then(hash => hash === this.pluginConfig.unlock.hash);
+
+            let doUnlock = () => {
+                isEnabled = !isEnabled;
+                if (this.isPluginEnabled()) {
+                    this.show();
+                } else {
+                    this.hide();
+                }
+            };
 
             this.showUnlockDialog = () => {
                 const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
                 const dialogTpl = '<input type="password" autocomplete="off" class="tao-wmark-input" />';
-                const submit = val => {
-                    this.validateUnlock(val).then(valid => {
-                        if (valid) {
-                            isEnabled = !isEnabled;
-                            if (this.isPluginEnabled()) {
-                                this.show();
-                            } else {
-                                this.hide();
-                            }
-                        }
-                    });
-                };
                 const dlg = dialog({
                     autoRender: true,
                     autoDestroy: true,
@@ -215,6 +213,12 @@ define([
                     buttons: [],
                     renderTo: appendToEl
                 });
+                const submit = val =>
+                    validateUnlock(val).then(valid => {
+                        if (valid) {
+                            doUnlock();
+                        }
+                    });
                 const $input = dlg.getDom().find('.tao-wmark-input');
                 $input
                     .on('keydown', e => {
@@ -269,6 +273,49 @@ define([
                 };
                 freeSpaceTragets[0].addEventListener('keyup', handleKeyup, { signal: this.abortController.signal });
             };
+
+            this.tempShowSettingsDialog = () => {
+                const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
+                const dialogTpl = '<input type="password" autocomplete="off" class="tao-wmark-input" />';
+                const dlg = dialog({
+                    autoRender: true,
+                    autoDestroy: true,
+                    content: dialogTpl,
+                    width: 300,
+                    buttons: [],
+                    renderTo: appendToEl
+                });
+                const submit = val =>
+                    validateUnlock(val).then(valid => {
+                        if (valid) {
+                            const $btn = $(
+                                `<button>${isEnabled ? 'Watermark: disable' : 'Watermark: enable'}</button>`
+                            ); //TODO: i18n
+                            $btn.on('click', e => {
+                                e.preventDefault();
+                                dlg.hide();
+                                doUnlock();
+                            });
+                            $btn.insertAfter($input);
+                            $input.remove();
+                        }
+                    });
+                const $input = dlg.getDom().find('.tao-wmark-input');
+                $input
+                    .on('keydown', e => {
+                        e.stopPropagation(); // stop shortcut detector
+                        if (e.key === 'Enter') {
+                            $input.off('change');
+                            submit(e.target.value);
+                        } else if (e.key === 'Escape') {
+                            dlg.hide();
+                        }
+                    })
+                    .on('change', e => {
+                        submit(e.target.value);
+                    })
+                    .focus();
+            };
         },
 
         init: function init() {
@@ -287,6 +334,26 @@ define([
 
             if (this.pluginConfig.unlock && this.pluginConfig.unlock.enabled) {
                 this.listenToUnlock();
+            }
+
+            if (this.pluginConfig.unlock && this.pluginConfig.unlock.tempShowToolbarButton) {
+                //always? for item with watermark? if any item in test has watermark?
+                const toggleButton = this.getAreaBroker()
+                    .getToolbox()
+                    .createEntry({
+                        control: 'show-locked-settings',
+                        title: __(''),
+                        icon: 'settings',
+                        text: __('')
+                    });
+                toggleButton.on('click', e => {
+                    e.preventDefault();
+                    this.tempShowSettingsDialog(); //even of btn is disabled
+                });
+                testRunner.on('enabletools renderitem', () => {
+                    //disabletools unloaditem
+                    toggleButton.enable();
+                });
             }
         },
 
