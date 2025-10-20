@@ -24,8 +24,9 @@ define([
     'context',
     'taoQtiTest/runner/helpers/map',
     'core/digest',
+    'ui/dialog',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/watermark'
-], function ($, _, __, pluginFactory, context, mapHelper, digest) {
+], function ($, _, __, pluginFactory, context, mapHelper, digest, dialog) {
     'use strict';
 
     const defaultConfig = {
@@ -39,7 +40,7 @@ define([
          * 'background' | 'foreground' | 'circle'
          * @type {String}
          */
-        type: 'background',
+        type: 'circle',
         /**
          * Override default watermark styles
          * @type {String}
@@ -57,7 +58,20 @@ define([
          * Recommended: `15` if 'foreground', `3` if 'background', `1` if 'circle.
          *  @type {Number}
          */
-        separatorsLength: 3
+        separatorsLength: 1,
+
+        /**
+         * Enable/disable watermark in the runtime.
+         * Click on free space in the item -> type `triggerWord` to open dialog ->
+         *   in the dialog type keyword which matches configured `hash` & `algorithm`.
+         */
+        unlock: {
+            enabled: true, //default: false
+            triggerWord: 'WMK',
+            algorithm: 'SHA-512',
+            //"password", default: ''
+            hash: 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86'
+        }
     };
 
     const watermarkTypes = {
@@ -75,17 +89,22 @@ define([
 
         install: function install() {
             this.$watermark = null;
+            this.abortController = new AbortController();
+            let isEnabled = true;
 
             /**
              * @returns {Boolean}
              */
             this.isPluginEnabled = () => {
                 const testRunner = this.getTestRunner();
-                return mapHelper.hasItemCategory(
-                    testRunner.getTestMap(),
-                    testRunner.getTestContext().itemIdentifier,
-                    this.getName(),
-                    true
+                return (
+                    isEnabled &&
+                    mapHelper.hasItemCategory(
+                        testRunner.getTestMap(),
+                        testRunner.getTestContext().itemIdentifier,
+                        this.getName(),
+                        true
+                    )
                 );
             };
 
@@ -93,7 +112,7 @@ define([
             /**
              * @returns {Promise<string>}
              */
-            this.getHash = () => {
+            this.getTextHash = () => {
                 if (textHash) {
                     return Promise.resolve(textHash);
                 }
@@ -110,7 +129,7 @@ define([
              * @returns {Promise<string>}
              */
             this.getText = () =>
-                this.getHash().then(userHash => {
+                this.getTextHash().then(userHash => {
                     const textPartLength = this.pluginConfig.textPartLength;
                     const separatorsLength = this.pluginConfig.separatorsLength;
                     let str = '';
@@ -145,8 +164,6 @@ define([
             this.renderCircle = ($watermarkContent, text) => {
                 $watermarkContent.html('');
 
-                const repeatedText = text.repeat(100); //TODO: enough to cover
-
                 const contentEl = $watermarkContent.get(0);
                 const boxSize = Math.trunc(Math.min(contentEl.offsetWidth, contentEl.offsetHeight));
                 const fontSizePropVal = getComputedStyle(contentEl).getPropertyValue('font-size');
@@ -156,6 +173,8 @@ define([
                 const r = s - f; // radius
                 const circlePath = `M ${s},${f} A ${r},${r} 0 1,1 ${s},${s + r} A ${r},${r} 0 1,1 ${s},${f}`;
 
+                const repeatedText = text.repeat(Math.trunc((3.15 * 2 * r) / text.length / (f / 4)));
+
                 const $svg = $(
                     `<svg width="${boxSize}" height="${boxSize}" viewBox="0 0 ${boxSize} ${boxSize}" xmlns="http://www.w3.org/2000/svg">` +
                         `<!-- <defs> --><path id="circlePath" fill="none" stroke="none" d="${circlePath}" /><!-- </defs> -->` +
@@ -164,6 +183,91 @@ define([
                 );
                 $svg.find('textPath').get(0).textContent = repeatedText;
                 $watermarkContent.append($svg);
+            };
+
+            /**
+             * @param {string} val
+             * @returns {Promise<string>}
+             */
+            this.validateUnlock = val =>
+                digest(val, this.pluginConfig.unlock.algorithm).then(hash => hash === this.pluginConfig.unlock.hash);
+
+            this.showUnlockDialog = () => {
+                const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
+                const dialogTpl = '<input type="password" autocomplete="off" class="tao-wmark-input" />';
+                const submit = val => {
+                    this.validateUnlock(val).then(valid => {
+                        if (valid) {
+                            isEnabled = !isEnabled;
+                            if (this.isPluginEnabled()) {
+                                this.show();
+                            } else {
+                                this.hide();
+                            }
+                        }
+                    });
+                };
+                const dlg = dialog({
+                    autoRender: true,
+                    autoDestroy: true,
+                    content: dialogTpl,
+                    width: 300,
+                    buttons: [],
+                    renderTo: appendToEl
+                });
+                const $input = dlg.getDom().find('.tao-wmark-input');
+                $input
+                    .on('keydown', e => {
+                        e.stopPropagation(); // stop shortcut detector
+                        if (e.key === 'Enter') {
+                            $input.off('change');
+                            submit(e.target.value);
+                            dlg.hide();
+                        } else if (e.key === 'Escape') {
+                            dlg.hide();
+                        }
+                    })
+                    .on('change', e => {
+                        submit(e.target.value);
+                        dlg.hide();
+                    })
+                    .focus();
+            };
+
+            this.listenToUnlock = () => {
+                //NB! Conflict with shortcuts. 'r' toggles review panel. But with shift - 'R' - doesn't.
+                //TODO: this itself is a multi-key shortcut, which should be handled with `util/shortcut`
+                const triggerWord = this.pluginConfig.unlock.triggerWord;
+                const maxTimeBetweenKeys = 3 * 1000;
+                const freeSpaceTragets = [
+                    document.body,
+                    this.getAreaBroker().getContainer().find('.content-wrapper').get(0)
+                ];
+
+                let typedWord = '';
+                let prevTimestamp = Date.now();
+                const handleKeyup = e => {
+                    if (freeSpaceTragets.includes(e.target)) {
+                        const isLetterKey = !e.ctrlKey && !e.altKey && !e.metaKey && e.key.length === 1; //skip 'Shift' if it was pressed
+                        if (isLetterKey) {
+                            const timestamp = Date.now();
+                            if (timestamp - prevTimestamp > maxTimeBetweenKeys) {
+                                typedWord = '';
+                            }
+                            prevTimestamp = timestamp;
+                            typedWord = typedWord + e.key;
+                            if (typedWord.length > triggerWord.length) {
+                                typedWord = typedWord.substring(1);
+                            }
+                            if (typedWord === triggerWord) {
+                                typedWord = '';
+                                //TODO: turn off typing listener until done with the dialog
+                                this.showUnlockDialog();
+                            }
+                        }
+                    }
+                };
+                freeSpaceTragets[0].addEventListener('keyup', handleKeyup, { signal: this.abortController.signal });
             };
         },
 
@@ -180,6 +284,10 @@ define([
             testRunner.on(`unloaditem.${this.getName()}`, () => {
                 this.hide();
             });
+
+            if (this.pluginConfig.unlock && this.pluginConfig.unlock.enabled) {
+                this.listenToUnlock();
+            }
         },
 
         show: function show() {
@@ -235,8 +343,9 @@ define([
         },
 
         destroy: function destroy() {
-            this.hide();
+            this.abortController.abort();
             this.getTestRunner().off(this.getName());
+            this.hide();
         }
     });
 });
