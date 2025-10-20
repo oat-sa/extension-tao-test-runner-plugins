@@ -43,7 +43,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Cache the answers to restore them after refresh',
                 'category' => 'content',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ]
         ],
         'controls' => [
@@ -55,7 +55,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Send a regular signal to keep the session alive',
                 'category' => 'controls',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ]
         ],
         'navigation' => [
@@ -79,7 +79,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Register metrics',
                 'category' => 'probes',
                 'active' => false,
-                'tags' => [ 'technical' ]
+                'tags' => ['technical']
             ]
         ],
         'security' => [
@@ -91,7 +91,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Pause delivery execution when the section changed',
                 'category' => 'tools',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ],
             [
                 'id' => 'autoPause',
@@ -101,7 +101,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Persist the pause state',
                 'category' => 'security',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ],
             [
                 'id' => 'blurPause',
@@ -111,7 +111,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Pause the test when leaving the test window',
                 'category' => 'security',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ],
             [
                 'id' => 'preventScreenshot',
@@ -121,7 +121,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Prevent screenshot from Cmd+Shift (mac) and PrtScn (win) shortcuts',
                 'category' => 'security',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ],
             [
                 'id' => 'disableCommands',
@@ -131,8 +131,9 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Disable and report some forbidden shortcuts',
                 'category' => 'security',
                 'active' => false,
-                'tags' => [  ]
-            ], [
+                'tags' => []
+            ],
+            [
                 'id' => 'preventCopy',
                 'name' => 'Prevent Copy',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/preventCopy',
@@ -140,8 +141,9 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Prevent copying from CTRL-C/X/V shortcuts',
                 'category' => 'security',
                 'active' => false,
-                'tags' => [  ]
-            ], [
+                'tags' => []
+            ],
+            [
                 'id' => 'fullscreen',
                 'name' => 'Full Screen',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/security/fullScreen',
@@ -149,7 +151,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Force the test in full screen mode',
                 'category' => 'security',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ]
         ],
         'accessibility' => [
@@ -161,9 +163,21 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Added h1 tag with default text in case if there is no h1 tags in test item. The tag will be visible only for screenreader devices',
                 'category' => 'accessibility',
                 'active' => false,
-                'tags' => [ ]
+                'tags' => []
             ]
         ],
+        'watermark' => [
+            [
+                'id' => 'watermark',
+                'name' => 'Watermark',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/security/watermark',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Show watermark over the item content',
+                'category' => 'tools',
+                'active' => false,
+                'tags' => []
+            ]
+        ]
     ];
 
     protected $configs = [
@@ -227,7 +241,7 @@ class RegisterTestRunnerPlugins extends InstallAction
             }
 
             if ($configured) {
-                $count ++;
+                $count++;
             }
         }
 

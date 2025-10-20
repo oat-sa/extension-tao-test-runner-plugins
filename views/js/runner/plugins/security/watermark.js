@@ -137,7 +137,7 @@ define([
              */
             this.getText = () =>
                 this.getTextHash().then(userHash => {
-                    const textPartLength = this.pluginConfig.textPartLength;
+                    const textPartLength = Math.min(this.pluginConfig.textPartLength, userHash.length);
                     const separatorsLength = this.pluginConfig.separatorsLength;
                     let str = '';
                     for (let idx = 0; idx < userHash.length - textPartLength + 1; idx = idx + textPartLength) {
