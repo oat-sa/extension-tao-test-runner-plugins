@@ -74,7 +74,7 @@ define([
         unlock: {
             enabled: true, //default: false
             triggerWord: 'WMK',
-            tempShowToolbarButton: true, // TEMP, choose either toolbar button or trigger word. Also toolbar button is separate, can be for other plugins
+            tempShowToolbarButton: false, // TEMP, choose either toolbar button or trigger word. Also toolbar button is separate, can be for other plugins
             algorithm: 'SHA-512',
             //"password", default: ''
             hash: 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86'
@@ -143,6 +143,9 @@ define([
                     for (let idx = 0; idx < userHash.length - textPartLength + 1; idx = idx + textPartLength) {
                         str += userHash.slice(idx, idx + textPartLength);
                         str += ' '.repeat(separatorsLength);
+                    }
+                    if (!separatorsLength) {
+                        str += ' ';
                     }
                     return str;
                 });
