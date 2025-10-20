@@ -42,11 +42,17 @@ define([
          */
         type: 'background',
         /**
-         * Override default watermark styles
+         * Override default watermark content styles
          * @type {String}
          * @example `opacity: 0.1; font-size: 20px; letter-spacing: 5px`
          */
         style: '',
+        /**
+         * Override default watermark container styles
+         * @type {String}
+         * @example `padding: 50px`
+         */
+        containerStyle: '',
         /**
          * Long hash string will be visually split into the shorter text parts with N chars each.
          * (sha-1 is 40 chars, so 4 parts by 10 chars. sha-256 is 64 chars, so 6 parts by 10 chars and ignore lefotver 4)
@@ -373,12 +379,13 @@ define([
                         requestAnimationFrame(() => {
                             //position the element to cover the expected area
                             const containerBox = $appendTo.get(0).getBoundingClientRect();
-                            this.$watermark.attr(
-                                'style',
-                                ['left', 'top', 'width', 'height']
-                                    .map(prop => `${prop}: ${Math.round(containerBox[prop])}px`)
-                                    .join(';')
-                            );
+                            let style = ['left', 'top', 'width', 'height']
+                                .map(prop => `${prop}: ${Math.round(containerBox[prop])}px`)
+                                .join(';');
+                            if (this.pluginConfig.containerStyle) {
+                                style += `;${this.pluginConfig.containerStyle}`;
+                            }
+                            this.$watermark.attr('style', style);
 
                             if (this.pluginConfig.type === watermarkTypes.circle) {
                                 this.renderCircle($watermarkContent, text);
