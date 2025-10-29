@@ -337,8 +337,9 @@ define([
             const testRunner = this.getTestRunner();
             this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
 
-            testRunner.on(`loaditem.${this.getName()}`, () => {
+            testRunner.on(`renderitem.${this.getName()}`, () => {
                 if (this.isPluginEnabled()) {
+                    this.hide(); // just a precaution
                     this.show();
                 }
             });
@@ -357,7 +358,9 @@ define([
         },
 
         show: function show() {
-            const $appendTo = this.getAreaBroker().getContainer().find('.content-wrapper');
+            const $coverArea = this.getAreaBroker().getContainer().find('.content-wrapper');
+            // append here, because this element has not-transparent background
+            const $appendTo = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
 
             this.$watermark = $(`<div class="tao-wmark ${this.pluginConfig.type}"><div></div></div>`);
             const $watermarkContent = this.$watermark.children().first();
@@ -371,7 +374,7 @@ define([
                     () =>
                         requestAnimationFrame(() => {
                             //position the element to cover the expected area
-                            const containerBox = $appendTo.get(0).getBoundingClientRect();
+                            const containerBox = $coverArea.get(0).getBoundingClientRect();
                             let style = ['left', 'top', 'width', 'height']
                                 .map(prop => `${prop}: ${Math.round(containerBox[prop])}px`)
                                 .join(';');
@@ -390,7 +393,7 @@ define([
                 );
                 $appendTo.append(this.$watermark);
                 this.resizeObserver = new ResizeObserver(this.throttledResizeCallback);
-                this.resizeObserver.observe($appendTo.get(0));
+                this.resizeObserver.observe($coverArea.get(0));
             });
         },
 
