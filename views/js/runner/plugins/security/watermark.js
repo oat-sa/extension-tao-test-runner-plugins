@@ -19,14 +19,14 @@
 define([
     'jquery',
     'lodash',
-    'i18n',
     'taoTests/runner/plugin',
     'context',
     'taoQtiTest/runner/helpers/map',
     'core/digest',
     'ui/dialog',
+    'tpl!taoTestRunnerPlugins/runner/plugins/security/templates/watermarkCirclePath',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/watermark'
-], function ($, _, __, pluginFactory, context, mapHelper, digest, dialog) {
+], function ($, _, pluginFactory, context, mapHelper, digest, dialog, watermarkCirclePathTpl) {
     'use strict';
 
     const defaultConfig = {
@@ -72,13 +72,25 @@ define([
          *   in the dialog type keyword which matches configured `hash` & `algorithm`.
          */
         unlock: {
-            enabled: true, //default: false
+            enabled: false,
             triggerWord: 'WMK',
-            tempShowToolbarButton: false, // TEMP, choose either toolbar button or trigger word. Also toolbar button is separate, can be for other plugins
             algorithm: 'SHA-512',
-            //"password", default: ''
-            hash: 'b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86'
-        }
+            hash: ''
+        },
+
+        /**
+         * Profiles to use if any of the settings above (except `unlock`)
+         *   should depend on the specific test/item
+         * @example
+         * a) add category `x-tao-option-watermark-abc` for one test, and `x-tao-option-watermark-def` for another test
+         * b) set `{
+         *    configsByCategory : {
+         *      abc: {type: 'circle', style: 'color:blue'},
+         *      def: {type: 'foreground', style: 'color:red'}
+         *   }`
+         * c) first test will show blue circle, second test will show red foreground
+         */
+        configsByCategory: {}
     };
 
     const watermarkTypes = {
@@ -88,46 +100,71 @@ define([
     };
 
     /**
-     * Plugin shows watermark over the item content, to discourge test-takers from taking and sharing screenshots.
-     * Plugin is activated by the item category "x-tao-option-watermark"
+     * Plugin shows watermark over the item content, to discourage test-takers from taking and sharing screenshots.
+     * Plugin is activated by the item category "x-tao-option-watermark",
+     *   or by the item category defined in config: `x-tao-option-watermark-abc` for `{configsByCategory: {abc: ...}}`
      */
     return pluginFactory({
         name: 'watermark',
 
         install: function install() {
+            this.pluginConfig = {};
             this.$watermark = null;
-            this.abortController = new AbortController();
+            this.abortController = null;
             let isEnabled = true;
 
             /**
+             * Checks if plugin is enabled, and also sets effective config
+             * (config depends on item category)
              * @returns {Boolean}
              */
             this.isPluginEnabled = () => {
                 const testRunner = this.getTestRunner();
-                return (
-                    isEnabled &&
-                    mapHelper.hasItemCategory(
-                        testRunner.getTestMap(),
-                        testRunner.getTestContext().itemIdentifier,
-                        this.getName(),
-                        true
-                    )
-                );
+                const testMap = testRunner.getTestMap();
+                const itemIdentifier = testRunner.getTestContext().itemIdentifier;
+                let isEnabledByCategory = false;
+
+                if (this.getConfig() && this.getConfig().configsByCategory) {
+                    for (const categorySuffix of Object.keys(this.getConfig().configsByCategory)) {
+                        const category = `${this.getName()}-${categorySuffix}`;
+                        if (mapHelper.hasItemCategory(testMap, itemIdentifier, category, true)) {
+                            this.pluginConfig = Object.assign(
+                                {},
+                                defaultConfig,
+                                this.getConfig(),
+                                _.omit(this.getConfig().configsByCategory[categorySuffix], ['unlock'])
+                            );
+                            isEnabledByCategory = true;
+                            break;
+                        }
+                    }
+                }
+                if (!isEnabledByCategory) {
+                    const category = this.getName();
+                    if (mapHelper.hasItemCategory(testMap, itemIdentifier, category, true)) {
+                        this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
+                        isEnabledByCategory = true;
+                    }
+                }
+                return isEnabledByCategory && isEnabled;
             };
 
             let textHash;
+            let textHashAlgorithm;
             /**
              * @returns {Promise<string>}
              */
             this.getTextHash = () => {
-                if (textHash) {
+                const text = context.currentUser.login;
+                const algorithm = this.pluginConfig.hashAlgorithm;
+
+                if (textHash && textHashAlgorithm === algorithm) {
                     return Promise.resolve(textHash);
                 }
-                const text = context.currentUser.login;
-                const hashAlgorithm = this.pluginConfig.hashAlgorithm;
 
-                return digest(text, hashAlgorithm).then(hash => {
+                return digest(text, algorithm).then(hash => {
                     textHash = hash;
+                    textHashAlgorithm = algorithm;
                     return textHash;
                 });
             };
@@ -178,21 +215,22 @@ define([
                 const boxSize = Math.trunc(Math.min(contentEl.offsetWidth, contentEl.offsetHeight));
                 const fontSizePropVal = getComputedStyle(contentEl).getPropertyValue('font-size');
 
-                const s = Math.trunc(boxSize / 2); // half of box size
-                const f = parseInt(fontSizePropVal) || 10; //font size
-                const r = s - f; // radius
-                const circlePath = `M ${s},${f} A ${r},${r} 0 1,1 ${s},${s + r} A ${r},${r} 0 1,1 ${s},${f}`;
+                const halfOfBoxSize = Math.trunc(boxSize / 2);
+                const fontSize = parseInt(fontSizePropVal) || 10;
+                const radius = halfOfBoxSize - fontSize;
 
-                const repeatedText = text.repeat(Math.trunc((3.15 * 2 * r) / text.length / (f / 4)));
+                const repeatedText = text.repeat(Math.trunc((3.15 * 2 * radius) / text.length / (fontSize / 4)));
 
-                const $svg = $(
-                    `<svg width="${boxSize}" height="${boxSize}" viewBox="0 0 ${boxSize} ${boxSize}" xmlns="http://www.w3.org/2000/svg">` +
-                        `<!-- <defs> --><path id="circlePath" fill="none" stroke="none" d="${circlePath}" /><!-- </defs> -->` +
-                        `<text><textPath href="#circlePath"></textPath></text>` +
-                        '</svg>'
+                $watermarkContent.html(
+                    watermarkCirclePathTpl({
+                        boxSize,
+                        repeatedText,
+                        s: halfOfBoxSize,
+                        f: fontSize,
+                        r: radius,
+                        sr: halfOfBoxSize + radius
+                    })
                 );
-                $svg.find('textPath').get(0).textContent = repeatedText;
-                $watermarkContent.append($svg);
             };
 
             /**
@@ -222,6 +260,12 @@ define([
                     buttons: [],
                     renderTo: appendToEl
                 });
+
+                this.isShowingUnlockDialog = true;
+                dlg.on('closed.modal', () => {
+                    this.isShowingUnlockDialog = false;
+                });
+
                 const submit = val =>
                     validateUnlock(val).then(valid => {
                         if (valid) {
@@ -247,9 +291,8 @@ define([
                     .focus();
             };
 
-            this.listenToUnlock = () => {
+            this.addUnlockListener = () => {
                 //NB! Conflict with shortcuts. 'r' toggles review panel. But with shift - 'R' - doesn't.
-                //TODO: this itself is a multi-key shortcut, which should be handled with `util/shortcut`
                 const triggerWord = this.pluginConfig.unlock.triggerWord;
                 const maxTimeBetweenKeys = 3 * 1000;
                 const freeSpaceTragets = [
@@ -260,7 +303,7 @@ define([
                 let typedWord = '';
                 let prevTimestamp = Date.now();
                 const handleKeyup = e => {
-                    if (freeSpaceTragets.includes(e.target)) {
+                    if (!this.isShowingUnlockDialog && freeSpaceTragets.includes(e.target)) {
                         const isLetterKey = !e.ctrlKey && !e.altKey && !e.metaKey && e.key.length === 1; //skip 'Shift' if it was pressed
                         if (isLetterKey) {
                             const timestamp = Date.now();
@@ -274,63 +317,25 @@ define([
                             }
                             if (typedWord === triggerWord) {
                                 typedWord = '';
-                                //TODO: turn off typing listener until done with the dialog
                                 this.showUnlockDialog();
                             }
                         }
                     }
                 };
+                this.abortController = new AbortController();
                 freeSpaceTragets[0].addEventListener('keyup', handleKeyup, { signal: this.abortController.signal });
             };
 
-            this.tempShowSettingsDialog = () => {
-                const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
-                const dialogTpl = '<input type="password" autocomplete="off" class="tao-wmark-input" />';
-                const dlg = dialog({
-                    autoRender: true,
-                    autoDestroy: true,
-                    content: dialogTpl,
-                    width: 300,
-                    buttons: [],
-                    renderTo: appendToEl
-                });
-                const submit = val =>
-                    validateUnlock(val).then(valid => {
-                        if (valid) {
-                            const $btn = $(
-                                `<button>${isEnabled ? 'Watermark: disable' : 'Watermark: enable'}</button>`
-                            ); //TODO: i18n
-                            $btn.on('click', e => {
-                                e.preventDefault();
-                                dlg.hide();
-                                doUnlock();
-                            });
-                            $btn.insertAfter($input);
-                            $input.remove();
-                        }
-                    });
-                const $input = dlg.getDom().find('.tao-wmark-input');
-                $input
-                    .on('keydown', e => {
-                        e.stopPropagation(); // stop shortcut detector
-                        if (e.key === 'Enter') {
-                            $input.off('change');
-                            submit(e.target.value);
-                        } else if (e.key === 'Escape') {
-                            dlg.hide();
-                        }
-                    })
-                    .on('change', e => {
-                        submit(e.target.value);
-                    })
-                    .focus();
+            this.removeUnlockListener = () => {
+                if (this.abortController) {
+                    this.abortController.abort();
+                }
             };
         },
 
         init: function init() {
-            this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
-
             const testRunner = this.getTestRunner();
+            this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
 
             testRunner.on(`loaditem.${this.getName()}`, () => {
                 if (this.isPluginEnabled()) {
@@ -341,28 +346,13 @@ define([
                 this.hide();
             });
 
-            if (this.pluginConfig.unlock && this.pluginConfig.unlock.enabled) {
-                this.listenToUnlock();
-            }
-
-            if (this.pluginConfig.unlock && this.pluginConfig.unlock.tempShowToolbarButton) {
-                //always? for item with watermark? if any item in test has watermark?
-                const toggleButton = this.getAreaBroker()
-                    .getToolbox()
-                    .createEntry({
-                        control: 'show-locked-settings',
-                        title: __(''),
-                        icon: 'settings',
-                        text: __('')
-                    });
-                toggleButton.on('click', e => {
-                    e.preventDefault();
-                    this.tempShowSettingsDialog(); //even of btn is disabled
-                });
-                testRunner.on('enabletools renderitem', () => {
-                    //disabletools unloaditem
-                    toggleButton.enable();
-                });
+            if (
+                this.pluginConfig.unlock &&
+                this.pluginConfig.unlock.enabled &&
+                this.pluginConfig.unlock.triggerWord &&
+                this.pluginConfig.unlock.hash
+            ) {
+                this.addUnlockListener();
             }
         },
 
@@ -420,7 +410,7 @@ define([
         },
 
         destroy: function destroy() {
-            this.abortController.abort();
+            this.removeUnlockListener();
             this.getTestRunner().off(this.getName());
             this.hide();
         }

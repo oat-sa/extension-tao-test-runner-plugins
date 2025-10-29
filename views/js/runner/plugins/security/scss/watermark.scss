@@ -57,10 +57,9 @@
     font-size: 12px;
 }
 
-/* TODO: move to item-runner (qti-runner.css)  */
 .qti-item .block-listing li.qti-choice {
     background: #fff; /* make interaction choices not transparent */
 }
 .qti-item.qti-item {
-    background: transparent; /* or append to '.qti-item' on 'renderitem' event  */
+    background: transparent;
 }
