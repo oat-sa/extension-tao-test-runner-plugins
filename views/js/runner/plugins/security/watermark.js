@@ -70,6 +70,11 @@ define([
          * Enable/disable watermark in the runtime.
          * Click on free space in the item -> type `triggerWord` to open dialog ->
          *   in the dialog type keyword which matches configured `hash` & `algorithm`.
+         * NB! letters in `triggerWord` conflict with test-runner shortcuts.
+         *   For example, `triggerWord` is 'abr'.
+         *   But typing 'r' toggles review panel.
+         *   Then can either use `ABR` - uppercase letters typed with 'Shift',
+         *   or keep 'abr' but type it while holding 'Alt'.
          */
         unlock: {
             enabled: false,
@@ -98,6 +103,45 @@ define([
         background: 'background',
         circle: 'circle'
     };
+
+    /**
+     * TODO: move to `@oat-sa\tao-core-sdk\src\util\shortcut\registry.js`,
+     *   to have all existing test-runner shortucts in the one place,
+     *   and to be able to configure desired modifier keys (Alt+Shift...)
+     * But at the moment shortcut registry doesn't support shortcuts with multiple letter keys
+     * @param {string} triggerWord - letter key sequence; does distinguish uppercase and lowercase ("R" is different from "r")
+     * @param {Function} action
+     * @param {Object} abortController - to remove listener
+     * @param {HTMLElement[]} freeSpaceTargets - checks key events with target on body and these elements
+     */
+    function addMultikeyShortcut(triggerWord, action, abortController, freeSpaceTargets) {
+        const maxTimeBetweenKeys = 3 * 1000;
+        freeSpaceTargets = [document.body, ...(freeSpaceTargets || [])];
+
+        let typedWord = '';
+        let prevTimestamp = Date.now();
+        const handleKeyup = e => {
+            if (freeSpaceTargets.includes(e.target)) {
+                const isLetterKey = e.key.length === 1; //skip modfier keys like 'Shift'
+                if (isLetterKey) {
+                    const timestamp = Date.now();
+                    if (timestamp - prevTimestamp > maxTimeBetweenKeys) {
+                        typedWord = '';
+                    }
+                    prevTimestamp = timestamp;
+                    typedWord = typedWord + e.key;
+                    if (typedWord.length > triggerWord.length) {
+                        typedWord = typedWord.substring(1);
+                    }
+                    if (typedWord === triggerWord) {
+                        typedWord = '';
+                        action();
+                    }
+                }
+            }
+        };
+        freeSpaceTargets[0].addEventListener('keyup', handleKeyup, { signal: abortController.signal });
+    }
 
     /**
      * Plugin shows watermark over the item content, to discourage test-takers from taking and sharing screenshots.
@@ -250,6 +294,8 @@ define([
             };
 
             this.showUnlockDialog = () => {
+                this.removeUnlockListener();
+
                 const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
                 const dialogTpl = '<input type="password" autocomplete="off" class="tao-wmark-input" />';
                 const dlg = dialog({
@@ -261,9 +307,8 @@ define([
                     renderTo: appendToEl
                 });
 
-                this.isShowingUnlockDialog = true;
                 dlg.on('closed.modal', () => {
-                    this.isShowingUnlockDialog = false;
+                    this.addUnlockListener();
                 });
 
                 const submit = val =>
@@ -292,38 +337,13 @@ define([
             };
 
             this.addUnlockListener = () => {
-                //NB! Conflict with shortcuts. 'r' toggles review panel. But with shift - 'R' - doesn't.
-                const triggerWord = this.pluginConfig.unlock.triggerWord;
-                const maxTimeBetweenKeys = 3 * 1000;
-                const freeSpaceTragets = [
-                    document.body,
-                    this.getAreaBroker().getContainer().find('.content-wrapper').get(0)
-                ];
-
-                let typedWord = '';
-                let prevTimestamp = Date.now();
-                const handleKeyup = e => {
-                    if (!this.isShowingUnlockDialog && freeSpaceTragets.includes(e.target)) {
-                        const isLetterKey = !e.ctrlKey && !e.altKey && !e.metaKey && e.key.length === 1; //skip 'Shift' if it was pressed
-                        if (isLetterKey) {
-                            const timestamp = Date.now();
-                            if (timestamp - prevTimestamp > maxTimeBetweenKeys) {
-                                typedWord = '';
-                            }
-                            prevTimestamp = timestamp;
-                            typedWord = typedWord + e.key;
-                            if (typedWord.length > triggerWord.length) {
-                                typedWord = typedWord.substring(1);
-                            }
-                            if (typedWord === triggerWord) {
-                                typedWord = '';
-                                this.showUnlockDialog();
-                            }
-                        }
-                    }
-                };
                 this.abortController = new AbortController();
-                freeSpaceTragets[0].addEventListener('keyup', handleKeyup, { signal: this.abortController.signal });
+                addMultikeyShortcut(
+                    this.pluginConfig.unlock.triggerWord,
+                    () => this.showUnlockDialog(),
+                    this.abortController,
+                    [this.getAreaBroker().getContainer().find('.content-wrapper').get(0)]
+                );
             };
 
             this.removeUnlockListener = () => {
