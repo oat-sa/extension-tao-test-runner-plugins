@@ -160,6 +160,7 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'name' => 'Default Heading',
                 'module' => 'taoTestRunnerPlugins/runner/plugins/accessibility/defaultHeading',
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                // phpcs:ignore
                 'description' => 'Added h1 tag with default text in case if there is no h1 tags in test item. The tag will be visible only for screenreader devices',
                 'category' => 'accessibility',
                 'active' => false,
@@ -219,7 +220,8 @@ class RegisterTestRunnerPlugins extends InstallAction
      */
     protected function configurePlugins()
     {
-        $extension = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID)->getExtensionById('taoQtiTest');
+        $extManager = $this->getServiceLocator()->get(\common_ext_ExtensionsManager::SERVICE_ID);
+        $extension = $extManager->getExtensionById('taoQtiTest');
         $config = $extension->getConfig('testRunner');
         $count = 0;
 
