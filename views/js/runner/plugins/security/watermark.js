@@ -19,6 +19,7 @@
 define([
     'jquery',
     'lodash',
+    'i18n',
     'taoTests/runner/plugin',
     'context',
     'taoQtiTest/runner/helpers/map',
@@ -26,7 +27,7 @@ define([
     'ui/dialog',
     'tpl!taoTestRunnerPlugins/runner/plugins/security/templates/watermarkCirclePath',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/watermark'
-], function ($, _, pluginFactory, context, mapHelper, digest, dialog, watermarkCirclePathTpl) {
+], function ($, _, __, pluginFactory, context, mapHelper, digest, dialog, watermarkCirclePathTpl) {
     'use strict';
 
     const defaultConfig = {
@@ -37,10 +38,17 @@ define([
          */
         hashAlgorithm: 'SHA-1',
         /**
-         * 'background' | 'foreground' | 'circle'
+         * 'horizontal' | 'diagonal' | 'circle'
          * @type {String}
          */
-        type: 'background',
+        type: 'horizontal',
+        /**
+         * 'background' | 'foreground'
+         * Suggested to use 'foreground' for types 'diagonal' and 'circle',
+         *  and 'background' for type 'horizontal'.
+         * @type {String}
+         */
+        layer: 'background',
         /**
          * Override default watermark content styles
          * @type {String}
@@ -99,8 +107,8 @@ define([
     };
 
     const watermarkTypes = {
-        foreground: 'foreground',
-        background: 'background',
+        horizontal: 'horizontal',
+        diagonal: 'diagonal',
         circle: 'circle'
     };
 
@@ -172,7 +180,7 @@ define([
                     for (const categorySuffix of Object.keys(this.getConfig().configsByCategory)) {
                         const category = `${this.getName()}-${categorySuffix}`;
                         if (mapHelper.hasItemCategory(testMap, itemIdentifier, category, true)) {
-                            this.pluginConfig = Object.assign(
+                            this.pluginConfig = _.merge(
                                 {},
                                 defaultConfig,
                                 this.getConfig(),
@@ -186,7 +194,7 @@ define([
                 if (!isEnabledByCategory) {
                     const category = this.getName();
                     if (mapHelper.hasItemCategory(testMap, itemIdentifier, category, true)) {
-                        this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
+                        this.pluginConfig = _.merge({}, defaultConfig, this.getConfig());
                         isEnabledByCategory = true;
                     }
                 }
@@ -199,7 +207,7 @@ define([
              * @returns {Promise<string>}
              */
             this.getTextHash = () => {
-                const text = context.currentUser.login;
+                const text = (context.currentUser && context.currentUser.login) || 'anonymous';
                 const algorithm = this.pluginConfig.hashAlgorithm;
 
                 if (textHash && textHashAlgorithm === algorithm) {
@@ -281,10 +289,10 @@ define([
              * @param {string} val
              * @returns {Promise<string>}
              */
-            let validateUnlock = val =>
+            const validateUnlock = val =>
                 digest(val, this.pluginConfig.unlock.algorithm).then(hash => hash === this.pluginConfig.unlock.hash);
 
-            let doUnlock = () => {
+            const doUnlock = () => {
                 isEnabled = !isEnabled;
                 if (this.isPluginEnabled()) {
                     this.show();
@@ -297,7 +305,8 @@ define([
                 this.removeUnlockListener();
 
                 const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
-                const dialogTpl = '<input type="password" autocomplete="off" class="tao-wmark-input" />';
+                const label = isEnabled ? __('To hide watermark, type keyword') : __('To show watermark, type keyword');
+                const dialogTpl = `<label>${label}<input type="password" autocomplete="off" class="tao-wmark-input" /></label>`;
                 const dlg = dialog({
                     autoRender: true,
                     autoDestroy: true,
@@ -355,26 +364,27 @@ define([
 
         init: function init() {
             const testRunner = this.getTestRunner();
-            this.pluginConfig = Object.assign({}, defaultConfig, this.getConfig());
+            this.pluginConfig = _.merge({}, defaultConfig, this.getConfig());
 
             testRunner.on(`renderitem.${this.getName()}`, () => {
                 if (this.isPluginEnabled()) {
                     this.hide(); // just a precaution
                     this.show();
+
+                    if (
+                        this.pluginConfig.unlock &&
+                        this.pluginConfig.unlock.enabled &&
+                        this.pluginConfig.unlock.triggerWord &&
+                        this.pluginConfig.unlock.hash
+                    ) {
+                        this.addUnlockListener();
+                    }
                 }
             });
             testRunner.on(`unloaditem.${this.getName()}`, () => {
                 this.hide();
+                this.removeUnlockListener();
             });
-
-            if (
-                this.pluginConfig.unlock &&
-                this.pluginConfig.unlock.enabled &&
-                this.pluginConfig.unlock.triggerWord &&
-                this.pluginConfig.unlock.hash
-            ) {
-                this.addUnlockListener();
-            }
         },
 
         show: function show() {
@@ -382,7 +392,9 @@ define([
             // append here, because this element has not-transparent background
             const $appendTo = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
 
-            this.$watermark = $(`<div class="tao-wmark ${this.pluginConfig.type}"><div></div></div>`);
+            this.$watermark = $(
+                `<div class="tao-wmark ${this.pluginConfig.type} ${this.pluginConfig.layer}"><div></div></div>`
+            );
             const $watermarkContent = this.$watermark.children().first();
 
             if (this.pluginConfig.style) {

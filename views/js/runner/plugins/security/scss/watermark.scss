@@ -16,28 +16,27 @@
 
     &.foreground {
         z-index: 120000; /* InlineChoiceInteraction dropdown is 109999 */
-
-        & > div {
-            opacity: 0.3;
-            line-height: 9em;
-            width: calc((100vw + 100vh) / 1.4);
-            transform-origin: top left;
-            transform: rotate(-45deg) translateX(calc(-100vh / 1.4));
-        }
     }
 
     &.background {
         z-index: -1000;
+    }
 
-        & > div {
-            opacity: 0.1;
-            line-height: 2.5em;
-            width: 100vw;
-        }
+    &.diagonal > div {
+        opacity: 0.3;
+        line-height: 9em;
+        width: calc((100vw + 100vh) / 1.4);
+        transform-origin: top left;
+        transform: rotate(-45deg) translateX(calc(-100vh / 1.4));
+    }
+
+    &.horizontal > div {
+        opacity: 0.1;
+        line-height: 2.5em;
+        width: 100vw;
     }
 
     &.circle {
-        z-index: 120000;
         padding: 8vh;
 
         & > div {
@@ -48,6 +47,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
+
+            text {
+                fill: currentColor;
+            }
         }
     }
 }
