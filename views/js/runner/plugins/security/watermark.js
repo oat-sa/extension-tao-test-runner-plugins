@@ -393,7 +393,7 @@ define([
             const $appendTo = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
 
             this.$watermark = $(
-                `<div class="tao-wmark ${this.pluginConfig.type} ${this.pluginConfig.layer}"><div></div></div>`
+                `<div class="tao-wmark ${this.pluginConfig.type} ${this.pluginConfig.layer}" aria-hidden="true"><div></div></div>`
             );
             const $watermarkContent = this.$watermark.children().first();
 
