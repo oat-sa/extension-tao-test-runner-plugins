@@ -306,7 +306,8 @@ define([
 
                 const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
                 const label = isEnabled ? __('To hide watermark, type keyword') : __('To show watermark, type keyword');
-                const dialogTpl = `<label>${label}<input type="password" autocomplete="off" class="tao-wmark-input" /></label>`;
+                //`-webkit-text-security` instead of `type="password" because we don't want autofill & save suggestions
+                const dialogTpl = `<label>${label}<input autocomplete="off" class="tao-wmark-input" style="-webkit-text-security:disc" /></label>`;
                 const dlg = dialog({
                     autoRender: true,
                     autoDestroy: true,
@@ -328,6 +329,9 @@ define([
                     });
                 const $input = dlg.getDom().find('.tao-wmark-input');
                 $input
+                    .on('copy', e => {
+                        e.preventDefault();
+                    })
                     .on('keydown', e => {
                         e.stopPropagation(); // stop shortcut detector
                         if (e.key === 'Enter') {
