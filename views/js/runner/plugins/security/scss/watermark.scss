@@ -53,6 +53,11 @@
             }
         }
     }
+
+    /* if item is behind overlay, make watermark brighter */
+    &.overlayed > div {
+        opacity: 0.5 !important;
+    }
 }
 
 .tao-wmark-input {

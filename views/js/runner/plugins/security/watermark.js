@@ -25,9 +25,10 @@ define([
     'taoQtiTest/runner/helpers/map',
     'core/digest',
     'ui/dialog',
+    'taoQtiTest/runner/config/states',
     'tpl!taoTestRunnerPlugins/runner/plugins/security/templates/watermarkCirclePath',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/watermark'
-], function ($, _, __, pluginFactory, context, mapHelper, digest, dialog, watermarkCirclePathTpl) {
+], function ($, _, __, pluginFactory, context, mapHelper, digest, dialog, states, watermarkCirclePathTpl) {
     'use strict';
 
     const defaultConfig = {
@@ -364,6 +365,11 @@ define([
                     this.abortController.abort();
                 }
             };
+
+            this.itemHasOverlay = () => {
+                const testContext = this.getTestRunner().getTestContext();
+                return testContext.itemSessionState === states.itemSession.closed;
+            };
         },
 
         init: function init() {
@@ -394,11 +400,18 @@ define([
         show: function show() {
             const $coverArea = this.getAreaBroker().getContainer().find('.content-wrapper');
             // append here, because this element has not-transparent background
-            const $appendTo = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
+            let $appendTo = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
 
-            this.$watermark = $(
-                `<div class="tao-wmark ${this.pluginConfig.type} ${this.pluginConfig.layer}" aria-hidden="true"><div></div></div>`
-            );
+            const classesStr = [
+                'tao-wmark',
+                this.pluginConfig.type,
+                this.pluginConfig.layer,
+                this.itemHasOverlay() ? 'overlayed' : ''
+            ]
+                .filter(Boolean)
+                .join(' ');
+
+            this.$watermark = $(`<div class="${classesStr}" aria-hidden="true"><div></div></div>`);
             const $watermarkContent = this.$watermark.children().first();
 
             if (this.pluginConfig.style) {
