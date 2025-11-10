@@ -23,34 +23,38 @@ const path = require('path');
  *
  * @param {Object} grunt - the grunt object (by convention)
  */
-module.exports = function(grunt) {
+module.exports = function (grunt) {
     'use strict';
 
-    const root       = path.join(grunt.option('root'), '/taoTestRunnerPlugins/views/');
+    const root = path.join(grunt.option('root'), '/taoTestRunnerPlugins/views/');
 
     grunt.config.merge({
-        sass : {
+        sass: {
             taotestrunnerplugins: {
                 options: {},
-                files : [
+                files: [
                     {
-                        dest : path.join(root, 'js/runner/plugins/security/css/fullscreen.css'),
-                        src : path.join(root, 'js/runner/plugins/security/scss/fullscreen.scss')
+                        dest: path.join(root, 'js/runner/plugins/security/css/fullscreen.css'),
+                        src: path.join(root, 'js/runner/plugins/security/scss/fullscreen.scss')
+                    },
+                    {
+                        dest: path.join(root, 'js/runner/plugins/security/css/watermark.css'),
+                        src: path.join(root, 'js/runner/plugins/security/scss/watermark.scss')
                     }
                 ]
-            },
+            }
         },
-        watch : {
-            taotestrunnerpluginssass : {
-                files : [path.join(root, 'scss/**/*.scss')],
-                tasks : ['sass:taotestrunnerplugins'],
-                options : {
-                    debounceDelay : 1000
+        watch: {
+            taotestrunnerpluginssass: {
+                files: [path.join(root, 'scss/**/*.scss')],
+                tasks: ['sass:taotestrunnerplugins'],
+                options: {
+                    debounceDelay: 1000
                 }
             }
         },
-        notify : {
-            taotestrunnerpluginssass : {
+        notify: {
+            taotestrunnerpluginssass: {
                 options: {
                     title: 'Grunt SASS',
                     message: 'SASS files compiled to CSS'
