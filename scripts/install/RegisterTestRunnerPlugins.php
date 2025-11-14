@@ -164,6 +164,18 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'tags' => [ ]
             ]
         ],
+        'watermark' => [
+            [
+                'id' => 'watermark',
+                'name' => 'Watermark',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/security/watermark',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Show watermark over the item content',
+                'category' => 'tools',
+                'active' => false,
+                'tags' => []
+            ]
+        ]
     ];
 
     protected $configs = [
