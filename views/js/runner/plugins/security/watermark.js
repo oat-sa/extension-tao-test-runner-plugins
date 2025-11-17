@@ -448,7 +448,7 @@ define([
 
         hide: function hide() {
             if (this.throttledResizeCallback) {
-                this.throttledResizeCallback.cancel();
+                this.throttledResizeCallback.cancel;
                 this.throttledResizeCallback = null;
             }
             if (this.resizeObserver) {
