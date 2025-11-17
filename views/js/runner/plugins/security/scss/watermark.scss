@@ -1,0 +1,69 @@
+@charset "UTF-8";
+
+.tao-wmark.tao-wmark {
+    pointer-events: none;
+    overflow: hidden;
+    position: fixed;
+
+    & > div {
+        color: black;
+        font-size: 10px;
+        white-space-collapse: preserve;
+        font-family: 'Courier New', monospace !important;
+        height: auto;
+        overflow: visible;
+    }
+
+    &.foreground {
+        z-index: 120000; /* InlineChoiceInteraction dropdown is 109999 */
+    }
+
+    &.background {
+        z-index: -1000;
+    }
+
+    &.diagonal > div {
+        opacity: 0.3;
+        line-height: 9em;
+        width: calc((100vw + 100vh) / 1.4);
+        transform-origin: top left;
+        transform: rotate(-45deg) translateX(calc(-100vh / 1.4));
+    }
+
+    &.horizontal > div {
+        opacity: 0.1;
+        line-height: 2.5em;
+        width: 100vw;
+    }
+
+    &.circle {
+        padding: 8vh;
+
+        & > div {
+            opacity: 0.1;
+            font-size: 8px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            text {
+                fill: currentColor;
+            }
+        }
+    }
+
+    /* if item is behind overlay, make watermark brighter */
+    &.overlayed > div {
+        opacity: 0.5 !important;
+    }
+}
+
+.tao-wmark-input {
+    width: 100%;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    line-height: 2em;
+    margin-top: 8px;
+}

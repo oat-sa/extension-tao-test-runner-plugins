@@ -36,6 +36,10 @@ module.exports = function(grunt) {
                     {
                         dest : path.join(root, 'js/runner/plugins/security/css/fullscreen.css'),
                         src : path.join(root, 'js/runner/plugins/security/scss/fullscreen.scss')
+                    },
+                    {
+                        dest: path.join(root, 'js/runner/plugins/security/css/watermark.css'),
+                        src: path.join(root, 'js/runner/plugins/security/scss/watermark.scss')
                     }
                 ]
             },
