@@ -164,18 +164,18 @@ define([
             this.pluginConfig = {};
             this.$watermark = null;
             this.abortController = null;
-            let isEnabled = true;
+            this.isNotUnlocked = true;
 
             /**
              * Checks if plugin is enabled, and also sets effective config
              * (config depends on item category)
              * @returns {Boolean}
              */
-            this.isPluginEnabled = () => {
+            this.getIsEnabledByCategory = () => {
                 const testRunner = this.getTestRunner();
                 const testMap = testRunner.getTestMap();
                 const itemIdentifier = testRunner.getTestContext().itemIdentifier;
-                let isEnabledByCategory = false;
+                let enabledByCategory = false;
 
                 if (this.getConfig() && this.getConfig().configsByCategory) {
                     for (const categorySuffix of Object.keys(this.getConfig().configsByCategory)) {
@@ -187,19 +187,19 @@ define([
                                 this.getConfig(),
                                 _.omit(this.getConfig().configsByCategory[categorySuffix], ['unlock'])
                             );
-                            isEnabledByCategory = true;
+                            enabledByCategory = true;
                             break;
                         }
                     }
                 }
-                if (!isEnabledByCategory) {
+                if (!enabledByCategory) {
                     const category = this.getName();
                     if (mapHelper.hasItemCategory(testMap, itemIdentifier, category, true)) {
                         this.pluginConfig = _.merge({}, defaultConfig, this.getConfig());
-                        isEnabledByCategory = true;
+                        enabledByCategory = true;
                     }
                 }
-                return isEnabledByCategory && isEnabled;
+                return enabledByCategory;
             };
 
             let textHash;
@@ -294,8 +294,8 @@ define([
                 digest(val, this.pluginConfig.unlock.algorithm).then(hash => hash === this.pluginConfig.unlock.hash);
 
             const doUnlock = () => {
-                isEnabled = !isEnabled;
-                if (this.isPluginEnabled()) {
+                this.isNotUnlocked = !this.isNotUnlocked;
+                if (this.getIsEnabledByCategory() && this.isNotUnlocked) {
                     this.show();
                 } else {
                     this.hide();
@@ -306,7 +306,9 @@ define([
                 this.removeUnlockListener();
 
                 const appendToEl = this.getAreaBroker().getContainer().find('.content-wrapper').get(0);
-                const label = isEnabled ? __('To hide watermark, type keyword') : __('To show watermark, type keyword');
+                const label = this.isNotUnlocked
+                    ? __('To hide watermark, type keyword')
+                    : __('To show watermark, type keyword');
                 //`-webkit-text-security` instead of `type="password" because we don't want autofill & save suggestions
                 const dialogTpl = `<label>${label}<input autocomplete="off" class="tao-wmark-input" style="-webkit-text-security:disc" /></label>`;
                 const dlg = dialog({
@@ -377,10 +379,11 @@ define([
             this.pluginConfig = _.merge({}, defaultConfig, this.getConfig());
 
             testRunner.on(`renderitem.${this.getName()}`, () => {
-                if (this.isPluginEnabled()) {
-                    this.hide(); // just a precaution
-                    this.show();
-
+                if (this.getIsEnabledByCategory()) {
+                    if (this.isNotUnlocked) {
+                        this.hide(); // just a precaution
+                        this.show();
+                    }
                     if (
                         this.pluginConfig.unlock &&
                         this.pluginConfig.unlock.enabled &&
