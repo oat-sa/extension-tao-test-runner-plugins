@@ -245,9 +245,9 @@ define([
              * @param {jQuery} $watermarkContent
              */
             this.renderText = ($watermarkContent, text) => {
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < 50; i++) {
                     const actualHeight = $watermarkContent.get(0).offsetHeight;
-                    const expectedHeight = window.innerWidth + window.innerHeight; //enough to cover any degree of rotate
+                    const expectedHeight = this.$watermark.get(0).offsetWidth + this.$watermark.get(0).offsetHeight; //enough to cover any degree of rotate
                     if (actualHeight < expectedHeight) {
                         const repeatedText = text.repeat(200);
                         $watermarkContent.get(0).textContent += repeatedText;
@@ -378,32 +378,39 @@ define([
             const testRunner = this.getTestRunner();
             this.pluginConfig = _.merge({}, defaultConfig, this.getConfig());
 
-            testRunner.on(`renderitem.${this.getName()}`, () => {
-                if (this.getIsEnabledByCategory()) {
-                    if (this.isNotUnlocked) {
-                        this.hide(); // just a precaution
+            testRunner
+                .on(`renderitem.${this.getName()}`, () => {
+                    if (this.getIsEnabledByCategory()) {
+                        if (this.isNotUnlocked) {
+                            this.hide(); // just a precaution
+                            this.show();
+                        }
+                        if (
+                            this.pluginConfig.unlock &&
+                            this.pluginConfig.unlock.enabled &&
+                            this.pluginConfig.unlock.triggerWord &&
+                            this.pluginConfig.unlock.hash
+                        ) {
+                            this.addUnlockListener();
+                        }
+                    }
+                })
+                .on(`unloaditem.${this.getName()}`, () => {
+                    this.hide();
+                    this.removeUnlockListener();
+                })
+                .after(`tool-zoomout.${this.getName()} tool-zoomin.${this.getName()}`, () => {
+                    if (this.getIsEnabledByCategory() && this.isNotUnlocked) {
+                        this.hide();
                         this.show();
                     }
-                    if (
-                        this.pluginConfig.unlock &&
-                        this.pluginConfig.unlock.enabled &&
-                        this.pluginConfig.unlock.triggerWord &&
-                        this.pluginConfig.unlock.hash
-                    ) {
-                        this.addUnlockListener();
-                    }
-                }
-            });
-            testRunner.on(`unloaditem.${this.getName()}`, () => {
-                this.hide();
-                this.removeUnlockListener();
-            });
+                });
         },
 
         show: function show() {
             const $coverArea = this.getAreaBroker().getContainer().find('.content-wrapper');
-            // append here, because this element has not-transparent background
-            let $appendTo = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
+            const $itemArea = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
+            let $appendTo = this.getTestRunner().getAreaBroker().getContentArea();
 
             const classesStr = [
                 'tao-wmark',
@@ -426,8 +433,16 @@ define([
                     () =>
                         requestAnimationFrame(() => {
                             //position the element to cover the expected area
-                            const containerBox = $coverArea.get(0).getBoundingClientRect();
-                            let style = ['left', 'top', 'width', 'height']
+                            const containerRect = $coverArea.get(0).getBoundingClientRect();
+
+                            const containerBox = {
+                                left: containerRect.left,
+                                width: containerRect.width,
+                                top: containerRect.top,
+                                height: containerRect.height
+                            };
+
+                            let style = ['left', 'width', 'top', 'height']
                                 .map(prop => `${prop}: ${Math.round(containerBox[prop])}px`)
                                 .join(';');
                             if (this.pluginConfig.containerStyle) {
@@ -443,7 +458,7 @@ define([
                         }),
                     100
                 );
-                $appendTo.append(this.$watermark);
+                $appendTo.prepend(this.$watermark);
                 this.resizeObserver = new ResizeObserver(this.throttledResizeCallback);
                 this.resizeObserver.observe($coverArea.get(0));
             });
