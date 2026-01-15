@@ -435,6 +435,9 @@ define([
                             //position the element to cover the expected area
                             const containerRect = $coverArea.get(0).getBoundingClientRect();
 
+                            const itemRect = $itemArea.get(0).getBoundingClientRect();
+                            const itemScale = Math.max(0.4, itemRect.width / $itemArea.get(0).offsetWidth); // if 'zoom' plugin
+
                             const containerBox = {
                                 left: containerRect.left,
                                 width: containerRect.width,
@@ -449,6 +452,19 @@ define([
                                 style += `;${this.pluginConfig.containerStyle}`;
                             }
                             this.$watermark.attr('style', style);
+
+                            //all styles, including customer styles from config, should be applied now
+                            if (Math.abs(itemScale - 1) > 0.01) {
+                                const originalContentStyle = $watermarkContent.attr('style') || '';
+                                const computedContentStyle = getComputedStyle($watermarkContent.get(0));
+                                const scaledContentStyle = ['font-size', 'line-height', 'letter-spacing']
+                                    .map(prop => {
+                                        const propVal = computedContentStyle.getPropertyValue(prop);
+                                        return `${prop}: calc(${itemScale} * ${propVal})`;
+                                    })
+                                    .join(';');
+                                $watermarkContent.attr('style', `${originalContentStyle};${scaledContentStyle}`);
+                            }
 
                             if (this.pluginConfig.type === watermarkTypes.circle) {
                                 this.renderCircle($watermarkContent, text);
