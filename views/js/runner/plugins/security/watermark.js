@@ -243,13 +243,18 @@ define([
             /**
              * Render a text long enough to cover the expected area
              * @param {jQuery} $watermarkContent
+             * @param {string} text
+             * @param {number} itemScale
              */
-            this.renderText = ($watermarkContent, text) => {
-                for (let i = 0; i < 50; i++) {
+            this.renderText = ($watermarkContent, text, itemScale) => {
+                for (let i = 0; i < 10; i++) {
                     const actualHeight = $watermarkContent.get(0).offsetHeight;
-                    const expectedHeight = this.$watermark.get(0).offsetWidth + this.$watermark.get(0).offsetHeight; //enough to cover any degree of rotate
+                    //enough to cover any degree of rotate
+                    const expectedHeight =
+                        this.$watermark.get(0).offsetHeight +
+                        (this.pluginConfig.type === watermarkTypes.horizontal ? 0 : this.$watermark.get(0).offsetWidth);
                     if (actualHeight < expectedHeight) {
-                        const repeatedText = text.repeat(200);
+                        const repeatedText = text.repeat(200 / itemScale);
                         $watermarkContent.get(0).textContent += repeatedText;
                     } else {
                         break;
@@ -260,6 +265,7 @@ define([
             /**
              * Render text on a circular path
              * @param {jQuery} $watermarkContent
+             * @param {string} text
              */
             this.renderCircle = ($watermarkContent, text) => {
                 $watermarkContent.html('');
@@ -422,11 +428,20 @@ define([
                 .join(' ');
 
             this.$watermark = $(`<div class="${classesStr}" aria-hidden="true"><div></div></div>`);
-            const $watermarkContent = this.$watermark.children().first();
 
+            const $watermarkContent = this.$watermark.children().first();
             if (this.pluginConfig.style) {
                 $watermarkContent.attr('style', this.pluginConfig.style);
             }
+
+            $appendTo.prepend(this.$watermark);
+
+            const originalContentStyle = $watermarkContent.attr('style') || '';
+            const computedContentStyle = getComputedStyle($watermarkContent.get(0));
+            const scalableComputedContentStyle = ['font-size', 'line-height', 'letter-spacing'].reduce((acc, prop) => {
+                acc[prop] = computedContentStyle.getPropertyValue(prop);
+                return acc;
+            }, {});
 
             this.getText().then(text => {
                 this.throttledResizeCallback = _.throttle(
@@ -434,7 +449,6 @@ define([
                         requestAnimationFrame(() => {
                             //position the element to cover the expected area
                             const containerRect = $coverArea.get(0).getBoundingClientRect();
-
                             const itemRect = $itemArea.get(0).getBoundingClientRect();
                             const itemScale = Math.max(0.4, itemRect.width / $itemArea.get(0).offsetWidth); // if 'zoom' plugin
 
@@ -453,15 +467,9 @@ define([
                             }
                             this.$watermark.attr('style', style);
 
-                            //all styles, including customer styles from config, should be applied now
                             if (Math.abs(itemScale - 1) > 0.01) {
-                                const originalContentStyle = $watermarkContent.attr('style') || '';
-                                const computedContentStyle = getComputedStyle($watermarkContent.get(0));
-                                const scaledContentStyle = ['font-size', 'line-height', 'letter-spacing']
-                                    .map(prop => {
-                                        const propVal = computedContentStyle.getPropertyValue(prop);
-                                        return `${prop}: calc(${itemScale} * ${propVal})`;
-                                    })
+                                const scaledContentStyle = Object.keys(scalableComputedContentStyle)
+                                    .map(prop => `${prop}: calc(${itemScale} * ${scalableComputedContentStyle[prop]})`)
                                     .join(';');
                                 $watermarkContent.attr('style', `${originalContentStyle};${scaledContentStyle}`);
                             }
@@ -469,12 +477,11 @@ define([
                             if (this.pluginConfig.type === watermarkTypes.circle) {
                                 this.renderCircle($watermarkContent, text);
                             } else {
-                                this.renderText($watermarkContent, text);
+                                this.renderText($watermarkContent, text, itemScale);
                             }
                         }),
                     100
                 );
-                $appendTo.prepend(this.$watermark);
                 this.resizeObserver = new ResizeObserver(this.throttledResizeCallback);
                 this.resizeObserver.observe($coverArea.get(0));
             });
