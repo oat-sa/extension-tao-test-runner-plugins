@@ -4,7 +4,6 @@
     pointer-events: none;
     overflow: hidden;
     position: fixed;
-    transform-origin: top left;
     container-type: inline-size;
     direction: ltr;
 
@@ -25,6 +24,7 @@
         opacity: 0.3;
         line-height: 9em;
         width: calc((100cqw + 100cqh) / 1.4);
+        transform-origin: top left;
         transform: rotate(-45deg) translateX(calc(-100cqh / 1.4));
     }
 
