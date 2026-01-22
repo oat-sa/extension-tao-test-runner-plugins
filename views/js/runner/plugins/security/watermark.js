@@ -415,7 +415,6 @@ define([
 
         show: function show() {
             const $coverArea = this.getAreaBroker().getContainer().find('.content-wrapper');
-            const $itemArea = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
             let $appendTo = this.getTestRunner().getAreaBroker().getContentArea();
 
             const classesStr = [
@@ -449,8 +448,10 @@ define([
                         requestAnimationFrame(() => {
                             //position the element to cover the expected area
                             const containerRect = $coverArea.get(0).getBoundingClientRect();
-                            const itemRect = $itemArea.get(0).getBoundingClientRect();
-                            const itemScale = Math.max(0.4, itemRect.width / $itemArea.get(0).offsetWidth); // if 'zoom' plugin
+                            const itemScale = Math.max(
+                                0.4,
+                                parseFloat(computedContentStyle.getPropertyValue('--tool-zoom-level')) || 1 // if 'zoom' plugin
+                            );
 
                             const containerBox = {
                                 left: containerRect.left,
