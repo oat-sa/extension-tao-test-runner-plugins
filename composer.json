@@ -25,7 +25,7 @@
         "oat-sa/tao-core": ">=54.0.0",
         "oat-sa/extension-tao-delivery": ">=15.0.0",
         "oat-sa/extension-tao-delivery-rdf": ">=14.0.0",
-        "oat-sa/extension-tao-testqti": ">=41.0.0",
+        "oat-sa/extension-tao-testqti": ">=49.1.1",
         "oat-sa/extension-tao-test": ">=15.0.0"
     },
     "autoload": {

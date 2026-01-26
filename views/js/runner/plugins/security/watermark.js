@@ -243,13 +243,18 @@ define([
             /**
              * Render a text long enough to cover the expected area
              * @param {jQuery} $watermarkContent
+             * @param {string} text
+             * @param {number} itemScale
              */
-            this.renderText = ($watermarkContent, text) => {
+            this.renderText = ($watermarkContent, text, itemScale) => {
                 for (let i = 0; i < 10; i++) {
                     const actualHeight = $watermarkContent.get(0).offsetHeight;
-                    const expectedHeight = window.innerWidth + window.innerHeight; //enough to cover any degree of rotate
+                    //enough to cover any degree of rotate
+                    const expectedHeight =
+                        this.$watermark.get(0).offsetHeight +
+                        (this.pluginConfig.type === watermarkTypes.horizontal ? 0 : this.$watermark.get(0).offsetWidth);
                     if (actualHeight < expectedHeight) {
-                        const repeatedText = text.repeat(200);
+                        const repeatedText = text.repeat(200 / itemScale);
                         $watermarkContent.get(0).textContent += repeatedText;
                     } else {
                         break;
@@ -260,6 +265,7 @@ define([
             /**
              * Render text on a circular path
              * @param {jQuery} $watermarkContent
+             * @param {string} text
              */
             this.renderCircle = ($watermarkContent, text) => {
                 $watermarkContent.html('');
@@ -378,32 +384,38 @@ define([
             const testRunner = this.getTestRunner();
             this.pluginConfig = _.merge({}, defaultConfig, this.getConfig());
 
-            testRunner.on(`renderitem.${this.getName()}`, () => {
-                if (this.getIsEnabledByCategory()) {
-                    if (this.isNotUnlocked) {
-                        this.hide(); // just a precaution
+            testRunner
+                .on(`renderitem.${this.getName()}`, () => {
+                    if (this.getIsEnabledByCategory()) {
+                        if (this.isNotUnlocked) {
+                            this.hide(); // just a precaution
+                            this.show();
+                        }
+                        if (
+                            this.pluginConfig.unlock &&
+                            this.pluginConfig.unlock.enabled &&
+                            this.pluginConfig.unlock.triggerWord &&
+                            this.pluginConfig.unlock.hash
+                        ) {
+                            this.addUnlockListener();
+                        }
+                    }
+                })
+                .on(`unloaditem.${this.getName()}`, () => {
+                    this.hide();
+                    this.removeUnlockListener();
+                })
+                .after(`tool-zoomout.${this.getName()} tool-zoomin.${this.getName()}`, () => {
+                    if (this.getIsEnabledByCategory() && this.isNotUnlocked) {
+                        this.hide();
                         this.show();
                     }
-                    if (
-                        this.pluginConfig.unlock &&
-                        this.pluginConfig.unlock.enabled &&
-                        this.pluginConfig.unlock.triggerWord &&
-                        this.pluginConfig.unlock.hash
-                    ) {
-                        this.addUnlockListener();
-                    }
-                }
-            });
-            testRunner.on(`unloaditem.${this.getName()}`, () => {
-                this.hide();
-                this.removeUnlockListener();
-            });
+                });
         },
 
         show: function show() {
             const $coverArea = this.getAreaBroker().getContainer().find('.content-wrapper');
-            // append here, because this element has not-transparent background
-            let $appendTo = this.getTestRunner().getAreaBroker().getContentArea().find('.qti-item');
+            let $appendTo = this.getTestRunner().getAreaBroker().getContentArea();
 
             const classesStr = [
                 'tao-wmark',
@@ -415,19 +427,40 @@ define([
                 .join(' ');
 
             this.$watermark = $(`<div class="${classesStr}" aria-hidden="true"><div></div></div>`);
-            const $watermarkContent = this.$watermark.children().first();
 
+            const $watermarkContent = this.$watermark.children().first();
             if (this.pluginConfig.style) {
                 $watermarkContent.attr('style', this.pluginConfig.style);
             }
+
+            $appendTo.prepend(this.$watermark);
+
+            const originalContentStyle = $watermarkContent.attr('style') || '';
+            const computedContentStyle = getComputedStyle($watermarkContent.get(0));
+            const scalableComputedContentStyle = ['font-size', 'line-height', 'letter-spacing'].reduce((acc, prop) => {
+                acc[prop] = computedContentStyle.getPropertyValue(prop);
+                return acc;
+            }, {});
 
             this.getText().then(text => {
                 this.throttledResizeCallback = _.throttle(
                     () =>
                         requestAnimationFrame(() => {
                             //position the element to cover the expected area
-                            const containerBox = $coverArea.get(0).getBoundingClientRect();
-                            let style = ['left', 'top', 'width', 'height']
+                            const containerRect = $coverArea.get(0).getBoundingClientRect();
+                            const itemScale = Math.max(
+                                0.4,
+                                parseFloat(computedContentStyle.getPropertyValue('--tool-zoom-level')) || 1 // if 'zoom' plugin
+                            );
+
+                            const containerBox = {
+                                left: containerRect.left,
+                                width: containerRect.width,
+                                top: containerRect.top,
+                                height: containerRect.height
+                            };
+
+                            let style = ['left', 'width', 'top', 'height']
                                 .map(prop => `${prop}: ${Math.round(containerBox[prop])}px`)
                                 .join(';');
                             if (this.pluginConfig.containerStyle) {
@@ -435,15 +468,21 @@ define([
                             }
                             this.$watermark.attr('style', style);
 
+                            if (Math.abs(itemScale - 1) > 0.01) {
+                                const scaledContentStyle = Object.keys(scalableComputedContentStyle)
+                                    .map(prop => `${prop}: calc(${itemScale} * ${scalableComputedContentStyle[prop]})`)
+                                    .join(';');
+                                $watermarkContent.attr('style', `${originalContentStyle};${scaledContentStyle}`);
+                            }
+
                             if (this.pluginConfig.type === watermarkTypes.circle) {
                                 this.renderCircle($watermarkContent, text);
                             } else {
-                                this.renderText($watermarkContent, text);
+                                this.renderText($watermarkContent, text, itemScale);
                             }
                         }),
                     100
                 );
-                $appendTo.append(this.$watermark);
                 this.resizeObserver = new ResizeObserver(this.throttledResizeCallback);
                 this.resizeObserver.observe($coverArea.get(0));
             });
