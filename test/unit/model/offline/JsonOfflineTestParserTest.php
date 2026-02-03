@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -95,7 +96,6 @@ class JsonOfflineTestParserTest extends TestCase
         $parser->setServiceLocator($this->getMockServiceLocator());
 
         $this->assertTrue($parser->validateUris());
-
     }
 
     public function testValidateUrisSeveralIncorrect()
@@ -178,7 +178,7 @@ class JsonOfflineTestParserTest extends TestCase
         $uriProvider->provide()->willReturn('http://local.domain/first.rdf#i1544535042650000');
 
         return $this->getServiceLocatorMock([
-            UriProvider::SERVICE_ID => $uriProvider
+            UriProvider::SERVICE_ID => $uriProvider->reveal()
         ]);
     }
 }
