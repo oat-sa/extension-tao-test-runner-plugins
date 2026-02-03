@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 3.4.0-sprint136\n"
-"PO-Revision-Date: 2020-09-08T11:34:28\n"
+"Project-Id-Version: TAO 2026.02 LTS\n"
+"PO-Revision-Date: 2026-02-03T14:44:44\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: es-ES\n"
@@ -96,6 +96,12 @@ msgstr ""
 
 msgid "This test needs to be taken in full screen mode (%s)."
 msgstr "Esta prueba debe tomarse en modo de pantalla completa (%s)."
+
+msgid "To hide watermark, type keyword"
+msgstr ""
+
+msgid "To show watermark, type keyword"
+msgstr ""
 
 msgid "Upload"
 msgstr ""
