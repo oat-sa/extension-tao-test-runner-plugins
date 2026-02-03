@@ -39,15 +39,30 @@ use qtism\runtime\common\OutcomeVariable;
 use qtism\runtime\tests\AssessmentTestSession;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use oat\oatbox\filesystem\FileSystemService;
+use oat\generis\test\FileSystemMockTrait;
 
 
 class JsonOfflineImportTest extends TaoPhpUnitTestRunner
 {
+    use FileSystemMockTrait;
+
     public function testGetForm()
     {
         $importer = new JsonOfflineTestImporter();
         $importer->setServiceLocator($this->getMockServiceLocator());
         $this->assertInstanceOf(tao_helpers_form_xhtml_Form::class, $importer->getForm());
+    }
+
+    /**
+     * Override to provide a working temp directory; parent uses getServiceManagerProphecy() with no services.
+     */
+    protected function getTempDirectory()
+    {
+        if (!$this->tempDirectory) {
+            $fileSystem = $this->getFileSystemMock(['temp']);
+            $this->tempDirectory = $fileSystem->getDirectory('temp');
+        }
+        return $this->tempDirectory;
     }
 
     /**
@@ -186,11 +201,11 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
         $filesystemService = $this->createMock(FileSystemService::class);
 
         return $this->getServiceLocatorMock([
-            ServiceProxy::SERVICE_ID => $prophecy,
-            QtiRunnerService::SERVICE_ID => $qtiRunnerService,
-            UploadService::SERVICE_ID => $upload,
-            QtiCommunicationService::SERVICE_ID => $qtiCommunicationService,
-            UriProvider::SERVICE_ID => $uriProvider,
+            ServiceProxy::SERVICE_ID => $prophecy->reveal(),
+            QtiRunnerService::SERVICE_ID => $qtiRunnerService->reveal(),
+            UploadService::SERVICE_ID => $upload->reveal(),
+            QtiCommunicationService::SERVICE_ID => $qtiCommunicationService->reveal(),
+            UriProvider::SERVICE_ID => $uriProvider->reveal(),
             FileSystemService::SERVICE_ID => $filesystemService
         ]);
     }

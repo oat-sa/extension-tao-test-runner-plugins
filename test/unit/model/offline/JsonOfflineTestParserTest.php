@@ -178,7 +178,7 @@ class JsonOfflineTestParserTest extends TestCase
         $uriProvider->provide()->willReturn('http://local.domain/first.rdf#i1544535042650000');
 
         return $this->getServiceLocatorMock([
-            UriProvider::SERVICE_ID => $uriProvider
+            UriProvider::SERVICE_ID => $uriProvider->reveal()
         ]);
     }
 }
