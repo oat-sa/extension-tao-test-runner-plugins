@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,7 +41,6 @@ use qtism\runtime\tests\AssessmentTestSession;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use oat\oatbox\filesystem\FileSystemService;
 use oat\generis\test\FileSystemMockTrait;
-
 
 class JsonOfflineImportTest extends TaoPhpUnitTestRunner
 {
@@ -141,7 +141,7 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
     protected function getSamplePath($path)
     {
         return __DIR__ . DIRECTORY_SEPARATOR .
-            '..'. DIRECTORY_SEPARATOR .
+            '..' . DIRECTORY_SEPARATOR .
             'samples' . DIRECTORY_SEPARATOR .
             trim($path, '\\/');
     }
@@ -161,7 +161,7 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
 
         $deP->getState()->willReturn($stateProphecy);
 
-        $deP->setState(Argument::any())->will(function ($args) use($stateProphecy) {
+        $deP->setState(Argument::any())->will(function ($args) use ($stateProphecy) {
             $stateProphecy->getUri()->willReturn(array_shift($args));
         });
 
@@ -298,5 +298,4 @@ class JsonOfflineImportTest extends TaoPhpUnitTestRunner
             ],
         ];
     }
-
 }
