@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2026-02-04 09:01\n"
+"PO-Revision-Date: 2026-02-04 13:45\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: sk\n"
@@ -30,7 +30,7 @@ msgid "%s deliveries were updated"
 msgstr "%s doručení bolo aktualizovaných"
 
 msgid "%s deliveries will be updated"
-msgstr ""
+msgstr "Dodávky %s budú aktualizované"
 
 msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
 msgstr "Všetci študenti začnú s ďalšou časťou súčasne. Prosím, pokojne sa uvoľnite, kým vedúci triedy nezačne s ďalšou časťou."
