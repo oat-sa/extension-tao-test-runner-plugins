@@ -1,120 +1,127 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2026.02 LTS\n"
-"PO-Revision-Date: 2026-02-03T15:40:35\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2026-02-04 09:01\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: sk-SK\n"
+"Language: sk\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: sk-SK\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: sk\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-test-runner-plugins] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 1269\n"
+"Language-Team: Slovak\n"
 
 msgid ""
 msgstr ""
 
 msgid "%s actions were successfully imported"
-msgstr ""
+msgstr "Akcie %s boli úspešne importované"
 
 msgid "%s deliveries were updated"
-msgstr ""
+msgstr "%s doručení bolo aktualizovaných"
 
 msgid "%s deliveries will be updated"
 msgstr ""
 
 msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
-msgstr ""
+msgstr "Všetci študenti začnú s ďalšou časťou súčasne. Prosím, pokojne sa uvoľnite, kým vedúci triedy nezačne s ďalšou časťou."
 
 msgid "Assessment ended. Please email the downloaded file to complete the process."
-msgstr ""
+msgstr "Hodnotenie ukončené. Pre dokončenie procesu pošlite stiahnutý súbor e-mailom."
 
 msgid "Assessment Item"
-msgstr ""
+msgstr "Hodnotená položka"
 
 msgid "Attempt to navigate to another window or tab."
-msgstr ""
+msgstr "Skúste prejsť do iného okna alebo karty."
 
 msgid "Cannot find any actions for importing."
-msgstr ""
+msgstr "Nepodarilo sa nájsť žiadne akcie na import."
 
 msgid "Delivery execution %s is not active state."
-msgstr ""
+msgstr "Stav doručenia %s nie je aktívny."
 
 msgid "Download & End Assessment"
-msgstr ""
+msgstr "Stiahnuť a ukončiť hodnotenie"
 
 msgid "Fail to import test actions with message: "
-msgstr ""
+msgstr "Nepodarilo sa importovať testovacie akcie so správou: "
 
 msgid "Import a test sent to you by an offline test taker."
-msgstr ""
+msgstr "Importujte test, ktorý vám poslal offline účastník testu."
 
 msgid "Invalid MimeType of file"
-msgstr ""
+msgstr "Neplatný typ súboru MimeType"
 
 msgid "JSON with test actions"
-msgstr ""
+msgstr "JSON s testovacími akciami"
 
 msgid "Migrate to use delivery features to control security plugins"
-msgstr ""
+msgstr "Migrácia na používanie funkcií doručovania na ovládanie bezpečnostných doplnkov"
 
 msgid "or"
-msgstr ""
+msgstr "alebo"
 
 msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
-msgstr ""
+msgstr "Prosím, čakajte, kým sa pokúsime obnoviť pripojenie. Prípadne môžete tento test ukončiť stiahnutím súboru, ktorý budete musieť odoslať manuálne."
 
 msgid "Please wait while we try to restore the connection."
-msgstr ""
+msgstr "Počkajte, prosím, kým sa pokúsime obnoviť pripojenie."
 
 msgid "Several resources URIs do not belong to the instance where the test was passed"
-msgstr ""
+msgstr "Niekoľko URI zdrojov nepatrí k inštancii, v ktorej bol test úspešný."
 
 msgid "Test actions imported successfully. Imported execution %s"
-msgstr ""
+msgstr "Testovacie akcie boli úspešne importované. Importované vykonanie %s"
 
 msgid "Test actions importing"
-msgstr ""
+msgstr "Import testovacích akcií"
 
 msgid "Test could not be launched. Test must always be launched in a full screen mode."
-msgstr ""
+msgstr "Test sa nepodarilo spustiť. Test sa musí vždy spustiť v režime celej obrazovky."
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "Hodnotenie bolo pozastavené z dôvodu pokusu o prechod do iného okna alebo karty. Ak chcete pokračovať v hodnotení, kontaktujte svojho dozorcu alebo administrátora."
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "Hodnotenie bolo pozastavené z dôvodu pokusu o vytlačenie snímky obrazovky. Ak chcete pokračovať v hodnotení, kontaktujte svojho dozorcu alebo administrátora."
 
 msgid "The connection seems to be back, please proceed"
-msgstr ""
+msgstr "Zdá sa, že pripojenie je obnovené, pokračujte prosím."
 
 msgid "The download will be available in <strong>%d</strong> seconds"
-msgstr ""
+msgstr "Stiahnutie bude k dispozícii o <strong>%d</strong> sekúnd"
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr ""
+msgstr "Tento test je potrebné absolvovať v režime celej obrazovky (%s)."
 
 msgid "To hide watermark, type keyword"
-msgstr ""
+msgstr "Ak chcete skryť vodoznak, zadajte kľúčové slovo"
 
 msgid "To show watermark, type keyword"
-msgstr ""
+msgstr "Ak chcete zobraziť vodoznak, zadajte kľúčové slovo"
 
 msgid "Upload"
-msgstr ""
+msgstr "Nahrať"
 
 msgid "Upload offline test"
-msgstr ""
+msgstr "Nahrať offline test"
 
 msgid "You are encountering a connectivity loss. The test has been suspended."
-msgstr ""
+msgstr "Došlo k výpadku pripojenia. Test bol pozastavený."
 
 msgid "You are encountering a prolonged connectivity loss."
-msgstr ""
+msgstr "Dochádza k dlhodobému výpadku pripojenia."
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr ""
+msgstr "Dochádza k dlhodobému výpadku pripojenia. "
 
