@@ -1,120 +1,127 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2026.02 LTS\n"
-"PO-Revision-Date: 2026-02-03T15:40:34\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2026-02-04 09:00\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: de-DE\n"
+"Language: de\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: de-DE\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: de\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-test-runner-plugins] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 1269\n"
+"Language-Team: German\n"
 
 msgid ""
 msgstr ""
 
 msgid "%s actions were successfully imported"
-msgstr ""
+msgstr "%s Aktionen wurden erfolgreich importiert"
 
 msgid "%s deliveries were updated"
-msgstr ""
+msgstr "%s Lieferungen wurden aktualisiert"
 
 msgid "%s deliveries will be updated"
-msgstr ""
+msgstr "%s Lieferungen werden aktualisiert"
 
 msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
-msgstr ""
+msgstr "Alle Teilnehmer beginnen gleichzeitig den nächsten Abschnitt. Bitte entspannen Sie sich ruhig, bis der Zimmerbetreuer den nächsten Abschnitt beginnt."
 
 msgid "Assessment ended. Please email the downloaded file to complete the process."
-msgstr ""
+msgstr "Prüfung beendet. Bitte senden Sie eine E-Mail an die heruntergeladene Datei, um den Prozess abzuschließen."
 
 msgid "Assessment Item"
-msgstr ""
+msgstr "Prüfungsgegenstand"
 
 msgid "Attempt to navigate to another window or tab."
-msgstr ""
+msgstr "Versuch, zu einem anderen Fenster oder Tab zu navigieren."
 
 msgid "Cannot find any actions for importing."
-msgstr ""
+msgstr "Keine Aktionen zum Importieren gefunden."
 
 msgid "Delivery execution %s is not active state."
-msgstr ""
+msgstr "Lieferausführung %s ist nicht aktiv."
 
 msgid "Download & End Assessment"
-msgstr ""
+msgstr "Download & Ende Prüfung"
 
 msgid "Fail to import test actions with message: "
-msgstr ""
+msgstr "Fehler beim Importieren von Testaktionen mit Nachricht: "
 
 msgid "Import a test sent to you by an offline test taker."
-msgstr ""
+msgstr "Importieren Sie einen Test, der von einem Offline-Prüfer an Sie gesendet wurde."
 
 msgid "Invalid MimeType of file"
-msgstr ""
+msgstr "Ungültiger MimeType der Datei"
 
 msgid "JSON with test actions"
-msgstr ""
+msgstr "JSON mit Testaktionen"
 
 msgid "Migrate to use delivery features to control security plugins"
-msgstr ""
+msgstr "Migrieren, um Auslieferungsfunktionen zur Steuerung von Sicherheits-Plugins zu verwenden"
 
 msgid "or"
-msgstr ""
+msgstr "oder"
 
 msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
-msgstr ""
+msgstr "Bitte warten Sie weiter, während wir versuchen, die Verbindung wiederherzustellen. Alternativ können Sie diesen Test auch beenden, indem Sie ihn als Datei herunterladen, die Sie manuell absenden müssen."
 
 msgid "Please wait while we try to restore the connection."
-msgstr ""
+msgstr "Haben Sie bitte einen Moment, wir versuchen die Verbindung wiederherzustellen."
 
 msgid "Several resources URIs do not belong to the instance where the test was passed"
-msgstr ""
+msgstr "Mehrere Ressourcen URIs gehören nicht zu der Instanz, in der der Test bestanden wurde"
 
 msgid "Test actions imported successfully. Imported execution %s"
-msgstr ""
+msgstr "Test-Aktionen erfolgreich importiert, Ausführung %s importiert"
 
 msgid "Test actions importing"
-msgstr ""
+msgstr "Test-Aktionen importieren"
 
 msgid "Test could not be launched. Test must always be launched in a full screen mode."
-msgstr ""
+msgstr "Test konnte nicht gestartet werden. Test muss immer im Vollbildmodus gestartet werden."
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "Die Prüfung wurde angehalten, da versucht wurde, zu einem anderen Fenster oder Tab zu navigieren. Bitte wenden Sie sich an Ihren Protor oder Administrator, um Ihre Prüfung fortzusetzen."
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "Die Prüfung wurde wegen eines Druckversuchs angehalten. Bitte wenden Sie sich an Ihren Proktor oder Administrator, um die Prüfung fortzusetzen."
 
 msgid "The connection seems to be back, please proceed"
-msgstr ""
+msgstr "Die Verbindung scheint zurück zu sein, bitte fortfahren"
 
 msgid "The download will be available in <strong>%d</strong> seconds"
-msgstr ""
+msgstr "Der Download wird in <strong>%d</strong> Sekunden verfügbar sein"
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr ""
+msgstr "Dieser Test muss im Vollbildmodus durchgeführt werden (%s)."
 
 msgid "To hide watermark, type keyword"
-msgstr ""
+msgstr "Um Wasserzeichen zu verstecken, geben Sie Schlüsselwort ein"
 
 msgid "To show watermark, type keyword"
-msgstr ""
+msgstr "Um Wasserzeichen anzuzeigen, geben Sie Schlüsselwort ein"
 
 msgid "Upload"
-msgstr ""
+msgstr "Hochladen"
 
 msgid "Upload offline test"
-msgstr ""
+msgstr "Offline-Test hochladen"
 
 msgid "You are encountering a connectivity loss. The test has been suspended."
-msgstr ""
+msgstr "Sie haben einen Verbindungsverlust. Der Test wurde unterbrochen."
 
 msgid "You are encountering a prolonged connectivity loss."
-msgstr ""
+msgstr "Die Verbindung ist seit längerer Zeit unterbrochen."
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr ""
+msgstr "Die Verbindung ist seit längerer Zeit unterbrochen. Klicken Sie, um neu zu laden."
 
