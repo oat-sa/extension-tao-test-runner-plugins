@@ -1,0 +1,127 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2026-02-04 09:00\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ar\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: ar\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-test-runner-plugins] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 1269\n"
+"Language-Team: Arabic\n"
+
+msgid ""
+msgstr ""
+
+msgid "%s actions were successfully imported"
+msgstr "تم استيراد إجراءات %s بنجاح"
+
+msgid "%s deliveries were updated"
+msgstr "تم تحديث شحنات %s"
+
+msgid "%s deliveries will be updated"
+msgstr "سيتم تحديث شحنات %s"
+
+msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
+msgstr "سيبدأ جميع الطلاب القسم التالي في نفس الوقت. يرجى الاسترخاء بهدوء حتى يبدأ مشرف الغرفة القسم التالي."
+
+msgid "Assessment ended. Please email the downloaded file to complete the process."
+msgstr "انتهى التقييم. يرجى إرسال بريد إلكتروني للملف الذي تم تنزيله لإكمال العملية."
+
+msgid "Assessment Item"
+msgstr "عنصر التقييم"
+
+msgid "Attempt to navigate to another window or tab."
+msgstr "حاول الانتقال إلى نافذة أخرى أو علامة تبويب أخرى."
+
+msgid "Cannot find any actions for importing."
+msgstr "لا يمكن العثور على أي إجراءات للاستيراد."
+
+msgid "Delivery execution %s is not active state."
+msgstr "تنفيذ التوصيل %s ليس حالة نشطة."
+
+msgid "Download & End Assessment"
+msgstr "تحميل و تقييم النهاية"
+
+msgid "Fail to import test actions with message: "
+msgstr "فشل استيراد إجراءات الاختبار مع الرسالة: "
+
+msgid "Import a test sent to you by an offline test taker."
+msgstr "استيراد اختبار تم إرساله إليك من قبل جاري اختبار بدون اتصال."
+
+msgid "Invalid MimeType of file"
+msgstr "MimeType غير صالح للملف"
+
+msgid "JSON with test actions"
+msgstr "JSON مع إجراءات الاختبار"
+
+msgid "Migrate to use delivery features to control security plugins"
+msgstr "ترحيل إلى استخدام ميزات التوصيل للتحكم بالمكونات الأمان"
+
+msgid "or"
+msgstr "أو"
+
+msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
+msgstr "يرجى الاستمرار في الانتظار بينما نحاول استعادة الاتصال. بدلاً من ذلك، يمكنك إنهاء هذا الاختبار عن طريق تنزيله كملف يجب عليك إرساله يدوياً."
+
+msgid "Please wait while we try to restore the connection."
+msgstr "الرجاء الانتظار بينما نحاول استعادة الاتصال."
+
+msgid "Several resources URIs do not belong to the instance where the test was passed"
+msgstr "لا تنتمي عدة موارد إلى الحالة التي اجتاز فيها الاختبار"
+
+msgid "Test actions imported successfully. Imported execution %s"
+msgstr "تم استيراد إجراءات الاختبار بنجاح. التنفيذ المستورد %s"
+
+msgid "Test actions importing"
+msgstr "إجراءات اختبار الاستيراد"
+
+msgid "Test could not be launched. Test must always be launched in a full screen mode."
+msgstr "تعذر بدء الاختبار. يجب أن يتم تشغيل الاختبار دائماً في وضع ملء الشاشة."
+
+msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
+msgstr "وقد توقف التقييم مؤقتا بسبب محاولة الانتقال إلى نافذة أخرى أو علامة تبويب أخرى. الرجاء الاتصال بالبروتور أو المسؤول الخاص بك لاستئناف التقييم الخاص بك."
+
+msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
+msgstr "تم إيقاف التقييم مؤقتاً بسبب محاولة لطباعة الشاشة. يرجى الاتصال بالبروتور أو المسؤول لاستئناف التقييم الخاص بك."
+
+msgid "The connection seems to be back, please proceed"
+msgstr "يبدو أن الاتصال قد عاد ، يرجى المتابعة"
+
+msgid "The download will be available in <strong>%d</strong> seconds"
+msgstr "سيكون التنزيل متاحًا في غضون <strong>%d</strong> ثانية"
+
+msgid "This test needs to be taken in full screen mode (%s)."
+msgstr "هذا الاختبار بحاجة إلى أن يتم في وضع ملء الشاشة (%s."
+
+msgid "To hide watermark, type keyword"
+msgstr "لإخفاء العلامة المائية، اكتب الكلمة الرئيسية"
+
+msgid "To show watermark, type keyword"
+msgstr "لإظهار العلامة المائية، اكتب الكلمة الرئيسية"
+
+msgid "Upload"
+msgstr "تحميل"
+
+msgid "Upload offline test"
+msgstr "تحميل اختبار غير متصل"
+
+msgid "You are encountering a connectivity loss. The test has been suspended."
+msgstr "أنت تواجه خسارة في الاتصال. تم تعليق الاختبار."
+
+msgid "You are encountering a prolonged connectivity loss."
+msgstr "أنت تواجه فقدان الاتصال لفترات طويلة."
+
+msgid "You are encountering a prolonged connectivity loss. "
+msgstr "أنت تواجه فقدان اتصال مباشر"
+

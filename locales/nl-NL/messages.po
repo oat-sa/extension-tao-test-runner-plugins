@@ -1,120 +1,127 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2026.02 LTS\n"
-"PO-Revision-Date: 2026-02-03T15:40:35\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2026-02-04 09:00\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: nl-NL\n"
+"Language: nl\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: nl-NL\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: nl\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-test-runner-plugins] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 1269\n"
+"Language-Team: Dutch\n"
 
 msgid ""
 msgstr ""
 
 msgid "%s actions were successfully imported"
-msgstr ""
+msgstr "%s acties zijn succesvol geïmporteerd"
 
 msgid "%s deliveries were updated"
-msgstr ""
+msgstr "%s leveringen zijn bijgewerkt"
 
 msgid "%s deliveries will be updated"
-msgstr ""
+msgstr "%s leveringen zullen worden bijgewerkt"
 
 msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
-msgstr ""
+msgstr "Alle leerlingen beginnen de volgende sectie op hetzelfde moment. Gelieve rustig te relaxen tot de kamertoezichthouder begint met de volgende sectie."
 
 msgid "Assessment ended. Please email the downloaded file to complete the process."
-msgstr ""
+msgstr "Toets beëindigd. Stuur een e-mail naar het gedownloade bestand om het proces te voltooien."
 
 msgid "Assessment Item"
-msgstr ""
+msgstr "Beoordelings item"
 
 msgid "Attempt to navigate to another window or tab."
-msgstr ""
+msgstr "Poging om naar een ander venster of tabblad te navigeren."
 
 msgid "Cannot find any actions for importing."
-msgstr ""
+msgstr "Kan geen acties vinden om te importeren."
 
 msgid "Delivery execution %s is not active state."
-msgstr ""
+msgstr "Levering executie %s is niet actief."
 
 msgid "Download & End Assessment"
-msgstr ""
+msgstr "Toets downloaden en beëindigen"
 
 msgid "Fail to import test actions with message: "
-msgstr ""
+msgstr "Test acties met bericht importeren mislukt: "
 
 msgid "Import a test sent to you by an offline test taker."
-msgstr ""
+msgstr "Importeer een test die u is verzonden door een offline testmaker."
 
 msgid "Invalid MimeType of file"
-msgstr ""
+msgstr "Ongeldig MimeType bestand"
 
 msgid "JSON with test actions"
-msgstr ""
+msgstr "JSON met test acties"
 
 msgid "Migrate to use delivery features to control security plugins"
-msgstr ""
+msgstr "Migreren om leveringsfuncties te gebruiken om beveiligingsplug-ins te beheren"
 
 msgid "or"
-msgstr ""
+msgstr "of"
 
 msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
-msgstr ""
+msgstr "Wacht alsjeblieft verder terwijl we de verbinding proberen te herstellen. Als alternatief kunt u deze test beëindigen door deze als een bestand te downloaden dat u handmatig moet indienen."
 
 msgid "Please wait while we try to restore the connection."
-msgstr ""
+msgstr "Wacht even terwijl we proberen de verbinding te herstellen."
 
 msgid "Several resources URIs do not belong to the instance where the test was passed"
-msgstr ""
+msgstr "Verscheidene URI's behoren niet tot de instantie waar de test is geslaagd"
 
 msgid "Test actions imported successfully. Imported execution %s"
-msgstr ""
+msgstr "Test acties succesvol geïmporteerd. Uitvoering %s geïmporteerd"
 
 msgid "Test actions importing"
-msgstr ""
+msgstr "Test acties importeren"
 
 msgid "Test could not be launched. Test must always be launched in a full screen mode."
-msgstr ""
+msgstr "Test kon niet worden gestart. Er moet altijd een test worden gestart in een volledige schermmodus."
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "De beoordeling is onderbroken vanwege een poging om door te navigeren naar een ander venster of tabblad. Neem contact op met uw proctor of beheerder om uw toets te hervatten."
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "De toets is onderbroken vanwege een poging om het scherm af te drukken. Neem contact op met uw proctor of beheerder om uw toets te hervatten."
 
 msgid "The connection seems to be back, please proceed"
-msgstr ""
+msgstr "De verbinding lijkt terug te zijn, ga alstublieft verder"
 
 msgid "The download will be available in <strong>%d</strong> seconds"
-msgstr ""
+msgstr "De download zal beschikbaar zijn in <strong>%d</strong> seconden"
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr ""
+msgstr "Deze test moet worden gedaan in volledig scherm modus (%s)."
 
 msgid "To hide watermark, type keyword"
-msgstr ""
+msgstr "Om watermerk te verbergen, typ het trefwoord"
 
 msgid "To show watermark, type keyword"
-msgstr ""
+msgstr "Typ trefwoord om watermerk weer te geven"
 
 msgid "Upload"
-msgstr ""
+msgstr "Uploaden"
 
 msgid "Upload offline test"
-msgstr ""
+msgstr "Offline test uploaden"
 
 msgid "You are encountering a connectivity loss. The test has been suspended."
-msgstr ""
+msgstr "U heeft te maken met verlies van de verbinding. De test is opgeschort."
 
 msgid "You are encountering a prolonged connectivity loss."
-msgstr ""
+msgstr "Je hebt te maken met een langdurig verbindingsprobleem."
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr ""
+msgstr "U heeft te kampen met een langdurig verlies van verbinding."
 

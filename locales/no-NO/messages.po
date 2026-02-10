@@ -1,0 +1,127 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2026-02-04 09:01\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: no\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: no\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-test-runner-plugins] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 1269\n"
+"Language-Team: Norwegian\n"
+
+msgid ""
+msgstr ""
+
+msgid "%s actions were successfully imported"
+msgstr "%s handlinger ble vellykket importert"
+
+msgid "%s deliveries were updated"
+msgstr "%s leveranser ble oppdatert"
+
+msgid "%s deliveries will be updated"
+msgstr "%s leveranser vil bli oppdatert"
+
+msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
+msgstr "Alle elevene vil starte den neste seksjonen samtidig. Vennligst slapp av og til veilederen starter neste seksjon."
+
+msgid "Assessment ended. Please email the downloaded file to complete the process."
+msgstr "Vurdering er avsluttet. Vennligst send den nedlastede filen via e-post for å fullføre prosessen."
+
+msgid "Assessment Item"
+msgstr "Vurdering element"
+
+msgid "Attempt to navigate to another window or tab."
+msgstr "Forsøk å navigere til en annen vindu eller fane."
+
+msgid "Cannot find any actions for importing."
+msgstr "Kan ikke finne noen handlinger for import."
+
+msgid "Delivery execution %s is not active state."
+msgstr "Leveringsutførelse %s er ikke aktiv."
+
+msgid "Download & End Assessment"
+msgstr "Last ned og slutt vurdering"
+
+msgid "Fail to import test actions with message: "
+msgstr "Kunne ikke importere testhandlinger med melding: "
+
+msgid "Import a test sent to you by an offline test taker."
+msgstr "Importer en test som sendes til deg med en frakoblet testbruker."
+
+msgid "Invalid MimeType of file"
+msgstr "Ugyldig MimeType for fil"
+
+msgid "JSON with test actions"
+msgstr "JSON med prøvingshandlinger"
+
+msgid "Migrate to use delivery features to control security plugins"
+msgstr "Migrere til å bruke leveringsfunksjoner for å kontrollere sikkerhetsutvidelser"
+
+msgid "or"
+msgstr ""
+
+msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
+msgstr "Vennligst vent mens vi prøver å gjenopprette forbindelsen. Alternativt kan du avslutte denne testen ved å laste den ned som en fil du må sende inn manuelt."
+
+msgid "Please wait while we try to restore the connection."
+msgstr ""
+
+msgid "Several resources URIs do not belong to the instance where the test was passed"
+msgstr "Flere ressurs-URI-er tilhører ikke på det tilfellet hvor testen ble bestått"
+
+msgid "Test actions imported successfully. Imported execution %s"
+msgstr "Testhandlinger ble importert vellykket. Importert utførelse %s"
+
+msgid "Test actions importing"
+msgstr "Prøvingshandlinger importeres"
+
+msgid "Test could not be launched. Test must always be launched in a full screen mode."
+msgstr "Test kan ikke startes. Test må alltid startes i full skjermmodus."
+
+msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
+msgstr "Vurderingen er satt på grunn av et forsøk på å navigere til et annet vindu eller en fane. Kontakt projektor eller administrator for å gjenoppta vurderingen."
+
+msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
+msgstr "Vurderingen har blitt satt på grunn av et forsøk på å skrive ut skjermen. Kontakt projektoren eller administratoren din for å gjenoppta vurderingen."
+
+msgid "The connection seems to be back, please proceed"
+msgstr ""
+
+msgid "The download will be available in <strong>%d</strong> seconds"
+msgstr ""
+
+msgid "This test needs to be taken in full screen mode (%s)."
+msgstr "Denne testen må være i fullskjermmodus (%s)."
+
+msgid "To hide watermark, type keyword"
+msgstr "Hvis du vil skjule vannmerket, skriv nøkkelord"
+
+msgid "To show watermark, type keyword"
+msgstr "For å vise vannmerke, skriv nøkkelord"
+
+msgid "Upload"
+msgstr ""
+
+msgid "Upload offline test"
+msgstr "Last opp frakoblet test"
+
+msgid "You are encountering a connectivity loss. The test has been suspended."
+msgstr "Du møter et tap for tilkobling. Testen har blitt suspendert."
+
+msgid "You are encountering a prolonged connectivity loss."
+msgstr ""
+
+msgid "You are encountering a prolonged connectivity loss. "
+msgstr ""
+

@@ -1,120 +1,127 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2026.02 LTS\n"
-"PO-Revision-Date: 2026-02-03T15:40:35\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2026-02-04 09:00\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: hu-HU\n"
+"Language: hu\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: hu-HU\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: hu\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-test-runner-plugins] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 1269\n"
+"Language-Team: Hungarian\n"
 
 msgid ""
 msgstr ""
 
 msgid "%s actions were successfully imported"
-msgstr ""
+msgstr "%s művelet importálása sikeresen megtörtént"
 
 msgid "%s deliveries were updated"
-msgstr ""
+msgstr "%s szállítások frissítve"
 
 msgid "%s deliveries will be updated"
-msgstr ""
+msgstr "%s A szállítások frissülnek"
 
 msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
-msgstr ""
+msgstr "Minden diák egyszerre kezdi a következő részt. Kérjük, nyugodjanak meg, amíg a teremfelügyelő el nem kezdi a következő részt."
 
 msgid "Assessment ended. Please email the downloaded file to complete the process."
-msgstr ""
+msgstr "Az értékelés befejeződött. Kérjük, küldje el e-mailben a letöltött fájlt a folyamat befejezéséhez."
 
 msgid "Assessment Item"
-msgstr ""
+msgstr "Értékelési tétel"
 
 msgid "Attempt to navigate to another window or tab."
-msgstr ""
+msgstr "Próbáljon meg egy másik ablakba vagy lapra navigálni."
 
 msgid "Cannot find any actions for importing."
-msgstr ""
+msgstr "Nem találhatók importáláshoz szükséges műveletek."
 
 msgid "Delivery execution %s is not active state."
-msgstr ""
+msgstr "A kézbesítés végrehajtása %s nem aktív állapotban van."
 
 msgid "Download & End Assessment"
-msgstr ""
+msgstr "Értékelés letöltése és befejezése"
 
 msgid "Fail to import test actions with message: "
-msgstr ""
+msgstr "Nem sikerült importálni a tesztműveleteket, a következő üzenet jelenik meg: "
 
 msgid "Import a test sent to you by an offline test taker."
-msgstr ""
+msgstr "Importálj egy offline vizsgázó által küldött tesztet."
 
 msgid "Invalid MimeType of file"
-msgstr ""
+msgstr "Érvénytelen fájl MIME-típus"
 
 msgid "JSON with test actions"
-msgstr ""
+msgstr "JSON tesztelési műveletekkel"
 
 msgid "Migrate to use delivery features to control security plugins"
-msgstr ""
+msgstr "Migrálás a kézbesítési funkciók használatához a biztonsági bővítmények vezérléséhez"
 
 msgid "or"
-msgstr ""
+msgstr "vagy"
 
 msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
-msgstr ""
+msgstr "Kérjük, várjon, amíg megpróbáljuk helyreállítani a kapcsolatot. Alternatív megoldásként a tesztet úgy is befejezheti, hogy letölti a fájlt, amelyet manuálisan kell elküldenie."
 
 msgid "Please wait while we try to restore the connection."
-msgstr ""
+msgstr "Kérjük, várjon, amíg megpróbáljuk helyreállítani a kapcsolatot."
 
 msgid "Several resources URIs do not belong to the instance where the test was passed"
-msgstr ""
+msgstr "Több erőforrás URI nem tartozik ahhoz a példányhoz, ahol a teszt sikeresen lezajlott."
 
 msgid "Test actions imported successfully. Imported execution %s"
-msgstr ""
+msgstr "A tesztműveletek importálása sikeresen megtörtént. Importált végrehajtás %s"
 
 msgid "Test actions importing"
-msgstr ""
+msgstr "Tesztelési műveletek importálása"
 
 msgid "Test could not be launched. Test must always be launched in a full screen mode."
-msgstr ""
+msgstr "A teszt nem indítható. A tesztet mindig teljes képernyős módban kell elindítani."
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "Az értékelést egy másik ablakba vagy lapra való navigálási kísérlet miatt felfüggesztettük. Kérjük, vegye fel a kapcsolatot a felügyelővel vagy az adminisztrátorral az értékelés folytatásához."
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "Az értékelés képernyőkép nyomtatási kísérlet miatt szünetel. Kérjük, vegye fel a kapcsolatot a felügyelővel vagy az adminisztrátorral az értékelés folytatásához."
 
 msgid "The connection seems to be back, please proceed"
-msgstr ""
+msgstr "Úgy tűnik, hogy a kapcsolat helyreállt, kérjük, folytassa."
 
 msgid "The download will be available in <strong>%d</strong> seconds"
-msgstr ""
+msgstr "A letöltés <strong>%d</strong> másodperc múlva lesz elérhető"
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr ""
+msgstr "Ezt a tesztet teljes képernyős módban (%s) kell kitölteni."
 
 msgid "To hide watermark, type keyword"
-msgstr ""
+msgstr "A vízjel elrejtéséhez írja be a kulcsszót"
 
 msgid "To show watermark, type keyword"
-msgstr ""
+msgstr "A vízjel megjelenítéséhez írja be a kulcsszót"
 
 msgid "Upload"
-msgstr ""
+msgstr "Feltöltés"
 
 msgid "Upload offline test"
-msgstr ""
+msgstr "Offline teszt feltöltése"
 
 msgid "You are encountering a connectivity loss. The test has been suspended."
-msgstr ""
+msgstr "Kapcsolatvesztést tapasztal. A tesztet felfüggesztettük."
 
 msgid "You are encountering a prolonged connectivity loss."
-msgstr ""
+msgstr "Hosszan tartó kapcsolatkiesést tapasztal."
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr ""
+msgstr "Hosszan tartó kapcsolatkiesést tapasztal. "
 
