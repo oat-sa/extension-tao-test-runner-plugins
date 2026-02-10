@@ -1,120 +1,127 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2026.02 LTS\n"
-"PO-Revision-Date: 2026-02-03T14:44:44\n"
+"Project-Id-Version: tao-open-source\n"
+"PO-Revision-Date: 2026-02-04 09:00\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
-"Language: es-ES\n"
+"Language: es\n"
 "sourceLanguage: en-US\n"
-"targetLanguage: es-ES\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"targetLanguage: en-US\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Basepath: ../../\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Poedit-SearchPath-0: .\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: tao-open-source\n"
+"X-Crowdin-Project-ID: 590867\n"
+"X-Crowdin-Language: es-ES\n"
+"X-Crowdin-File: /[oat-sa.extension-tao-test-runner-plugins] develop/locales/en-US/messages.po\n"
+"X-Crowdin-File-ID: 1269\n"
+"Language-Team: Spanish\n"
 
 msgid ""
 msgstr ""
 
 msgid "%s actions were successfully imported"
-msgstr ""
+msgstr "Acciones %s se importaron correctamente"
 
 msgid "%s deliveries were updated"
-msgstr ""
+msgstr "Se actualizaron las entregas de %s"
 
 msgid "%s deliveries will be updated"
-msgstr ""
+msgstr "Entregas %s se actualizarán"
 
 msgid "All students will begin the next section at the same time. Please relax quietly until the room supervisor starts the next section."
 msgstr "Todos los estudiantes comenzarán la siguiente sección al mismo tiempo. Por favor Relájese tranquilamente hasta que el supervisor de la sala comience la siguiente sección."
 
 msgid "Assessment ended. Please email the downloaded file to complete the process."
-msgstr ""
+msgstr "La evaluación ha finalizado. Por favor envía un correo electrónico al archivo descargado para completar el proceso."
 
 msgid "Assessment Item"
-msgstr ""
+msgstr "Elemento del examen"
 
 msgid "Attempt to navigate to another window or tab."
-msgstr ""
+msgstr "Intento de navegar a otra ventana o pestaña."
 
 msgid "Cannot find any actions for importing."
-msgstr ""
+msgstr "No se puede encontrar ninguna acción para importar."
 
 msgid "Delivery execution %s is not active state."
-msgstr ""
+msgstr "La ejecución de entrega %s no es un estado activo."
 
 msgid "Download & End Assessment"
-msgstr ""
+msgstr "Descargar y finalizar evaluación"
 
 msgid "Fail to import test actions with message: "
-msgstr ""
+msgstr "Error al importar las acciones de prueba con el mensaje: "
 
 msgid "Import a test sent to you by an offline test taker."
-msgstr ""
+msgstr "Importe una prueba enviada a usted por un tomador de pruebas sin conexión."
 
 msgid "Invalid MimeType of file"
-msgstr ""
+msgstr "MimeType no válido del archivo"
 
 msgid "JSON with test actions"
-msgstr ""
+msgstr "JSON con acciones de prueba"
 
 msgid "Migrate to use delivery features to control security plugins"
-msgstr ""
+msgstr "Migrar para usar funciones de entrega para controlar plugins de seguridad"
 
 msgid "or"
-msgstr ""
+msgstr "o"
 
 msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
-msgstr ""
+msgstr "Por favor, continúa esperando mientras intentamos restaurar la conexión. Alternativamente, usted puede terminar esta prueba descargándola como un archivo que usted tendrá que enviar manualmente."
 
 msgid "Please wait while we try to restore the connection."
-msgstr ""
+msgstr "Por favor espere mientras intenta restablecer la conexión."
 
 msgid "Several resources URIs do not belong to the instance where the test was passed"
-msgstr ""
+msgstr "Varios recursos URIs no pertenecen a la instancia donde se pasó la prueba"
 
 msgid "Test actions imported successfully. Imported execution %s"
-msgstr ""
+msgstr "Acciones de prueba importadas con éxito. Importada ejecución %s"
 
 msgid "Test actions importing"
-msgstr ""
+msgstr "Probar acciones importando"
 
 msgid "Test could not be launched. Test must always be launched in a full screen mode."
-msgstr ""
+msgstr "La prueba no pudo ser lanzada. La prueba debe iniciarse siempre en modo de pantalla completa."
 
 msgid "The assessment has been paused due to an attempt to navigate to another window or tab. Please contact your proctor or administrator to resume your assessment."
 msgstr "La evaluación se ha pausado debido a un intento de navegar a otra ventana o tabulador. Póngase en contacto con su Proctor o administrador para reanudar su evaluación"
 
 msgid "The assessment has been paused due to an attempt to print screen. Please contact your proctor or administrator to resume your assessment."
-msgstr ""
+msgstr "El examen ha sido pausado debido a un intento de imprimir la pantalla. Póngase en contacto con su proctor o administrador para reanudar su evaluación."
 
 msgid "The connection seems to be back, please proceed"
-msgstr ""
+msgstr "Parece que se retomó la conexión. Continúe."
 
 msgid "The download will be available in <strong>%d</strong> seconds"
-msgstr ""
+msgstr "La descarga estará disponible en <strong>%d</strong> segundos"
 
 msgid "This test needs to be taken in full screen mode (%s)."
 msgstr "Esta prueba debe tomarse en modo de pantalla completa (%s)."
 
 msgid "To hide watermark, type keyword"
-msgstr ""
+msgstr "Para ocultar marca de agua, escriba la palabra clave"
 
 msgid "To show watermark, type keyword"
-msgstr ""
+msgstr "Para mostrar marca de agua, escriba la palabra clave"
 
 msgid "Upload"
-msgstr ""
+msgstr "Subir"
 
 msgid "Upload offline test"
-msgstr ""
+msgstr "Subir prueba sin conexión"
 
 msgid "You are encountering a connectivity loss. The test has been suspended."
 msgstr "Tiene una pérdida de conectividad. La prueba ha sido suspendida."
 
 msgid "You are encountering a prolonged connectivity loss."
-msgstr ""
+msgstr "Usted está encontrando una pérdida de conectividad prolongada."
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr ""
+msgstr "Usted está encontrando una pérdida de conectividad prolongada. "
 
