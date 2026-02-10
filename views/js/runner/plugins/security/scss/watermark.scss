@@ -70,3 +70,9 @@
     line-height: 2em;
     margin-top: 8px;
 }
+
+//quick fix of LSI-7344, make background transparent for choice elements of choice-related interactions
+#qti-content .qti-item.runtime .qti-interaction .qti-choice
+{
+    background: none !important;
+}
