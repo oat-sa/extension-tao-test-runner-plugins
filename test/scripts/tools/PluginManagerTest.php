@@ -188,7 +188,7 @@ class PluginManagerTest extends TaoPhpUnitTestRunner
 
     private function getServiceManager()
     {
-        $config = new \common_persistence_KeyValuePersistence([], new \common_persistence_InMemoryKvDriver());
+        $config = new \common_persistence_KeyValuePersistence(new \common_persistence_InMemoryKvDriver(), []);
         $config->set(TestPluginService::SERVICE_ID, new TestPluginService([]));
         $config->set('generis/log', new \oat\oatbox\log\LoggerService([]));
         $config->set(TestRunnerFeatureService::SERVICE_ID, new TestRunnerFeatureService([
