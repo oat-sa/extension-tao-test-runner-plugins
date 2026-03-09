@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,6 +20,7 @@
  *
  */
 
+declare(strict_types=1);
 
 namespace oat\taoTestRunnerPlugins\test\scripts\tools;
 
@@ -165,7 +167,10 @@ class PluginManagerTest extends TaoPhpUnitTestRunner
             '--feature', 'feature1',
             '--plugins', 'overlay, dialog'
         ]);
-        $this->assertEquals(['rubricBlock', 'overlay', 'dialog'], ($testRunnerFeatureService->getAll()['feature1']->getPluginsIds()));
+        $this->assertEquals(
+            ['rubricBlock', 'overlay', 'dialog'],
+            $testRunnerFeatureService->getAll()['feature1']->getPluginsIds()
+        );
         $this->assertTrue($report instanceof Report && $report->getType() === Report::TYPE_SUCCESS);
     }
 
@@ -174,7 +179,10 @@ class PluginManagerTest extends TaoPhpUnitTestRunner
         $serviceLocator = $this->getServiceManager();
         /** @var TestRunnerFeatureService $testRunnerFeatureService */
         $testRunnerFeatureService = $serviceLocator->get(TestRunnerFeatureService::SERVICE_ID);
-        $this->assertEquals(['rubricBlock', 'overlay'], $testRunnerFeatureService->getAll(false)['feature2']->getPluginsIds());
+        $this->assertEquals(
+            ['rubricBlock', 'overlay'],
+            $testRunnerFeatureService->getAll(false)['feature2']->getPluginsIds()
+        );
         $script = new PluginManager();
         $script->setServiceLocator($serviceLocator);
         $report = $script([
@@ -188,7 +196,7 @@ class PluginManagerTest extends TaoPhpUnitTestRunner
 
     private function getServiceManager()
     {
-        $config = new \common_persistence_KeyValuePersistence([], new \common_persistence_InMemoryKvDriver());
+        $config = new \common_persistence_KeyValuePersistence(new \common_persistence_InMemoryKvDriver(), []);
         $config->set(TestPluginService::SERVICE_ID, new TestPluginService([]));
         $config->set('generis/log', new \oat\oatbox\log\LoggerService([]));
         $config->set(TestRunnerFeatureService::SERVICE_ID, new TestRunnerFeatureService([
