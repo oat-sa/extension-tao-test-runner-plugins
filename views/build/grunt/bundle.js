@@ -30,6 +30,7 @@ module.exports = function(grunt) {
                     extension : 'taoTestRunnerPlugins',
                     outputDir : 'loader',
                     dependencies : ['taoQtiTest', 'taoTests'],
+                    babelPreTransform: { enabled: true },
                     bundles : [{
                         name : 'testPlugins',
                         babel : true,
