@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2026-05-26 13:30\n"
+"PO-Revision-Date: 2026-07-31 07:43\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: nl_BE\n"
@@ -111,7 +111,7 @@ msgid "To show watermark, type keyword"
 msgstr ""
 
 msgid "Upload"
-msgstr ""
+msgstr "Uploaden"
 
 msgid "Upload offline test"
 msgstr ""
@@ -124,4 +124,3 @@ msgstr ""
 
 msgid "You are encountering a prolonged connectivity loss. "
 msgstr ""
-
