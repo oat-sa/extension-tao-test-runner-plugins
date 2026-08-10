@@ -124,4 +124,3 @@ msgstr ""
 
 msgid "You are encountering a prolonged connectivity loss. "
 msgstr ""
-
