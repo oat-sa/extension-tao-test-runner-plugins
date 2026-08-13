@@ -124,4 +124,3 @@ msgstr "長時間の接続障害が発生しています"
 
 msgid "You are encountering a prolonged connectivity loss. "
 msgstr "長時間の接続障害が発生しています。"
-
