@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2026-08-11 17:01\n"
+"PO-Revision-Date: 2026-08-13 12:06\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja\n"
@@ -102,7 +102,7 @@ msgid "The download will be available in <strong>%d</strong> seconds"
 msgstr "ダウンロードは<strong>%d</strong>秒で利用可能になります。"
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr "このテストはフルスクリーンモード(%s)で行う必要があります。"
+msgstr "このテストはフルスクリーンモード(%s)で{ruby}行{rt}おこな{/rt}{/ruby}う{ruby}必要{rt}ひつよう{/rt}{/ruby}があります。"
 
 msgid "To hide watermark, type keyword"
 msgstr "透かしを非表示にするにはキーワードを入力してください"
@@ -123,5 +123,5 @@ msgid "You are encountering a prolonged connectivity loss."
 msgstr "長時間の接続障害が発生しています。"
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr "長時間の接続障害が発生しています"
+msgstr "長時間の接続障害が発生しています。"
 
