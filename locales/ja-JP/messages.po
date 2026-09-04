@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: tao-open-source\n"
-"PO-Revision-Date: 2026-08-13 13:29\n"
+"PO-Revision-Date: 2026-09-04 08:14\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja\n"
@@ -69,13 +69,13 @@ msgid "Migrate to use delivery features to control security plugins"
 msgstr "セキュリティプラグインを制御するためにデリバリ機能を使用するように移行します。"
 
 msgid "or"
-msgstr "／"
+msgstr "｜"
 
 msgid "Please continue waiting while we try to restore the connection. Alternatively, you may end this test by downloading it as a file which you will have to submit manually."
 msgstr "接続の回復を試みますので、引き続きお待ちください。また、このテストを終了するには、ファイルをダウンロードして手動で送信する必要があります。"
 
 msgid "Please wait while we try to restore the connection."
-msgstr "接続を回復するまでお待ちください。"
+msgstr "接続を回復中です。しばらくお待ちください。"
 
 msgid "Several resources URIs do not belong to the instance where the test was passed"
 msgstr "複数のリソースURIがテストに合格したインスタンスに属していない"
@@ -99,10 +99,10 @@ msgid "The connection seems to be back, please proceed"
 msgstr "接続が回復したようです。続けてください。"
 
 msgid "The download will be available in <strong>%d</strong> seconds"
-msgstr "<strong>%d</strong>秒後にダウンロードが可能となります。"
+msgstr "ダウンロードは<strong>%d</strong>秒で利用可能になります。"
 
 msgid "This test needs to be taken in full screen mode (%s)."
-msgstr "このテストはフルスクリーンモード(%s)で{ruby}行{rt}おこな{/rt}{/ruby}う{ruby}必要{rt}ひつよう{/rt}{/ruby}があります。"
+msgstr "このテストはフルスクリーンモード(%s)で行う必要があります。"
 
 msgid "To hide watermark, type keyword"
 msgstr "透かしを非表示にするにはキーワードを入力してください"
@@ -123,4 +123,5 @@ msgid "You are encountering a prolonged connectivity loss."
 msgstr "長時間の接続障害が発生しています"
 
 msgid "You are encountering a prolonged connectivity loss. "
-msgstr "長時間の接続障害が発生しています。"
+msgstr "長時間の接続障害が発生しています"
+
