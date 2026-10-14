@@ -154,13 +154,14 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'tags' => []
             ],
             [
-                'id' => 'kioskLockdown',
-                'name' => 'Kiosk Lockdown Browser',
-                'module' => 'taoTestRunnerPlugins/runner/plugins/security/kioskLockdown',
+                'id' => 'lockDownBrowser',
+                'name' => 'Lock down browser',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/security/lockDownBrowser',
                 'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
-                'description' => 'Kiosk{ed} detection, breach logging, and exit',
+                'description' => 'Lock down browser session, security violations, and exit',
                 'category' => 'security',
-                'active' => true,
+                'active' => false,
+                'driver' => 'kioskedMock',
                 'tags' => []
             ]
         ],

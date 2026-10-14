@@ -1,4 +1,4 @@
-.kiosk-exit-bar {
+.lockdown-browser-exit-bar {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -9,6 +9,6 @@
     background: rgba(0, 0, 0, 0.85);
 }
 
-.kiosk-exit-bar .kiosk-exit-button {
+.lockdown-browser-exit-bar .lockdown-browser-exit-button {
     min-width: 240px;
 }
