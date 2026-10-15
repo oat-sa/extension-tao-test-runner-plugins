@@ -39,11 +39,27 @@ define([
         return lockDownBrowserModule.createLockDownBrowserService(config);
     }
 
-    function buildServiceConfig(clientConfig, pluginConfig) {
-        return _.extend({}, clientConfig, {
-            driver: pluginConfig && pluginConfig.driver,
-            minVersion: pluginConfig && pluginConfig.minVersion
-        });
+    function buildServiceConfig(clientConfig, pluginConfig, testRunner) {
+        var merged = _.extend({}, clientConfig);
+        var runnerPluginConfig =
+            testRunner && typeof testRunner.getPluginConfig === 'function'
+                ? testRunner.getPluginConfig('lockDownBrowser')
+                : {};
+        var pluginOptions = _.extend({}, runnerPluginConfig, pluginConfig);
+
+        if (pluginOptions.driver) {
+            merged.driver = pluginOptions.driver;
+        }
+
+        if (pluginOptions.minVersion) {
+            merged.minVersion = pluginOptions.minVersion;
+        }
+
+        return merged;
+    }
+
+    function isLockDownBrowserSession(available, ldb) {
+        return available || ldb.isMockDriver();
     }
 
     return pluginFactory({
@@ -51,21 +67,26 @@ define([
 
         install: function install() {
             var testRunner = this.getTestRunner();
-            var pluginConfig = this.getConfig() || {};
-            var ldbConfig = getLockDownBrowserClientConfig();
-            var ldb = createService(buildServiceConfig(ldbConfig, pluginConfig));
+            var plugin = this;
             var proxy = testRunner.getProxy();
             var originalInit = proxy.init;
 
-            proxy.init = function initWithLockDownBrowserDetection(initConfig, params) {
-                var initParams = _.extend({}, params);
+            proxy.init = function initWithLockDownBrowserDetection(initParamsFromRunner, params) {
+                var initParams = _.extend({}, initParamsFromRunner, params);
+                var ldbConfig = getLockDownBrowserClientConfig();
+                var pluginConfig = plugin.getConfig() || {};
+                var fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
+                var ldb = createService(fullConfig);
 
+                // Single path: mock driver → whenAvailable is always true; real kiosked → only when native API ok.
+                // isMockDriver() guards mock QA if whenAvailable and selected driver ever disagree (stale bundle, etc.).
                 return ldb.whenAvailable().then(function (available) {
-                    if (available) {
+                    if (isLockDownBrowserSession(available, ldb)) {
                         initParams.clientKioskApiOk = '1';
                     }
 
-                    return originalInit.call(proxy, initConfig, initParams);
+                    // taoTests/runner/proxy.init(params) — one arg only; do not pass (config, params) like qtiServiceProxy.init
+                    return originalInit.call(proxy, initParams);
                 });
             };
         },
@@ -74,7 +95,8 @@ define([
             var testRunner = this.getTestRunner();
             var pluginConfig = this.getConfig() || {};
             var ldbConfig = getLockDownBrowserClientConfig();
-            var ldb = createService(buildServiceConfig(ldbConfig, pluginConfig));
+            var fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
+            var ldb = createService(fullConfig);
             var pendingTrace = {};
             var breachSeq = 0;
             var flushTimer;
@@ -295,14 +317,14 @@ define([
             }
 
             ldb.whenAvailable().then(function (available) {
-                if (available) {
+                if (isLockDownBrowserSession(available, ldb)) {
                     startLockDownBrowserIntegration();
                 }
             });
 
             testRunner.on('finish', function () {
                 ldb.whenAvailable().then(function (available) {
-                    if (!available) {
+                    if (!isLockDownBrowserSession(available, ldb)) {
                         return;
                     }
 
@@ -311,5 +333,9 @@ define([
                 });
             });
         }
+    }, {
+        hostName: 'testRunner',
+        // Keep in sync with config/taoTests/test_runner_plugin_registry.conf.php → lockDownBrowser.driver
+        driver: lockDownBrowserModule.DRIVER_KIOSKED_MOCK
     });
 });
