@@ -83,11 +83,20 @@ define([
 
             runBefore(name, ...args) {
                 const handlers = beforeHandlers.filter(entry => entry.event === name);
+                const event = {
+                    name: name.split('.')[0],
+                    namespace: name.indexOf('.') === -1 ? '' : name.slice(name.indexOf('.'))
+                };
 
                 return handlers.reduce(
-                    (promise, entry) => promise.then(() => entry.handler.apply(runner, args)),
+                    (promise, entry) =>
+                        promise.then(() => entry.handler.apply(runner, [event].concat(args))),
                     Promise.resolve()
                 );
+            },
+
+            stopEvent() {
+                return runner;
             },
 
             getProxy() {
