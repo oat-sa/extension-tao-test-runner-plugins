@@ -462,7 +462,7 @@ define([
             environment.runner.setItemIdentifier('item-42');
 
             return environment.runner
-                .runBefore('loaditem')
+                .runBefore('loaditem', 'item-target')
                 .catch(() => {})
                 .then(() => environment.runner.runBefore('unloaditem'))
                 .then(() => {
@@ -476,7 +476,12 @@ define([
                         'the applications are captured'
                     );
                     assert.equal(entries[0].detail.source, 'item-navigation', 'the source is captured');
-                    assert.equal(entries[0].itemIdentifier, 'item-42', 'the item identifier is captured');
+                    assert.equal(entries[0].itemIdentifier, 'item-42', 'the current context item is captured');
+                    assert.equal(
+                        entries[0].callerItemIdentifier,
+                        'item-target',
+                        'the item being loaded is captured'
+                    );
                     assert.equal(typeof entries[0].ts, 'number', 'the timestamp is captured');
                 })
                 .finally(environment.cleanup);

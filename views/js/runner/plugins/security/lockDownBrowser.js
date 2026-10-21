@@ -183,17 +183,22 @@ define([
                 }, FLUSH_DEBOUNCE_MS);
             }
 
-            function recordBreach(type, detail) {
+            function recordBreach(type, detail, callerItemIdentifier) {
                 breachSeq += 1;
                 const testContext = testRunner.getTestContext();
                 const key = `${ui.BREACH_TRACE_KEY_PREFIX}${type}-${breachSeq}`;
-
-                pendingTrace[key] = {
+                const entry = {
                     type: type,
                     ts: Date.now(),
                     itemIdentifier: testContext && testContext.itemIdentifier,
                     detail: detail || {}
                 };
+
+                if (callerItemIdentifier) {
+                    entry.callerItemIdentifier = callerItemIdentifier;
+                }
+
+                pendingTrace[key] = entry;
 
                 scheduleFlush();
             }
@@ -264,7 +269,7 @@ define([
                 normalizedProcessBlockList = processBlockList.create(ldbConfig.processBlackList);
             }
 
-            function handleDeniedProcesses(blockedApps, source, loadItemEvent) {
+            function handleDeniedProcesses(blockedApps, source, loadItemEvent, targetItemIdentifier) {
                 if (!blockedApps.length) {
                     if (blockedProcessSignature) {
                         setItemBlocked(false);
@@ -278,10 +283,14 @@ define([
 
                 if (signature !== blockedProcessSignature) {
                     blockedProcessSignature = signature;
-                    recordBreach('process-blocklist', {
-                        source: source,
-                        blockedApplications: blockedApps
-                    });
+                    recordBreach(
+                        'process-blocklist',
+                        {
+                            source: source,
+                            blockedApplications: blockedApps
+                        },
+                        source === 'item-navigation' ? targetItemIdentifier : undefined
+                    );
                     notifyBlockedApplications(blockedApps);
                 }
 
@@ -293,7 +302,7 @@ define([
                 }
             }
 
-            function runDeniedProcessCheck(source, loadItemEvent) {
+            function runDeniedProcessCheck(source, loadItemEvent, targetItemIdentifier) {
                 if (processCheckFailure) {
                     return Promise.reject(processCheckFailure);
                 }
@@ -308,7 +317,7 @@ define([
                             apps => {
                                 const blockedApps = normalizeAppList(apps);
 
-                                handleDeniedProcesses(blockedApps, source, loadItemEvent);
+                                handleDeniedProcesses(blockedApps, source, loadItemEvent, targetItemIdentifier);
                                 return blockedApps;
                             },
                             err => {
@@ -353,8 +362,8 @@ define([
                 });
 
                 if (ldbConfig.processCheckOnTestNavigation) {
-                    testRunner.before('loaditem.processBlockList', event =>
-                        runDeniedProcessCheck('item-navigation', event)
+                    testRunner.before('loaditem.processBlockList', (event, itemRef) =>
+                        runDeniedProcessCheck('item-navigation', event, itemRef)
                     );
                 }
 
