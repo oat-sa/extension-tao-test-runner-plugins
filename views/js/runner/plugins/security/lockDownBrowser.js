@@ -34,14 +34,12 @@ define([
     const ui = lockDownBrowserModule.uiProtocol;
     const FLUSH_DEBOUNCE_MS = 3000;
     const SIMULATE_VIOLATION_INTERVAL_MS = 30000;
+    const SESSION_ARM_RETRY_MS = 2000;
+    const SESSION_ARM_RETRY_TIMEOUT_MS = 60000;
     const LOAD_ITEM_CANCELLED = { cancel: true };
 
     function getLockDownBrowserClientConfig() {
         return (context && context.lockDownBrowser) || {};
-    }
-
-    function createService(config) {
-        return lockDownBrowserModule.createLockDownBrowserService(config);
     }
 
     function buildServiceConfig(clientConfig, pluginConfig, testRunner) {
@@ -50,7 +48,7 @@ define([
             testRunner && typeof testRunner.getPluginConfig === 'function'
                 ? testRunner.getPluginConfig('lockDownBrowser')
                 : {};
-        const pluginOptions = _.extend({}, runnerPluginConfig, pluginConfig);
+        const pluginOptions = _.extend({}, pluginConfig, runnerPluginConfig);
 
         if (pluginOptions.driver) {
             merged.driver = pluginOptions.driver;
@@ -67,22 +65,14 @@ define([
         return available || ldb.isMockDriver();
     }
 
-    function normalizeAppList(apps) {
-        return Array.isArray(apps) ? apps : [];
-    }
-
     function blockedAppsSignature(blockedApps) {
-        return JSON.stringify(
-            blockedApps
-                .map(app => String(app))
-                .sort()
-        );
+        return JSON.stringify(blockedApps.map(app => String(app)).sort());
     }
 
     return pluginFactory({
         name: 'lockDownBrowser',
 
-        install: function install() {
+        install() {
             const testRunner = this.getTestRunner();
             const plugin = this;
             const proxy = testRunner.getProxy();
@@ -93,9 +83,9 @@ define([
                 const ldbConfig = getLockDownBrowserClientConfig();
                 const pluginConfig = plugin.getConfig() || {};
                 const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
-                const ldb = createService(fullConfig);
+                const ldb = lockDownBrowserModule.createLockDownBrowserService(fullConfig);
 
-                return ldb.whenAvailable().then(function (available) {
+                return ldb.whenAvailable().then(available => {
                     if (isLockDownBrowserSession(available, ldb)) {
                         initParams.clientKioskApiOk = '1';
                     }
@@ -105,14 +95,13 @@ define([
             };
         },
 
-        init: function init() {
+        init() {
             const testRunner = this.getTestRunner();
             const areaBroker = this.getAreaBroker();
             const pluginConfig = this.getConfig() || {};
             const ldbConfig = getLockDownBrowserClientConfig();
             const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
-            const ldb = createService(fullConfig);
-            const availabilityPromise = ldb.whenAvailable();
+            const ldb = lockDownBrowserModule.createLockDownBrowserService(fullConfig);
             const processCheckInterval = Number(ldbConfig.processCheckInterval);
 
             let pendingTrace = {};
@@ -127,6 +116,8 @@ define([
             let processBlockListInitialized = false;
             let simulateViolationIntervalId;
             let processCheckIntervalId;
+            let sessionArmRetryId;
+            let sessionArmRetryDeadline = Date.now() + SESSION_ARM_RETRY_TIMEOUT_MS;
 
             function postToParent(message) {
                 if (window.parent === window) {
@@ -153,9 +144,7 @@ define([
             }
 
             function flushTrace() {
-                const keys = Object.keys(pendingTrace);
-
-                if (!keys.length) {
+                if (!Object.keys(pendingTrace).length) {
                     return Promise.resolve();
                 }
 
@@ -166,7 +155,7 @@ define([
                 return testRunner
                     .getProxy()
                     .sendVariables(batch)
-                    .catch(function (err) {
+                    .catch(err => {
                         _.merge(pendingTrace, batch);
                         testRunner.trigger('error', err);
                     });
@@ -177,7 +166,7 @@ define([
                     clearTimeout(flushTimer);
                 }
 
-                flushTimer = setTimeout(function () {
+                flushTimer = setTimeout(() => {
                     flushTimer = null;
                     flushTrace();
                 }, FLUSH_DEBOUNCE_MS);
@@ -188,7 +177,7 @@ define([
                 const testContext = testRunner.getTestContext();
                 const key = `${ui.BREACH_TRACE_KEY_PREFIX}${type}-${breachSeq}`;
                 const entry = {
-                    type: type,
+                    type,
                     ts: Date.now(),
                     itemIdentifier: testContext && testContext.itemIdentifier,
                     detail: detail || {}
@@ -199,7 +188,6 @@ define([
                 }
 
                 pendingTrace[key] = entry;
-
                 scheduleFlush();
             }
 
@@ -220,18 +208,6 @@ define([
                 testRunner.trigger('enablenav');
             }
 
-            function notifyBlockedApplications(blockedApps) {
-                const message =
-                    blockedApps.length === 1
-                        ? __('Please close "%s" before continuing the test.', blockedApps[0])
-                        : __(
-                              'Please close the following applications before continuing the test: %s',
-                              blockedApps.join(', ')
-                          );
-
-                dialogAlert(message, () => window.location.reload());
-            }
-
             function failProcessCheck(err) {
                 if (processCheckFailure) {
                     return;
@@ -242,9 +218,24 @@ define([
                 processCheckIntervalId = null;
                 dismissBlockingLoadUi();
                 setItemBlocked(true);
+                recordBreach('process-check-error', {
+                    message: err && err.message ? err.message : String(err)
+                });
                 dialogAlert(
-                    __('The prohibited application check could not be completed. Refresh the page to try again.'),
-                    () => window.location.reload()
+                    __('The prohibited application check could not be completed. Please refresh the page to try again.'),
+                    () => {
+                        flushTrace().finally(() => {
+                            window.location.reload();
+                        });
+                    },
+                    null,
+                    {
+                        buttons: {
+                            labels: {
+                                ok: __('Refresh')
+                            }
+                        }
+                    }
                 );
             }
 
@@ -286,12 +277,11 @@ define([
                     recordBreach(
                         'process-blocklist',
                         {
-                            source: source,
+                            source,
                             blockedApplications: blockedApps
                         },
                         source === 'item-navigation' ? targetItemIdentifier : undefined
                     );
-                    notifyBlockedApplications(blockedApps);
                 }
 
                 setItemBlocked(true);
@@ -315,7 +305,7 @@ define([
                         })
                         .then(
                             apps => {
-                                const blockedApps = normalizeAppList(apps);
+                                const blockedApps = Array.isArray(apps) ? apps : [];
 
                                 handleDeniedProcesses(blockedApps, source, loadItemEvent, targetItemIdentifier);
                                 return blockedApps;
@@ -358,7 +348,9 @@ define([
                 testRunner.on('destroy.processBlockList', () => {
                     clearInterval(processCheckIntervalId);
                     processCheckIntervalId = null;
+                    clearSessionArmRetry();
                     testRunner.off('.processBlockList');
+                    testRunner.off('.processBlockListArm');
                 });
 
                 if (ldbConfig.processCheckOnTestNavigation) {
@@ -396,52 +388,35 @@ define([
                     // ponytail: stay on current window if top is cross-origin
                 }
 
-                function simulateSecurityViolation(detail) {
-                    return ldb.simulateSecurityViolation(_.extend({
-                        simulated: true,
-                        source: 'taoLockDownBrowserTest.simulateSecurityViolation',
-                        processBlackList: ldbConfig.processBlackList
-                    }, detail || {}));
-                }
+                const simulateSecurityViolation = detail =>
+                    ldb.simulateSecurityViolation(
+                        _.extend(
+                            {
+                                simulated: true,
+                                source: 'taoLockDownBrowserTest.simulateSecurityViolation',
+                                processBlackList: ldbConfig.processBlackList
+                            },
+                            detail || {}
+                        )
+                    );
 
                 mountWindow.taoLockDownBrowserTest = {
-                    simulateSecurityViolation: simulateSecurityViolation
+                    simulateSecurityViolation
                 };
 
                 if (simulateViolationIntervalId) {
                     clearInterval(simulateViolationIntervalId);
                 }
 
-                simulateViolationIntervalId = setInterval(function () {
+                simulateViolationIntervalId = setInterval(() => {
                     simulateSecurityViolation({ reason: 'periodic-simulate-breach' });
                 }, SIMULATE_VIOLATION_INTERVAL_MS);
 
                 simulateSecurityViolation({ reason: 'harness-installed' });
             }
 
-            function notifyDeferFinishRedirect() {
-                postToParent({ type: ui.MESSAGE_DEFER_FINISH });
-            }
-
-            function showExitButton() {
-                const mountDoc = getExitMountDocument();
-
-                lockDownBrowserModule.mountExitBar({
-                    mountDocument: mountDoc,
-                    onExitClick: function () {
-                        const doc = getExitMountDocument();
-
-                        flushTrace().finally(function () {
-                            postToParent({ type: ui.MESSAGE_EXIT });
-                            lockDownBrowserModule.removeExitBar(doc);
-                            ldb.exitApplication();
-                        });
-                    }
-                });
-            }
-
             function onTestFinish() {
-                notifyDeferFinishRedirect();
+                postToParent({ type: ui.MESSAGE_DEFER_FINISH });
 
                 try {
                     sessionStorage.setItem(ui.PENDING_EXIT_STORAGE_KEY, '1');
@@ -449,7 +424,18 @@ define([
                     // ponytail: ignore private mode
                 }
 
-                showExitButton();
+                lockDownBrowserModule.mountExitBar({
+                    mountDocument: getExitMountDocument(),
+                    onExitClick() {
+                        const doc = getExitMountDocument();
+
+                        flushTrace().finally(() => {
+                            postToParent({ type: ui.MESSAGE_EXIT });
+                            lockDownBrowserModule.removeExitBar(doc);
+                            ldb.exitApplication();
+                        });
+                    }
+                });
             }
 
             function startLockDownBrowserIntegration() {
@@ -459,23 +445,19 @@ define([
 
                 integrationStarted = true;
 
-                ldb.validateMinVersion().catch(function (err) {
+                ldb.validateMinVersion().catch(err => {
                     testRunner.trigger('warning', err);
                 });
 
-                ldb.addSecurityViolationListener(function (detail) {
+                ldb.addSecurityViolationListener(detail => {
                     recordBreach('breach', detail);
                 });
 
                 testRunner
-                    .before('unloaditem', function () {
-                        return flushTrace();
-                    })
-                    .on('leave finish', function () {
-                        return flushTrace();
-                    })
+                    .before('unloaditem', () => flushTrace())
+                    .on('leave finish', () => flushTrace())
                     .on('finish', onTestFinish)
-                    .on('destroy', function () {
+                    .on('destroy', () => {
                         if (flushTimer) {
                             clearTimeout(flushTimer);
                         }
@@ -491,28 +473,67 @@ define([
                 installSimulateBreachHarness();
             }
 
-            availabilityPromise.then(available => {
-                if (!isLockDownBrowserSession(available, ldb)) {
+            function clearSessionArmRetry() {
+                if (sessionArmRetryId) {
+                    clearInterval(sessionArmRetryId);
+                    sessionArmRetryId = null;
+                }
+            }
+
+            function armLockDownBrowserSession() {
+                return ldb.whenAvailable().then(available => {
+                    if (!isLockDownBrowserSession(available, ldb)) {
+                        return false;
+                    }
+
+                    setupProcessBlockListForSession();
+                    startLockDownBrowserIntegration();
+
+                    return runDeniedProcessCheck('session-start').then(
+                        () => true,
+                        () => true
+                    );
+                });
+            }
+
+            function scheduleSessionArming() {
+                armLockDownBrowserSession().then(armed => {
+                    if (armed && processBlockListSetup) {
+                        clearSessionArmRetry();
+                    }
+                });
+            }
+
+            scheduleSessionArming();
+
+            sessionArmRetryId = setInterval(() => {
+                if (processBlockListSetup || Date.now() >= sessionArmRetryDeadline) {
+                    clearSessionArmRetry();
                     return;
                 }
 
-                setupProcessBlockListForSession();
-                startLockDownBrowserIntegration();
-            });
+                scheduleSessionArming();
+            }, SESSION_ARM_RETRY_MS);
 
-            testRunner.on('finish', function () {
-                ldb.whenAvailable().then(function (available) {
+            testRunner.on('destroy.processBlockListArm', clearSessionArmRetry);
+
+            testRunner.on('finish', () => {
+                ldb.whenAvailable().then(available => {
                     if (!isLockDownBrowserSession(available, ldb)) {
                         return;
                     }
 
+                    const integrationWasStarted = integrationStarted;
+
                     startLockDownBrowserIntegration();
-                    onTestFinish();
+
+                    if (!integrationWasStarted) {
+                        onTestFinish();
+                    }
                 });
             });
         }
     }, {
-        hostName: 'testRunner',
-        driver: lockDownBrowserModule.DRIVER_KIOSKED_MOCK
+        hostName: 'testRunner'
     });
 });
