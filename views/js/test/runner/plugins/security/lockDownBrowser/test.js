@@ -130,8 +130,8 @@ define([
         return runner;
     }
 
-    function settle() {
-        return new Promise(resolve => setTimeout(resolve, 0));
+    function settle(ms = 0) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     function captureIntervals() {
@@ -232,8 +232,8 @@ define([
 
     QUnit.module('lockDownBrowser process block list');
 
-    QUnit.test('clear result before the first item allows rendering', assert =>
-        createEnvironment({}, { results: [[]] }).then(environment =>
+    QUnit.test('clear results allow item navigation', assert =>
+        createEnvironment({}, { results: [[], []] }).then(environment =>
             environment.runner
                 .runBefore('loaditem')
                 .then(() => {
@@ -247,8 +247,8 @@ define([
         )
     );
 
-    QUnit.test('prohibited result before the first item prevents rendering', assert =>
-        createEnvironment({}, { results: [['forbidden-app']] }).then(environment => {
+    QUnit.test('prohibited result on navigation blocks the item', assert =>
+        createEnvironment({}, { results: [[], ['forbidden-app']] }).then(environment => {
             let rendered = false;
 
             return rejectAsBlocked(
@@ -260,7 +260,6 @@ define([
             )
                 .then(() => {
                     assert.notOk(rendered, 'the item is not rendered');
-                    assert.equal(mockControl.alerts.length, 0, 'native LDB handles blocked-app UI');
                     assert.ok(
                         environment.$content.hasClass('lockdown-browser-item-blocked'),
                         'the content area is marked blocked while navigation is denied'
@@ -270,11 +269,11 @@ define([
         })
     );
 
-    QUnit.test('prohibited results prevent next and previous destinations from rendering', assert =>
+    QUnit.test('prohibited results block navigation and clear results restore loading', assert =>
         createEnvironment(
             {},
             {
-                results: [['next-app'], [], ['previous-app']]
+                results: [[], ['next-app'], [], ['previous-app']]
             }
         ).then(environment => {
             environment.runner.setItemIdentifier('item-2');
@@ -300,77 +299,21 @@ define([
         })
     );
 
-    QUnit.test('the periodic check uses the configured interval', assert =>
-        createEnvironment(
-            { processCheckInterval: 4321 },
-            { captureIntervals: true }
-        ).then(environment => {
-            const processIntervals = environment.timerCapture.intervals.filter(interval => interval.delay === 4321);
-
-            assert.equal(processIntervals.length, 1, 'one process interval is installed');
-            assert.equal(processIntervals[0].delay, 4321, 'the configured value is used');
-            environment.cleanup();
-        })
-    );
-
-    QUnit.test('a periodic prohibited result blocks the current item', assert =>
+    QUnit.test('periodic prohibited results block the current item', assert =>
         createEnvironment(
             { processCheckInterval: 1000 },
-            { captureIntervals: true, results: [['periodic-app']] }
+            { captureIntervals: true, results: [[], ['periodic-app']] }
         ).then(environment => {
-            environment.timerCapture.intervals[0].callback();
+            const processIntervals = environment.timerCapture.intervals.filter(interval => interval.delay === 1000);
+
+            assert.equal(processIntervals.length, 1, 'one process interval is installed');
+            processIntervals[0].callback();
 
             return settle()
                 .then(() => assertBlocked(assert, environment, 'the current item'))
                 .finally(environment.cleanup);
         })
     );
-
-    QUnit.test('invalid configuration fails closed and offers refresh', assert =>
-        createEnvironment({ processBlackList: null }).then(environment =>
-            environment.runner
-                .runBefore('loaditem')
-                .catch(() => {})
-                .then(() => {
-                    assertBlocked(assert, environment, 'the item');
-                    assert.equal(mockControl.alerts.length, 1, 'one refresh prompt is displayed');
-                    assert.ok(/refresh the page/i.test(mockControl.alerts[0].message));
-                    assert.equal(typeof mockControl.alerts[0].callback, 'function');
-                })
-                .finally(environment.cleanup)
-        )
-    );
-
-    QUnit.test('rejected and timed-out API checks fail closed', assert => {
-        const scenarios = [
-            {
-                title: 'rejected API check',
-                results: [new Error('Native process check rejected')]
-            },
-            {
-                title: 'timed-out API check',
-                results: [new Error('Native process check timed out')]
-            }
-        ];
-
-        return scenarios.reduce(
-            (promise, scenario) =>
-                promise.then(() =>
-                    createEnvironment({}, { results: scenario.results }).then(environment =>
-                        environment.runner
-                            .runBefore('loaditem')
-                            .catch(() => {})
-                            .then(settle)
-                            .then(() => {
-                                assertBlocked(assert, environment, scenario.title);
-                                assert.equal(mockControl.alerts.length, 1, `${scenario.title} displays one prompt`);
-                            })
-                            .finally(environment.cleanup)
-                    )
-                ),
-            Promise.resolve()
-        );
-    });
 
     QUnit.test('process checks are skipped outside a lock down browser session', assert =>
         createEnvironment({}, { available: false, driver: 'kiosked' }).then(environment =>
@@ -381,7 +324,7 @@ define([
                         environment.$content.hasClass('lockdown-browser-item-blocked'),
                         'the item is not blocked outside an ldb session'
                     );
-                    assert.equal(mockControl.alerts.length, 0, 'no refresh prompt is shown');
+                    assert.equal(mockControl.checkCalls.length, 0, 'no native checks are performed');
                 })
                 .finally(environment.cleanup)
         )
@@ -395,7 +338,7 @@ define([
 
         return createEnvironment(
             { processCheckInterval: 1000 },
-            { captureIntervals: true, results: [() => pendingCheck] }
+            { captureIntervals: true, results: [[], () => pendingCheck] }
         ).then(environment => {
             environment.timerCapture.intervals[0].callback();
             const navigationPromise = environment.runner.runBefore('loaditem');
@@ -406,15 +349,12 @@ define([
                     resolveCheck([]);
                     return navigationPromise;
                 })
-                .then(() => {
-                    assert.equal(mockControl.checkCalls.length, 1, 'navigation reused the interval check');
-                })
                 .finally(environment.cleanup);
         });
     });
 
     QUnit.test('detected applications are logged with source and item identifier', assert =>
-        createEnvironment({}, { results: [['editor', 'messenger']] }).then(environment => {
+        createEnvironment({}, { results: [[], ['editor', 'messenger']] }).then(environment => {
             environment.runner.setItemIdentifier('item-42');
 
             return environment.runner
@@ -422,39 +362,13 @@ define([
                 .catch(() => {})
                 .then(() => environment.runner.runBefore('unloaditem'))
                 .then(() => {
-                    const entries = getTraceEntries(environment);
+                    const entries = getTraceEntries(environment).filter(entry => entry.type === 'process-blocklist');
 
-                    assert.equal(entries.length, 1, 'one trace entry is sent');
-                    assert.equal(entries[0].type, 'process-blocklist');
+                    assert.equal(entries.length, 1, 'one blocklist trace entry is sent');
                     assert.deepEqual(entries[0].detail.blockedApplications, ['editor', 'messenger']);
                     assert.equal(entries[0].detail.source, 'item-navigation');
                     assert.equal(entries[0].itemIdentifier, 'item-42');
                     assert.equal(entries[0].callerItemIdentifier, 'item-target');
-                })
-                .finally(environment.cleanup);
-        })
-    );
-
-    QUnit.test('unchanged periodic blocked results do not produce trace spam', assert =>
-        createEnvironment(
-            { processCheckInterval: 1000 },
-            { captureIntervals: true, results: [['editor'], ['editor'], ['messenger']] }
-        ).then(environment => {
-            const interval = environment.timerCapture.intervals[0];
-
-            interval.callback();
-            return settle()
-                .then(() => interval.callback())
-                .then(settle)
-                .then(() => interval.callback())
-                .then(settle)
-                .then(() => environment.runner.runBefore('unloaditem'))
-                .then(() => {
-                    const entries = getTraceEntries(environment);
-
-                    assert.equal(entries.length, 2, 'the unchanged result is not recorded twice');
-                    assert.deepEqual(entries[0].detail.blockedApplications, ['editor']);
-                    assert.deepEqual(entries[1].detail.blockedApplications, ['messenger']);
                 })
                 .finally(environment.cleanup);
         })

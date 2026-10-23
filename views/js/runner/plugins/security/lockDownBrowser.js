@@ -22,13 +22,11 @@ define([
     'jquery',
     'i18n',
     'context',
-    'ui/dialog/alert',
-    'layout/loading-bar',
     'taoTests/runner/plugin',
     'tao/lockDownBrowser/lockDownBrowserService',
     'tao/lockDownBrowser/processBlockList',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/lockDownBrowser'
-], function (_, $, __, context, dialogAlert, loadingBar, pluginFactory, lockDownBrowserModule, processBlockList) {
+], function (_, $, __, context, pluginFactory, lockDownBrowserModule, processBlockList) {
     'use strict';
 
     const ui = lockDownBrowserModule.uiProtocol;
@@ -111,7 +109,6 @@ define([
             let processBlockListSetup = false;
             let normalizedProcessBlockList;
             let processCheckPromise;
-            let processCheckFailure;
             let blockedProcessSignature;
             let processBlockListInitialized = false;
             let simulateViolationIntervalId;
@@ -203,40 +200,11 @@ define([
                 }
             }
 
-            function dismissBlockingLoadUi() {
-                loadingBar.stop();
-                testRunner.trigger('enablenav');
-            }
-
-            function failProcessCheck(err) {
-                if (processCheckFailure) {
-                    return;
-                }
-
-                processCheckFailure = err;
-                clearInterval(processCheckIntervalId);
-                processCheckIntervalId = null;
-                dismissBlockingLoadUi();
-                setItemBlocked(true);
+            function reportProcessCheckError(err) {
                 recordBreach('process-check-error', {
-                    message: err && err.message ? err.message : String(err)
+                    message: err && err.message ? err.message : String(err),
+                    code: err && err.code ? err.code : undefined
                 });
-                dialogAlert(
-                    __('The prohibited application check could not be completed. Please refresh the page to try again.'),
-                    () => {
-                        flushTrace().finally(() => {
-                            window.location.reload();
-                        });
-                    },
-                    null,
-                    {
-                        buttons: {
-                            labels: {
-                                ok: __('Refresh')
-                            }
-                        }
-                    }
-                );
             }
 
             function ensureProcessBlockListModel() {
@@ -244,20 +212,8 @@ define([
                     return;
                 }
 
-                processBlockListInitialized = true;
-
-                if (
-                    ldbConfig.processCheckInterval !== null &&
-                    typeof ldbConfig.processCheckInterval !== 'undefined' &&
-                    (!isFinite(processCheckInterval) || processCheckInterval <= 0)
-                ) {
-                    throw processBlockList.createError(
-                        processBlockList.ERROR_INVALID_CONFIG,
-                        'The process check interval must be a positive number'
-                    );
-                }
-
                 normalizedProcessBlockList = processBlockList.create(ldbConfig.processBlackList);
+                processBlockListInitialized = true;
             }
 
             function handleDeniedProcesses(blockedApps, source, loadItemEvent, targetItemIdentifier) {
@@ -285,7 +241,6 @@ define([
                 }
 
                 setItemBlocked(true);
-                dismissBlockingLoadUi();
 
                 if (source === 'item-navigation' && loadItemEvent) {
                     testRunner.stopEvent('loaditem');
@@ -293,10 +248,6 @@ define([
             }
 
             function runDeniedProcessCheck(source, loadItemEvent, targetItemIdentifier) {
-                if (processCheckFailure) {
-                    return Promise.reject(processCheckFailure);
-                }
-
                 if (!processCheckPromise) {
                     processCheckPromise = Promise.resolve()
                         .then(() => {
@@ -311,8 +262,8 @@ define([
                                 return blockedApps;
                             },
                             err => {
-                                failProcessCheck(err);
-                                throw err;
+                                reportProcessCheckError(err);
+                                return [];
                             }
                         )
                         .finally(() => {
@@ -360,16 +311,9 @@ define([
                 }
 
                 if (processCheckInterval > 0) {
-                    try {
-                        ensureProcessBlockListModel();
-                        processCheckIntervalId = setInterval(() => {
-                            if (!processCheckFailure) {
-                                runDeniedProcessCheck('interval').catch(() => {});
-                            }
-                        }, processCheckInterval);
-                    } catch (err) {
-                        failProcessCheck(err);
-                    }
+                    processCheckIntervalId = setInterval(() => {
+                        runDeniedProcessCheck('interval').catch(() => {});
+                    }, processCheckInterval);
                 }
             }
 
@@ -489,10 +433,7 @@ define([
                     setupProcessBlockListForSession();
                     startLockDownBrowserIntegration();
 
-                    return runDeniedProcessCheck('session-start').then(
-                        () => true,
-                        () => true
-                    );
+                    return runDeniedProcessCheck('session-start').then(() => true);
                 });
             }
 

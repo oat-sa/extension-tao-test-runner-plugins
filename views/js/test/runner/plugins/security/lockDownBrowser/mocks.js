@@ -7,7 +7,6 @@ define(['lodash'], _ => {
             this.availabilityError = null;
             this.results = [];
             this.checkCalls = [];
-            this.alerts = [];
             this.serviceConfigs = [];
         },
 
@@ -27,17 +26,6 @@ define(['lodash'], _ => {
     };
 
     control.reset();
-
-    define(
-        'ui/dialog/alert',
-        [],
-        () => (message, callback) => {
-            control.alerts.push({
-                message,
-                callback
-            });
-        }
-    );
 
     define('tao/lockDownBrowser/processBlockList', [], () => {
         const api = {
