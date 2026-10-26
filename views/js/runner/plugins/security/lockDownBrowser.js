@@ -56,6 +56,10 @@ define([
             merged.minVersion = pluginOptions.minVersion;
         }
 
+        if (Array.isArray(pluginOptions.eventTypes)) {
+            merged.eventTypes = pluginOptions.eventTypes;
+        }
+
         return merged;
     }
 
@@ -101,9 +105,12 @@ define([
             const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
             const ldb = lockDownBrowserModule.createLockDownBrowserService(fullConfig);
             const processCheckInterval = Number(ldbConfig.processCheckInterval);
+            const eventTypes = _.uniq(
+                lockDownBrowserModule.EVENT_TYPES.concat(Array.isArray(fullConfig.eventTypes) ? fullConfig.eventTypes : [])
+            );
 
             let pendingTrace = {};
-            let breachSeq = 0;
+            let eventSeq = 0;
             let flushTimer;
             let integrationStarted = false;
             let processBlockListSetup = false;
@@ -169,13 +176,17 @@ define([
                 }, FLUSH_DEBOUNCE_MS);
             }
 
-            function recordBreach(type, detail, callerItemIdentifier) {
-                breachSeq += 1;
+            function recordEvent(type, detail, callerItemIdentifier) {
+                const occurredAt = detail && detail.occurredAt ? detail.occurredAt : new Date().toISOString();
+                const timestamp = Date.parse(occurredAt);
+
+                eventSeq += 1;
                 const testContext = testRunner.getTestContext();
-                const key = `${ui.BREACH_TRACE_KEY_PREFIX}${type}-${breachSeq}`;
+                const key = `${ui.EVENT_TRACE_KEY_PREFIX}${type}-${eventSeq}`;
                 const entry = {
                     type,
-                    ts: Date.now(),
+                    occurredAt,
+                    ts: Number.isNaN(timestamp) ? Date.now() : timestamp,
                     itemIdentifier: testContext && testContext.itemIdentifier,
                     detail: detail || {}
                 };
@@ -201,7 +212,7 @@ define([
             }
 
             function reportProcessCheckError(err) {
-                recordBreach('process-check-error', {
+                recordEvent('process-check-error', {
                     message: err && err.message ? err.message : String(err),
                     code: err && err.code ? err.code : undefined
                 });
@@ -230,7 +241,7 @@ define([
 
                 if (signature !== blockedProcessSignature) {
                     blockedProcessSignature = signature;
-                    recordBreach(
+                    recordEvent(
                         'process-blocklist',
                         {
                             source,
@@ -393,8 +404,8 @@ define([
                     testRunner.trigger('warning', err);
                 });
 
-                ldb.addSecurityViolationListener(detail => {
-                    recordBreach('breach', detail);
+                ldb.addEventListeners(eventTypes, event => {
+                    recordEvent(event.type, event);
                 });
 
                 testRunner
@@ -411,7 +422,7 @@ define([
                             simulateViolationIntervalId = null;
                         }
 
-                        ldb.removeSecurityViolationListener();
+                        ldb.removeEventListeners();
                     });
 
                 installSimulateBreachHarness();

@@ -192,7 +192,9 @@ define([
             }
         });
 
-        if (options && options.driver) {
+        if (options && options.pluginConfig) {
+            plugin.setConfig(options.pluginConfig);
+        } else if (options && options.driver) {
             plugin.setConfig({ driver: options.driver });
         }
 
@@ -231,6 +233,61 @@ define([
     }
 
     QUnit.module('lockDownBrowser process block list');
+
+    QUnit.test('captures every documented Kiosked event with its metadata', assert =>
+        createEnvironment({}, { results: [[]] }).then(environment => {
+            const eventTypes = ['breach', 'lost-focus', 'display-added', 'offline', 'online'];
+
+            assert.deepEqual(mockControl.eventTypes, eventTypes, 'all documented events are subscribed');
+
+            eventTypes.forEach(type => {
+                mockControl.emitEvent(type, { reason: `${type}-reason` });
+            });
+
+            return environment.runner
+                .runBefore('unloaditem')
+                .then(() => {
+                    const entries = getTraceEntries(environment).filter(entry => eventTypes.indexOf(entry.type) !== -1);
+
+                    assert.deepEqual(
+                        entries.map(entry => entry.type),
+                        eventTypes,
+                        'each event is stored separately'
+                    );
+                    entries.forEach(entry => {
+                        assert.ok(entry.occurredAt, `${entry.type} contains its occurrence time`);
+                        assert.equal(entry.itemIdentifier, 'item-1', `${entry.type} contains the item context`);
+                        assert.equal(entry.detail.reason, `${entry.type}-reason`, `${entry.type} keeps its reason`);
+                    });
+                })
+                .finally(environment.cleanup);
+        })
+    );
+
+    QUnit.test('captures a future event supplied through configuration', assert =>
+        createEnvironment({}, { results: [[]], pluginConfig: { eventTypes: ['future-security-event'] } }).then(
+            environment => {
+                assert.ok(mockControl.eventTypes.indexOf('breach') !== -1, 'documented events remain subscribed');
+                assert.ok(
+                    mockControl.eventTypes.indexOf('future-security-event') !== -1,
+                    'the future event is subscribed'
+                );
+
+                mockControl.emitEvent('future-security-event', { reason: 'future-reason' });
+
+                return environment.runner
+                    .runBefore('unloaditem')
+                    .then(() => {
+                        const entries = getTraceEntries(environment);
+
+                        assert.equal(entries.length, 1, 'the configured event is stored');
+                        assert.equal(entries[0].type, 'future-security-event');
+                        assert.equal(entries[0].detail.reason, 'future-reason');
+                    })
+                    .finally(environment.cleanup);
+            }
+        )
+    );
 
     QUnit.test('clear results allow item navigation', assert =>
         createEnvironment({}, { results: [[], []] }).then(environment =>

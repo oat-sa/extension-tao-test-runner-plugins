@@ -8,6 +8,22 @@ define(['lodash'], _ => {
             this.results = [];
             this.checkCalls = [];
             this.serviceConfigs = [];
+            this.eventTypes = [];
+            this.eventListener = null;
+        },
+
+        emitEvent(type, detail) {
+            if (this.eventTypes.indexOf(type) !== -1 && typeof this.eventListener === 'function') {
+                this.eventListener(
+                    _.extend(
+                        {
+                            type,
+                            occurredAt: new Date().toISOString()
+                        },
+                        detail
+                    )
+                );
+            }
         },
 
         nextResult() {
@@ -55,7 +71,9 @@ define(['lodash'], _ => {
         const module = {
             DRIVER_KIOSKED: 'kiosked',
             DRIVER_KIOSKED_MOCK: 'kioskedMock',
+            EVENT_TYPES: ['breach', 'lost-focus', 'display-added', 'offline', 'online'],
             uiProtocol: {
+                EVENT_TRACE_KEY_PREFIX: 'lockdown-event-',
                 BREACH_TRACE_KEY_PREFIX: 'lockdown-browser-',
                 MESSAGE_DEFER_FINISH: 'defer-finish',
                 MESSAGE_EXIT: 'exit',
@@ -82,6 +100,16 @@ define(['lodash'], _ => {
 
                     validateMinVersion() {
                         return Promise.resolve();
+                    },
+
+                    addEventListeners(eventTypes, callback) {
+                        control.eventTypes = eventTypes.slice();
+                        control.eventListener = callback;
+                    },
+
+                    removeEventListeners() {
+                        control.eventTypes = [];
+                        control.eventListener = null;
                     },
 
                     addSecurityViolationListener() {},
