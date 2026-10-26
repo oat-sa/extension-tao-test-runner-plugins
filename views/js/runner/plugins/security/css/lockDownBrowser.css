@@ -12,3 +12,8 @@
 .lockdown-browser-exit-bar .lockdown-browser-exit-button {
     min-width: 240px;
 }
+
+.lockdown-browser-item-blocked {
+    visibility: hidden;
+    pointer-events: none;
+}

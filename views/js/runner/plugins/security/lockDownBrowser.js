@@ -20,32 +20,33 @@
 define([
     'lodash',
     'jquery',
+    'i18n',
     'context',
     'taoTests/runner/plugin',
     'tao/lockDownBrowser/lockDownBrowserService',
+    'tao/lockDownBrowser/processBlockList',
     'css!taoTestRunnerPlugins/runner/plugins/security/css/lockDownBrowser'
-], function (_, $, context, pluginFactory, lockDownBrowserModule) {
+], function (_, $, __, context, pluginFactory, lockDownBrowserModule, processBlockList) {
     'use strict';
 
-    var ui = lockDownBrowserModule.uiProtocol;
-    var FLUSH_DEBOUNCE_MS = 3000;
-    var SIMULATE_VIOLATION_INTERVAL_MS = 30000;
+    const ui = lockDownBrowserModule.uiProtocol;
+    const FLUSH_DEBOUNCE_MS = 3000;
+    const SIMULATE_VIOLATION_INTERVAL_MS = 30000;
+    const SESSION_ARM_RETRY_MS = 2000;
+    const SESSION_ARM_RETRY_TIMEOUT_MS = 60000;
+    const LOAD_ITEM_CANCELLED = { cancel: true };
 
     function getLockDownBrowserClientConfig() {
         return (context && context.lockDownBrowser) || {};
     }
 
-    function createService(config) {
-        return lockDownBrowserModule.createLockDownBrowserService(config);
-    }
-
     function buildServiceConfig(clientConfig, pluginConfig, testRunner) {
-        var merged = _.extend({}, clientConfig);
-        var runnerPluginConfig =
+        const merged = _.extend({}, clientConfig);
+        const runnerPluginConfig =
             testRunner && typeof testRunner.getPluginConfig === 'function'
                 ? testRunner.getPluginConfig('lockDownBrowser')
                 : {};
-        var pluginOptions = _.extend({}, runnerPluginConfig, pluginConfig);
+        const pluginOptions = _.extend({}, pluginConfig, runnerPluginConfig);
 
         if (pluginOptions.driver) {
             merged.driver = pluginOptions.driver;
@@ -62,45 +63,58 @@ define([
         return available || ldb.isMockDriver();
     }
 
+    function blockedAppsSignature(blockedApps) {
+        return JSON.stringify(blockedApps.map(app => String(app)).sort());
+    }
+
     return pluginFactory({
         name: 'lockDownBrowser',
 
-        install: function install() {
-            var testRunner = this.getTestRunner();
-            var plugin = this;
-            var proxy = testRunner.getProxy();
-            var originalInit = proxy.init;
+        install() {
+            const testRunner = this.getTestRunner();
+            const plugin = this;
+            const proxy = testRunner.getProxy();
+            const originalInit = proxy.init;
 
             proxy.init = function initWithLockDownBrowserDetection(initParamsFromRunner, params) {
-                var initParams = _.extend({}, initParamsFromRunner, params);
-                var ldbConfig = getLockDownBrowserClientConfig();
-                var pluginConfig = plugin.getConfig() || {};
-                var fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
-                var ldb = createService(fullConfig);
+                const initParams = _.extend({}, initParamsFromRunner, params);
+                const ldbConfig = getLockDownBrowserClientConfig();
+                const pluginConfig = plugin.getConfig() || {};
+                const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
+                const ldb = lockDownBrowserModule.createLockDownBrowserService(fullConfig);
 
-                // Single path: mock driver → whenAvailable is always true; real kiosked → only when native API ok.
-                // isMockDriver() guards mock QA if whenAvailable and selected driver ever disagree (stale bundle, etc.).
-                return ldb.whenAvailable().then(function (available) {
+                return ldb.whenAvailable().then(available => {
                     if (isLockDownBrowserSession(available, ldb)) {
                         initParams.clientKioskApiOk = '1';
                     }
 
-                    // taoTests/runner/proxy.init(params) — one arg only; do not pass (config, params) like qtiServiceProxy.init
                     return originalInit.call(proxy, initParams);
                 });
             };
         },
 
-        init: function init() {
-            var testRunner = this.getTestRunner();
-            var pluginConfig = this.getConfig() || {};
-            var ldbConfig = getLockDownBrowserClientConfig();
-            var fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
-            var ldb = createService(fullConfig);
-            var pendingTrace = {};
-            var breachSeq = 0;
-            var flushTimer;
-            var integrationStarted = false;
+        init() {
+            const testRunner = this.getTestRunner();
+            const areaBroker = this.getAreaBroker();
+            const pluginConfig = this.getConfig() || {};
+            const ldbConfig = getLockDownBrowserClientConfig();
+            const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
+            const ldb = lockDownBrowserModule.createLockDownBrowserService(fullConfig);
+            const processCheckInterval = Number(ldbConfig.processCheckInterval);
+
+            let pendingTrace = {};
+            let breachSeq = 0;
+            let flushTimer;
+            let integrationStarted = false;
+            let processBlockListSetup = false;
+            let normalizedProcessBlockList;
+            let processCheckPromise;
+            let blockedProcessSignature;
+            let processBlockListInitialized = false;
+            let simulateViolationIntervalId;
+            let processCheckIntervalId;
+            let sessionArmRetryId;
+            let sessionArmRetryDeadline = Date.now() + SESSION_ARM_RETRY_TIMEOUT_MS;
 
             function postToParent(message) {
                 if (window.parent === window) {
@@ -127,20 +141,18 @@ define([
             }
 
             function flushTrace() {
-                var keys = Object.keys(pendingTrace);
-
-                if (!keys.length) {
+                if (!Object.keys(pendingTrace).length) {
                     return Promise.resolve();
                 }
 
-                var batch = pendingTrace;
+                const batch = pendingTrace;
 
                 pendingTrace = {};
 
                 return testRunner
                     .getProxy()
                     .sendVariables(batch)
-                    .catch(function (err) {
+                    .catch(err => {
                         _.merge(pendingTrace, batch);
                         testRunner.trigger('error', err);
                     });
@@ -151,41 +163,158 @@ define([
                     clearTimeout(flushTimer);
                 }
 
-                flushTimer = setTimeout(function () {
+                flushTimer = setTimeout(() => {
                     flushTimer = null;
                     flushTrace();
                 }, FLUSH_DEBOUNCE_MS);
             }
 
-            function recordBreach(type, detail) {
+            function recordBreach(type, detail, callerItemIdentifier) {
                 breachSeq += 1;
-                var testContext = testRunner.getTestContext();
-                var key = ui.BREACH_TRACE_KEY_PREFIX + type + '-' + breachSeq;
-
-                pendingTrace[key] = {
-                    type: type,
+                const testContext = testRunner.getTestContext();
+                const key = `${ui.BREACH_TRACE_KEY_PREFIX}${type}-${breachSeq}`;
+                const entry = {
+                    type,
                     ts: Date.now(),
                     itemIdentifier: testContext && testContext.itemIdentifier,
                     detail: detail || {}
                 };
 
+                if (callerItemIdentifier) {
+                    entry.callerItemIdentifier = callerItemIdentifier;
+                }
+
+                pendingTrace[key] = entry;
                 scheduleFlush();
             }
 
-            var simulateViolationIntervalId;
-            var processCheckIntervalId;
+            function setItemBlocked(blocked) {
+                if (!areaBroker || typeof areaBroker.getContentArea !== 'function') {
+                    return;
+                }
 
-            function runDeniedProcessCheck(source) {
-                return ldb.checkDeniedProcesses(ldbConfig.processBlackList).then(function (apps) {
-                    if (!apps.length) {
-                        return;
+                const contentArea = areaBroker.getContentArea();
+
+                if (contentArea) {
+                    $(contentArea).toggleClass('lockdown-browser-item-blocked', blocked);
+                }
+            }
+
+            function reportProcessCheckError(err) {
+                recordBreach('process-check-error', {
+                    message: err && err.message ? err.message : String(err),
+                    code: err && err.code ? err.code : undefined
+                });
+            }
+
+            function ensureProcessBlockListModel() {
+                if (processBlockListInitialized) {
+                    return;
+                }
+
+                normalizedProcessBlockList = processBlockList.create(ldbConfig.processBlackList);
+                processBlockListInitialized = true;
+            }
+
+            function handleDeniedProcesses(blockedApps, source, loadItemEvent, targetItemIdentifier) {
+                if (!blockedApps.length) {
+                    if (blockedProcessSignature) {
+                        setItemBlocked(false);
+                        blockedProcessSignature = null;
                     }
 
-                    recordBreach('process-blocklist', {
-                        source: source,
-                        blockedApplications: apps
-                    });
+                    return;
+                }
+
+                const signature = blockedAppsSignature(blockedApps);
+
+                if (signature !== blockedProcessSignature) {
+                    blockedProcessSignature = signature;
+                    recordBreach(
+                        'process-blocklist',
+                        {
+                            source,
+                            blockedApplications: blockedApps
+                        },
+                        source === 'item-navigation' ? targetItemIdentifier : undefined
+                    );
+                }
+
+                setItemBlocked(true);
+
+                if (source === 'item-navigation' && loadItemEvent) {
+                    testRunner.stopEvent('loaditem');
+                }
+            }
+
+            function runDeniedProcessCheck(source, loadItemEvent, targetItemIdentifier) {
+                if (!processCheckPromise) {
+                    processCheckPromise = Promise.resolve()
+                        .then(() => {
+                            ensureProcessBlockListModel();
+                            return ldb.checkDeniedProcesses(normalizedProcessBlockList);
+                        })
+                        .then(
+                            apps => {
+                                const blockedApps = Array.isArray(apps) ? apps : [];
+
+                                handleDeniedProcesses(blockedApps, source, loadItemEvent, targetItemIdentifier);
+                                return blockedApps;
+                            },
+                            err => {
+                                reportProcessCheckError(err);
+                                return [];
+                            }
+                        )
+                        .finally(() => {
+                            processCheckPromise = null;
+                        });
+                }
+
+                return processCheckPromise.then(blockedApps => {
+                    if (blockedApps.length && source === 'item-navigation') {
+                        return Promise.reject(LOAD_ITEM_CANCELLED);
+                    }
+
+                    return blockedApps;
                 });
+            }
+
+            function setupProcessBlockListForSession() {
+                if (processBlockListSetup) {
+                    return;
+                }
+
+                const hasBlockListConfig =
+                    Object.prototype.hasOwnProperty.call(ldbConfig, 'processBlackList') ||
+                    Object.prototype.hasOwnProperty.call(ldbConfig, 'processCheckOnTestNavigation') ||
+                    Object.prototype.hasOwnProperty.call(ldbConfig, 'processCheckInterval');
+
+                if (!hasBlockListConfig) {
+                    return;
+                }
+
+                processBlockListSetup = true;
+
+                testRunner.on('destroy.processBlockList', () => {
+                    clearInterval(processCheckIntervalId);
+                    processCheckIntervalId = null;
+                    clearSessionArmRetry();
+                    testRunner.off('.processBlockList');
+                    testRunner.off('.processBlockListArm');
+                });
+
+                if (ldbConfig.processCheckOnTestNavigation) {
+                    testRunner.before('loaditem.processBlockList', (event, itemRef) =>
+                        runDeniedProcessCheck('item-navigation', event, itemRef)
+                    );
+                }
+
+                if (processCheckInterval > 0) {
+                    processCheckIntervalId = setInterval(() => {
+                        runDeniedProcessCheck('interval').catch(() => {});
+                    }, processCheckInterval);
+                }
             }
 
             function installSimulateBreachHarness() {
@@ -193,7 +322,7 @@ define([
                     return;
                 }
 
-                var mountWindow = window;
+                let mountWindow = window;
 
                 try {
                     if (window.top && window.top.document) {
@@ -203,53 +332,35 @@ define([
                     // ponytail: stay on current window if top is cross-origin
                 }
 
-                // @TODO Disable simulateBreach in client config before production release.
-                function simulateSecurityViolation(detail) {
-                    return ldb.simulateSecurityViolation(_.extend({
-                        simulated: true,
-                        source: 'taoLockDownBrowserTest.simulateSecurityViolation',
-                        processBlackList: ldbConfig.processBlackList
-                    }, detail || {}));
-                }
+                const simulateSecurityViolation = detail =>
+                    ldb.simulateSecurityViolation(
+                        _.extend(
+                            {
+                                simulated: true,
+                                source: 'taoLockDownBrowserTest.simulateSecurityViolation',
+                                processBlackList: ldbConfig.processBlackList
+                            },
+                            detail || {}
+                        )
+                    );
 
                 mountWindow.taoLockDownBrowserTest = {
-                    simulateSecurityViolation: simulateSecurityViolation
+                    simulateSecurityViolation
                 };
 
                 if (simulateViolationIntervalId) {
                     clearInterval(simulateViolationIntervalId);
                 }
 
-                simulateViolationIntervalId = setInterval(function () {
+                simulateViolationIntervalId = setInterval(() => {
                     simulateSecurityViolation({ reason: 'periodic-simulate-breach' });
                 }, SIMULATE_VIOLATION_INTERVAL_MS);
 
                 simulateSecurityViolation({ reason: 'harness-installed' });
             }
 
-            function notifyDeferFinishRedirect() {
-                postToParent({ type: ui.MESSAGE_DEFER_FINISH });
-            }
-
-            function showExitButton() {
-                var mountDoc = getExitMountDocument();
-
-                lockDownBrowserModule.mountExitBar({
-                    mountDocument: mountDoc,
-                    onExitClick: function () {
-                        var doc = getExitMountDocument();
-
-                        flushTrace().finally(function () {
-                            postToParent({ type: ui.MESSAGE_EXIT });
-                            lockDownBrowserModule.removeExitBar(doc);
-                            ldb.exitApplication();
-                        });
-                    }
-                });
-            }
-
             function onTestFinish() {
-                notifyDeferFinishRedirect();
+                postToParent({ type: ui.MESSAGE_DEFER_FINISH });
 
                 try {
                     sessionStorage.setItem(ui.PENDING_EXIT_STORAGE_KEY, '1');
@@ -257,7 +368,18 @@ define([
                     // ponytail: ignore private mode
                 }
 
-                showExitButton();
+                lockDownBrowserModule.mountExitBar({
+                    mountDocument: getExitMountDocument(),
+                    onExitClick() {
+                        const doc = getExitMountDocument();
+
+                        flushTrace().finally(() => {
+                            postToParent({ type: ui.MESSAGE_EXIT });
+                            lockDownBrowserModule.removeExitBar(doc);
+                            ldb.exitApplication();
+                        });
+                    }
+                });
             }
 
             function startLockDownBrowserIntegration() {
@@ -267,35 +389,19 @@ define([
 
                 integrationStarted = true;
 
-                ldb.validateMinVersion().catch(function (err) {
+                ldb.validateMinVersion().catch(err => {
                     testRunner.trigger('warning', err);
                 });
 
-                ldb.addSecurityViolationListener(function (detail) {
+                ldb.addSecurityViolationListener(detail => {
                     recordBreach('breach', detail);
                 });
 
-                if (ldbConfig.processCheckInterval) {
-                    processCheckIntervalId = setInterval(function () {
-                        runDeniedProcessCheck('interval');
-                    }, ldbConfig.processCheckInterval);
-                }
-
-                if (ldbConfig.processCheckOnTestNavigation) {
-                    testRunner.on('renderitem', function () {
-                        runDeniedProcessCheck('item-navigation');
-                    });
-                }
-
                 testRunner
-                    .before('unloaditem', function () {
-                        return flushTrace();
-                    })
-                    .on('leave finish', function () {
-                        return flushTrace();
-                    })
+                    .before('unloaditem', () => flushTrace())
+                    .on('leave finish', () => flushTrace())
                     .on('finish', onTestFinish)
-                    .on('destroy', function () {
+                    .on('destroy', () => {
                         if (flushTimer) {
                             clearTimeout(flushTimer);
                         }
@@ -305,37 +411,70 @@ define([
                             simulateViolationIntervalId = null;
                         }
 
-                        if (processCheckIntervalId) {
-                            clearInterval(processCheckIntervalId);
-                            processCheckIntervalId = null;
-                        }
-
                         ldb.removeSecurityViolationListener();
                     });
 
                 installSimulateBreachHarness();
             }
 
-            ldb.whenAvailable().then(function (available) {
-                if (isLockDownBrowserSession(available, ldb)) {
-                    startLockDownBrowserIntegration();
+            function clearSessionArmRetry() {
+                if (sessionArmRetryId) {
+                    clearInterval(sessionArmRetryId);
+                    sessionArmRetryId = null;
                 }
-            });
+            }
 
-            testRunner.on('finish', function () {
-                ldb.whenAvailable().then(function (available) {
+            function armLockDownBrowserSession() {
+                return ldb.whenAvailable().then(available => {
+                    if (!isLockDownBrowserSession(available, ldb)) {
+                        return false;
+                    }
+
+                    setupProcessBlockListForSession();
+                    startLockDownBrowserIntegration();
+
+                    return runDeniedProcessCheck('session-start').then(() => true);
+                });
+            }
+
+            function scheduleSessionArming() {
+                armLockDownBrowserSession().then(armed => {
+                    if (armed && processBlockListSetup) {
+                        clearSessionArmRetry();
+                    }
+                });
+            }
+
+            scheduleSessionArming();
+
+            sessionArmRetryId = setInterval(() => {
+                if (processBlockListSetup || Date.now() >= sessionArmRetryDeadline) {
+                    clearSessionArmRetry();
+                    return;
+                }
+
+                scheduleSessionArming();
+            }, SESSION_ARM_RETRY_MS);
+
+            testRunner.on('destroy.processBlockListArm', clearSessionArmRetry);
+
+            testRunner.on('finish', () => {
+                ldb.whenAvailable().then(available => {
                     if (!isLockDownBrowserSession(available, ldb)) {
                         return;
                     }
 
+                    const integrationWasStarted = integrationStarted;
+
                     startLockDownBrowserIntegration();
-                    onTestFinish();
+
+                    if (!integrationWasStarted) {
+                        onTestFinish();
+                    }
                 });
             });
         }
     }, {
-        hostName: 'testRunner',
-        // Keep in sync with config/taoTests/test_runner_plugin_registry.conf.php → lockDownBrowser.driver
-        driver: lockDownBrowserModule.DRIVER_KIOSKED_MOCK
+        hostName: 'testRunner'
     });
 });
