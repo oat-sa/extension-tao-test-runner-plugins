@@ -22,14 +22,13 @@ define([
     'jquery',
     'context',
     'taoTests/runner/plugin',
-    'tao/lockDownBrowser/lockDownBrowserService',
-    'css!taoTestRunnerPlugins/runner/plugins/security/css/lockDownBrowser'
+    'tao/lockDownBrowser/lockDownBrowserService'
 ], function (_, $, context, pluginFactory, lockDownBrowserModule) {
     'use strict';
 
-    var ui = lockDownBrowserModule.uiProtocol;
-    var FLUSH_DEBOUNCE_MS = 3000;
-    var SIMULATE_VIOLATION_INTERVAL_MS = 30000;
+    const ui = lockDownBrowserModule.uiProtocol;
+    const FLUSH_DEBOUNCE_MS = 3000;
+    const SIMULATE_VIOLATION_INTERVAL_MS = 30000;
 
     function getLockDownBrowserClientConfig() {
         return (context && context.lockDownBrowser) || {};
@@ -40,12 +39,12 @@ define([
     }
 
     function buildServiceConfig(clientConfig, pluginConfig, testRunner) {
-        var merged = _.extend({}, clientConfig);
-        var runnerPluginConfig =
+        const merged = _.extend({}, clientConfig);
+        const runnerPluginConfig =
             testRunner && typeof testRunner.getPluginConfig === 'function'
                 ? testRunner.getPluginConfig('lockDownBrowser')
                 : {};
-        var pluginOptions = _.extend({}, runnerPluginConfig, pluginConfig);
+        const pluginOptions = _.extend({}, runnerPluginConfig, pluginConfig);
 
         if (pluginOptions.driver) {
             merged.driver = pluginOptions.driver;
@@ -66,17 +65,17 @@ define([
         name: 'lockDownBrowser',
 
         install: function install() {
-            var testRunner = this.getTestRunner();
-            var plugin = this;
-            var proxy = testRunner.getProxy();
-            var originalInit = proxy.init;
+            const testRunner = this.getTestRunner();
+            const plugin = this;
+            const proxy = testRunner.getProxy();
+            const originalInit = proxy.init;
 
             proxy.init = function initWithLockDownBrowserDetection(initParamsFromRunner, params) {
-                var initParams = _.extend({}, initParamsFromRunner, params);
-                var ldbConfig = getLockDownBrowserClientConfig();
-                var pluginConfig = plugin.getConfig() || {};
-                var fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
-                var ldb = createService(fullConfig);
+                const initParams = _.extend({}, initParamsFromRunner, params);
+                const ldbConfig = getLockDownBrowserClientConfig();
+                const pluginConfig = plugin.getConfig() || {};
+                const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
+                const ldb = createService(fullConfig);
 
                 // Single path: mock driver → whenAvailable is always true; real kiosked → only when native API ok.
                 // isMockDriver() guards mock QA if whenAvailable and selected driver ever disagree (stale bundle, etc.).
@@ -92,15 +91,15 @@ define([
         },
 
         init: function init() {
-            var testRunner = this.getTestRunner();
-            var pluginConfig = this.getConfig() || {};
-            var ldbConfig = getLockDownBrowserClientConfig();
-            var fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
-            var ldb = createService(fullConfig);
-            var pendingTrace = {};
-            var breachSeq = 0;
-            var flushTimer;
-            var integrationStarted = false;
+            const testRunner = this.getTestRunner();
+            const pluginConfig = this.getConfig() || {};
+            const ldbConfig = getLockDownBrowserClientConfig();
+            const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
+            const ldb = createService(fullConfig);
+            let pendingTrace = {};
+            let breachSeq = 0;
+            let flushTimer;
+            let integrationStarted = false;
 
             function postToParent(message) {
                 if (window.parent === window) {
@@ -127,13 +126,13 @@ define([
             }
 
             function flushTrace() {
-                var keys = Object.keys(pendingTrace);
+                const keys = Object.keys(pendingTrace);
 
                 if (!keys.length) {
                     return Promise.resolve();
                 }
 
-                var batch = pendingTrace;
+                const batch = pendingTrace;
 
                 pendingTrace = {};
 
@@ -159,8 +158,8 @@ define([
 
             function recordBreach(type, detail) {
                 breachSeq += 1;
-                var testContext = testRunner.getTestContext();
-                var key = ui.BREACH_TRACE_KEY_PREFIX + type + '-' + breachSeq;
+                const testContext = testRunner.getTestContext();
+                const key = ui.BREACH_TRACE_KEY_PREFIX + type + '-' + breachSeq;
 
                 pendingTrace[key] = {
                     type: type,
@@ -172,8 +171,8 @@ define([
                 scheduleFlush();
             }
 
-            var simulateViolationIntervalId;
-            var processCheckIntervalId;
+            let simulateViolationIntervalId;
+            let processCheckIntervalId;
 
             function runDeniedProcessCheck(source) {
                 return ldb.checkDeniedProcesses(ldbConfig.processBlackList).then(function (apps) {
@@ -193,7 +192,7 @@ define([
                     return;
                 }
 
-                var mountWindow = window;
+                let mountWindow = window;
 
                 try {
                     if (window.top && window.top.document) {
@@ -231,17 +230,14 @@ define([
                 postToParent({ type: ui.MESSAGE_DEFER_FINISH });
             }
 
-            function showExitButton() {
-                var mountDoc = getExitMountDocument();
+            function showExitMenu() {
+                const mountDoc = getExitMountDocument();
 
-                lockDownBrowserModule.mountExitBar({
+                lockDownBrowserModule.mountExitMenu({
                     mountDocument: mountDoc,
                     onExitClick: function () {
-                        var doc = getExitMountDocument();
-
                         flushTrace().finally(function () {
                             postToParent({ type: ui.MESSAGE_EXIT });
-                            lockDownBrowserModule.removeExitBar(doc);
                             ldb.exitApplication();
                         });
                     }
@@ -257,7 +253,7 @@ define([
                     // ponytail: ignore private mode
                 }
 
-                showExitButton();
+                showExitMenu();
             }
 
             function startLockDownBrowserIntegration() {
@@ -316,9 +312,14 @@ define([
                 installSimulateBreachHarness();
             }
 
+            if (lockDownBrowserModule.isLockDownBrowserContext(ldb)) {
+                showExitMenu();
+            }
+
             ldb.whenAvailable().then(function (available) {
                 if (isLockDownBrowserSession(available, ldb)) {
                     startLockDownBrowserIntegration();
+                    showExitMenu();
                 }
             });
 
