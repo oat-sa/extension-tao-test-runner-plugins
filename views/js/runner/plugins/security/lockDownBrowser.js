@@ -451,13 +451,17 @@ define([
                     startLockDownBrowserIntegration();
                     showExitMenu();
 
+                    if (!processBlockListSetup) {
+                        return true;
+                    }
+
                     return runDeniedProcessCheck('session-start').then(() => true);
                 });
             }
 
             function scheduleSessionArming() {
                 armLockDownBrowserSession().then(armed => {
-                    if (armed && processBlockListSetup) {
+                    if (armed) {
                         clearSessionArmRetry();
                     }
                 });

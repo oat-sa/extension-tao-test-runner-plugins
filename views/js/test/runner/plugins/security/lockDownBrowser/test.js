@@ -166,15 +166,17 @@ define([
         const timerCapture = options && options.captureIntervals ? captureIntervals() : null;
 
         mockControl.reset();
-        context.lockDownBrowser = _.extend(
-            {
-                processCheckInterval: null,
-                processCheckOnTestNavigation: true,
-                processBlackList: ['forbidden-app'],
-                simulateBreach: false
-            },
-            config
-        );
+        context.lockDownBrowser = options && options.withoutBlockListConfig
+            ? _.extend({}, config)
+            : _.extend(
+                {
+                    processCheckInterval: null,
+                    processCheckOnTestNavigation: true,
+                    processBlackList: ['forbidden-app'],
+                    simulateBreach: false
+                },
+                config
+            );
 
         if (options && Object.prototype.hasOwnProperty.call(options, 'available')) {
             mockControl.available = options.available;
@@ -393,6 +395,18 @@ define([
                 })
                 .finally(environment.cleanup)
         )
+    );
+
+    QUnit.test('session arming stops without block list configuration', assert =>
+        createEnvironment({}, { captureIntervals: true, withoutBlockListConfig: true }).then(environment => {
+            const retryIntervals = environment.timerCapture.intervals.filter(interval => interval.delay === 2000);
+
+            assert.equal(mockControl.checkCalls.length, 0, 'no denied-process check is performed');
+            assert.equal(retryIntervals.length, 1, 'the session retry interval is created');
+            assert.ok(retryIntervals[0].cleared, 'the session retry interval is cleared after arming');
+
+            environment.cleanup();
+        })
     );
 
     QUnit.test('simultaneous navigation and interval checks share one in-flight call', assert => {
