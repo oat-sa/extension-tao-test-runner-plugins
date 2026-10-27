@@ -161,7 +161,6 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'description' => 'Lock down browser session, security violations, and exit',
                 'category' => 'security',
                 'active' => false,
-                'driver' => 'kioskedMock',
                 'tags' => []
             ]
         ],
