@@ -87,13 +87,11 @@ define([
                 const fullConfig = buildServiceConfig(ldbConfig, pluginConfig, testRunner);
                 const ldb = lockDownBrowserModule.createLockDownBrowserService(fullConfig);
 
-                return ldb.whenAvailable().then(available => {
-                    if (isLockDownBrowserSession(available, ldb)) {
-                        initParams.clientKioskApiOk = '1';
-                    }
+                if (lockDownBrowserModule.isLockDownBrowserContext(ldb)) {
+                    initParams.clientKioskApiOk = '1';
+                }
 
-                    return originalInit.call(proxy, initParams);
-                });
+                return originalInit.call(proxy, initParams);
             };
         },
 

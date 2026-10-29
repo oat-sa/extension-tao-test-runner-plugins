@@ -4,6 +4,7 @@ define(['lodash'], _ => {
     const control = {
         reset() {
             this.available = true;
+            this.nativePresent = false;
             this.availabilityError = null;
             this.results = [];
             this.checkCalls = [];
@@ -129,7 +130,7 @@ define(['lodash'], _ => {
             },
 
             isLockDownBrowserContext(service) {
-                return service.isMockDriver();
+                return service.isMockDriver() || control.nativePresent;
             },
 
             mountExitMenu(options) {

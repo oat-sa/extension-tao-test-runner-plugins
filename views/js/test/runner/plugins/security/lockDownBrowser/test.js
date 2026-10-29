@@ -52,6 +52,7 @@ define([
         const runner = {
             triggered: [],
             sentVariables: [],
+            initParams: null,
 
             before(names, handler) {
                 addHandlers(beforeHandlers, names, handler);
@@ -100,16 +101,7 @@ define([
             },
 
             getProxy() {
-                return {
-                    init() {
-                        return Promise.resolve();
-                    },
-
-                    sendVariables(variables) {
-                        runner.sentVariables.push(variables);
-                        return Promise.resolve();
-                    }
-                };
+                return proxy;
             },
 
             getPluginConfig() {
@@ -124,6 +116,17 @@ define([
                 contextValue = {
                     itemIdentifier: identifier
                 };
+            }
+        };
+        const proxy = {
+            init(params) {
+                runner.initParams = params;
+                return Promise.resolve();
+            },
+
+            sendVariables(variables) {
+                runner.sentVariables.push(variables);
+                return Promise.resolve();
             }
         };
 
@@ -231,6 +234,23 @@ define([
             []
         );
     }
+
+    QUnit.module('lockDownBrowser initialization');
+
+    QUnit.test('reports a native Kiosked API without requiring a locked session', assert => {
+        const runner = createRunner();
+        const plugin = pluginFactory(runner);
+
+        mockControl.reset();
+        mockControl.available = false;
+        mockControl.nativePresent = true;
+        plugin.setConfig({ driver: 'kiosked' });
+        plugin.install();
+
+        return runner.getProxy().init({}).then(() => {
+            assert.equal(runner.initParams.clientKioskApiOk, '1', 'the native API is reported');
+        });
+    });
 
     QUnit.module('lockDownBrowser process block list');
 
