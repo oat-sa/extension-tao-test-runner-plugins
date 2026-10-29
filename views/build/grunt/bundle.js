@@ -29,13 +29,14 @@ module.exports = function(grunt) {
                 options : {
                     extension : 'taoTestRunnerPlugins',
                     outputDir : 'loader',
-                    dependencies : ['taoQtiTest', 'taoTests'],
+                    dependencies : ['tao', 'taoQtiTest', 'taoTests'],
                     babelPreTransform: { enabled: true },
                     bundles : [{
                         name : 'testPlugins',
                         babel : true,
                         include: ['taoTestRunnerPlugins/runner/plugins/**/*'],
-                        dependencies : []
+                        excludeNested: ['tao/lockDownBrowser/lockDownBrowserService'],
+                        dependencies : ['tao/loader/lockDownBrowser.min']
                     }]
                 }
             }
