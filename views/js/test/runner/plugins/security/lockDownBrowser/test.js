@@ -184,6 +184,9 @@ define([
         if (options && Object.prototype.hasOwnProperty.call(options, 'available')) {
             mockControl.available = options.available;
         }
+        if (options && Object.prototype.hasOwnProperty.call(options, 'nativePresent')) {
+            mockControl.nativePresent = options.nativePresent;
+        }
         if (options && options.availabilityError) {
             mockControl.availabilityError = options.availabilityError;
         }
@@ -256,9 +259,31 @@ define([
 
     QUnit.module('lockDownBrowser process block list');
 
-    QUnit.test('mounts the header exit menu in a lock down browser session', assert =>
-        createEnvironment({}, { results: [[]] }).then(environment => {
-            assert.ok(mockControl.exitMenuMounts.length, 'the exit menu is mounted');
+    QUnit.test('mounts the header exit menu from synchronous context detection', assert =>
+        createEnvironment(
+            { displayExitButtonTestRunner: true },
+            { available: false, nativePresent: true, driver: 'kiosked' }
+        ).then(environment => {
+            assert.equal(mockControl.exitMenuMounts.length, 1, 'the exit menu is mounted synchronously');
+
+            environment.cleanup();
+        })
+    );
+
+    QUnit.test('does not mount the header exit menu when its flag is disabled', assert =>
+        createEnvironment({}, { nativePresent: true, driver: 'kiosked', results: [[]] }).then(environment => {
+            assert.equal(mockControl.exitMenuMounts.length, 0, 'the disabled exit menu is not mounted');
+
+            environment.cleanup();
+        })
+    );
+
+    QUnit.test('does not mount the header exit menu from asynchronous availability', assert =>
+        createEnvironment(
+            { displayExitButtonTestRunner: true },
+            { available: true, nativePresent: false, driver: 'kiosked', results: [[]] }
+        ).then(environment => {
+            assert.equal(mockControl.exitMenuMounts.length, 0, 'availability does not render the exit menu');
 
             environment.cleanup();
         })

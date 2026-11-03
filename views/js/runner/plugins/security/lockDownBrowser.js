@@ -393,8 +393,6 @@ define([
                 } catch (storageErr) {
                     // ponytail: ignore private mode
                 }
-
-                showExitMenu();
             }
 
             function startLockDownBrowserIntegration() {
@@ -447,8 +445,6 @@ define([
 
                     setupProcessBlockListForSession();
                     startLockDownBrowserIntegration();
-                    showExitMenu();
-
                     if (!processBlockListSetup) {
                         return true;
                     }
@@ -465,7 +461,10 @@ define([
                 });
             }
 
-            if (lockDownBrowserModule.isLockDownBrowserContext(ldb)) {
+            if (
+                ldbConfig.displayExitButtonTestRunner === true &&
+                lockDownBrowserModule.isLockDownBrowserContext(ldb)
+            ) {
                 showExitMenu();
             }
 
