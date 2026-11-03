@@ -152,6 +152,16 @@ class RegisterTestRunnerPlugins extends InstallAction
                 'category' => 'security',
                 'active' => false,
                 'tags' => []
+            ],
+            [
+                'id' => 'lockDownBrowser',
+                'name' => 'Lock down browser',
+                'module' => 'taoTestRunnerPlugins/runner/plugins/security/lockDownBrowser',
+                'bundle' => 'taoTestRunnerPlugins/loader/testPlugins.min',
+                'description' => 'Lock down browser session, security violations, and exit',
+                'category' => 'security',
+                'active' => false,
+                'tags' => []
             ]
         ],
         'accessibility' => [
