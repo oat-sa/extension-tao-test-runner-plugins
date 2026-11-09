@@ -190,6 +190,9 @@ define([
         if (options && options.availabilityError) {
             mockControl.availabilityError = options.availabilityError;
         }
+        if (options && options.versionValidationError) {
+            mockControl.versionValidationError = options.versionValidationError;
+        }
         if (options && options.results) {
             mockControl.results = options.results.slice();
         }
@@ -341,6 +344,27 @@ define([
                     })
                     .finally(environment.cleanup);
             }
+        )
+    );
+
+    QUnit.test('logs version validation failures without warning the test-taker', assert =>
+        createEnvironment({}, { results: [[]], versionValidationError: new Error('Device info timed out') }).then(
+            environment =>
+                environment.runner
+                    .runBefore('unloaditem')
+                    .then(() => {
+                        const entries = getTraceEntries(environment).filter(
+                            entry => entry.type === 'version-check-error'
+                        );
+
+                        assert.equal(entries.length, 1, 'one version validation error is logged');
+                        assert.equal(entries[0].detail.message, 'Device info timed out');
+                        assert.notOk(
+                            environment.runner.triggered.includes('warning'),
+                            'no warning is shown to the test-taker'
+                        );
+                    })
+                    .finally(environment.cleanup)
         )
     );
 

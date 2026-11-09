@@ -403,7 +403,9 @@ define([
                 integrationStarted = true;
 
                 ldb.validateMinVersion().catch(err => {
-                    testRunner.trigger('warning', err);
+                    recordEvent('version-check-error', {
+                        message: err && err.message ? err.message : String(err)
+                    });
                 });
 
                 ldb.addEventListeners(eventTypes, event => {

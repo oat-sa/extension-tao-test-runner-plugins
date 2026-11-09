@@ -6,6 +6,7 @@ define(['lodash'], _ => {
             this.available = true;
             this.nativePresent = false;
             this.availabilityError = null;
+            this.versionValidationError = null;
             this.results = [];
             this.checkCalls = [];
             this.serviceConfigs = [];
@@ -101,6 +102,10 @@ define(['lodash'], _ => {
                     },
 
                     validateMinVersion() {
+                        if (control.versionValidationError) {
+                            return Promise.reject(control.versionValidationError);
+                        }
+
                         return Promise.resolve();
                     },
 
