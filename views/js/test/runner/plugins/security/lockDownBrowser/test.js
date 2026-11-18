@@ -108,6 +108,12 @@ define([
                 return {};
             },
 
+            getConfig() {
+                return {
+                    serviceCallId: 'test-execution-id'
+                };
+            },
+
             getTestContext() {
                 return contextValue;
             },
@@ -119,9 +125,13 @@ define([
             }
         };
         const proxy = {
+            initResponse: {
+                lastStoreId: false
+            },
+
             init(params) {
                 runner.initParams = params;
-                return Promise.resolve();
+                return Promise.resolve(this.initResponse);
             },
 
             sendVariables(variables) {
@@ -243,6 +253,84 @@ define([
         );
     }
 
+    const resumeTracedStorageKey = 'ldb.resumeTraced:test-execution-id';
+
+    function mockNavigationType(type) {
+        const originalGetEntries = performance.getEntriesByType;
+
+        performance.getEntriesByType = entryType => {
+            if (entryType === 'navigation') {
+                return [{ type }];
+            }
+
+            return originalGetEntries.call(performance, entryType);
+        };
+
+        return () => {
+            performance.getEntriesByType = originalGetEntries;
+        };
+    }
+
+    function createBootstrappedEnvironment(config, options, initResponse) {
+        const runner = createRunner();
+        const $content = $('#item-content').show();
+
+        runner.getProxy().initResponse = initResponse || { lastStoreId: false };
+
+        mockControl.reset();
+        context.lockDownBrowser = options && options.withoutBlockListConfig
+            ? _.extend({}, config)
+            : _.extend(
+                {
+                    processCheckInterval: null,
+                    processCheckOnTestNavigation: true,
+                    processBlackList: ['forbidden-app'],
+                    simulateBreach: false
+                },
+                config
+            );
+
+        if (options && Object.prototype.hasOwnProperty.call(options, 'available')) {
+            mockControl.available = options.available;
+        }
+        if (options && Object.prototype.hasOwnProperty.call(options, 'nativePresent')) {
+            mockControl.nativePresent = options.nativePresent;
+        }
+        if (options && options.results) {
+            mockControl.results = options.results.slice();
+        }
+
+        const plugin = pluginFactory(runner, {
+            getContentArea() {
+                return $content;
+            }
+        });
+
+        if (options && options.pluginConfig) {
+            plugin.setConfig(options.pluginConfig);
+        } else if (options && options.driver) {
+            plugin.setConfig({ driver: options.driver });
+        }
+
+        plugin.install();
+
+        return runner
+            .getProxy()
+            .init({})
+            .then(() => {
+                plugin.init();
+
+                return settle().then(() => ({
+                    runner,
+                    plugin,
+                    $content,
+                    cleanup() {
+                        runner.trigger('destroy');
+                    }
+                }));
+            });
+    }
+
     QUnit.module('lockDownBrowser initialization');
 
     QUnit.test('reports a native Kiosked API without requiring a locked session', assert => {
@@ -336,7 +424,9 @@ define([
                 return environment.runner
                     .runBefore('unloaditem')
                     .then(() => {
-                        const entries = getTraceEntries(environment);
+                        const entries = getTraceEntries(environment).filter(
+                            entry => entry.type === 'future-security-event'
+                        );
 
                         assert.equal(entries.length, 1, 'the configured event is stored');
                         assert.equal(entries[0].type, 'future-security-event');
@@ -499,6 +589,210 @@ define([
                 })
                 .finally(environment.cleanup);
         });
+    });
+
+    QUnit.module('lockDownBrowser delivery resume trace');
+
+    QUnit.test('records resume when lastStoreId is set and navigation is not reload', assert => {
+        const restoreNavigation = mockNavigationType('navigate');
+
+        try {
+            sessionStorage.removeItem(resumeTracedStorageKey);
+
+            return createBootstrappedEnvironment(
+                {},
+                { nativePresent: true, driver: 'kiosked', results: [[]] },
+                { lastStoreId: '2C8CE97F-8DC8-4929-9C07-BCB8F0FE414B' }
+            )
+                .then(environment =>
+                    environment.runner.runBefore('unloaditem').then(() => {
+                        const resumeEntries = getTraceEntries(environment).filter(entry => entry.type === 'resume');
+
+                        assert.equal(resumeEntries.length, 1, 'one resume trace is recorded');
+                        assert.equal(
+                            sessionStorage.getItem(resumeTracedStorageKey),
+                            '1',
+                            'resume is marked in session storage'
+                        );
+                    })
+                    .finally(environment.cleanup)
+                )
+                .finally(restoreNavigation);
+        } catch (err) {
+            restoreNavigation();
+            throw err;
+        }
+    });
+
+    QUnit.test('does not record resume when lastStoreId is false', assert => {
+        const restoreNavigation = mockNavigationType('navigate');
+
+        try {
+            sessionStorage.removeItem(resumeTracedStorageKey);
+
+            return createBootstrappedEnvironment(
+                {},
+                { nativePresent: true, driver: 'kiosked', results: [[]] },
+                { lastStoreId: false }
+            )
+                .then(environment =>
+                    environment.runner
+                        .runBefore('unloaditem')
+                        .then(() => {
+                            const resumeEntries = getTraceEntries(environment).filter(entry => entry.type === 'resume');
+
+                            assert.equal(resumeEntries.length, 0, 'no resume trace is recorded');
+                        })
+                        .finally(environment.cleanup)
+                )
+                .finally(restoreNavigation);
+        } catch (err) {
+            restoreNavigation();
+            throw err;
+        }
+    });
+
+    QUnit.test('does not record resume unless navigation type is navigate', assert => {
+        const restoreNavigation = mockNavigationType('back_forward');
+
+        try {
+            sessionStorage.removeItem(resumeTracedStorageKey);
+
+            return createBootstrappedEnvironment(
+                {},
+                { nativePresent: true, driver: 'kiosked', results: [[]] },
+                { lastStoreId: '2C8CE97F-8DC8-4929-9C07-BCB8F0FE414B' }
+            )
+                .then(environment =>
+                    environment.runner
+                        .runBefore('unloaditem')
+                        .then(() => {
+                            const resumeEntries = getTraceEntries(environment).filter(entry => entry.type === 'resume');
+
+                            assert.equal(resumeEntries.length, 0, 'only navigate navigation records resume');
+                        })
+                        .finally(environment.cleanup)
+                )
+                .finally(restoreNavigation);
+        } catch (err) {
+            restoreNavigation();
+            throw err;
+        }
+    });
+
+    QUnit.test('does not record resume on navigation reload', assert => {
+        const restoreNavigation = mockNavigationType('reload');
+
+        try {
+            sessionStorage.removeItem(resumeTracedStorageKey);
+
+            return createBootstrappedEnvironment(
+                {},
+                { nativePresent: true, driver: 'kiosked', results: [[]] },
+                { lastStoreId: '2C8CE97F-8DC8-4929-9C07-BCB8F0FE414B' }
+            )
+                .then(environment =>
+                    environment.runner
+                        .runBefore('unloaditem')
+                        .then(() => {
+                            const resumeEntries = getTraceEntries(environment).filter(entry => entry.type === 'resume');
+
+                            assert.equal(resumeEntries.length, 0, 'reload does not emit resume');
+                        })
+                        .finally(environment.cleanup)
+                )
+                .finally(restoreNavigation);
+        } catch (err) {
+            restoreNavigation();
+            throw err;
+        }
+    });
+
+    QUnit.test('does not duplicate resume when session storage is already set', assert => {
+        const restoreNavigation = mockNavigationType('navigate');
+
+        try {
+            sessionStorage.setItem(resumeTracedStorageKey, '1');
+
+            return createBootstrappedEnvironment(
+                {},
+                { nativePresent: true, driver: 'kiosked', results: [[]] },
+                { lastStoreId: '2C8CE97F-8DC8-4929-9C07-BCB8F0FE414B' }
+            )
+                .then(environment =>
+                    environment.runner
+                        .runBefore('unloaditem')
+                        .then(() => {
+                            const resumeEntries = getTraceEntries(environment).filter(entry => entry.type === 'resume');
+
+                            assert.equal(resumeEntries.length, 0, 'resume is not duplicated');
+                        })
+                        .finally(environment.cleanup)
+                )
+                .finally(() => {
+                    sessionStorage.removeItem(resumeTracedStorageKey);
+                    restoreNavigation();
+                });
+        } catch (err) {
+            sessionStorage.removeItem(resumeTracedStorageKey);
+            restoreNavigation();
+            throw err;
+        }
+    });
+
+    QUnit.test('pagehide clears resume traced so a later init can record resume again', assert => {
+        const restoreNavigation = mockNavigationType('navigate');
+        const initResponse = { lastStoreId: '2C8CE97F-8DC8-4929-9C07-BCB8F0FE414B' };
+
+        try {
+            sessionStorage.removeItem(resumeTracedStorageKey);
+
+            return createBootstrappedEnvironment(
+                {},
+                { nativePresent: true, driver: 'kiosked', results: [[]] },
+                initResponse
+            )
+                .then(environment =>
+                    environment.runner
+                        .runBefore('unloaditem')
+                        .then(() => {
+                            assert.equal(
+                                sessionStorage.getItem(resumeTracedStorageKey),
+                                '1',
+                                'first boot records resume and marks session storage'
+                            );
+
+                            const pageHideEvent = new Event('pagehide');
+
+                            pageHideEvent.persisted = false;
+                            window.dispatchEvent(pageHideEvent);
+                            assert.notOk(sessionStorage.getItem(resumeTracedStorageKey), 'pagehide cleared the flag');
+                        })
+                        .then(() => environment.cleanup())
+                )
+                .then(() =>
+                    createBootstrappedEnvironment(
+                        {},
+                        { nativePresent: true, driver: 'kiosked', results: [[]] },
+                        initResponse
+                    ).then(environment =>
+                        environment.runner
+                            .runBefore('unloaditem')
+                            .then(() => {
+                                const resumeEntries = getTraceEntries(environment).filter(
+                                    entry => entry.type === 'resume'
+                                );
+
+                                assert.equal(resumeEntries.length, 1, 'resume is recorded after leaving and returning');
+                            })
+                            .finally(environment.cleanup)
+                    )
+                )
+                .finally(restoreNavigation);
+        } catch (err) {
+            restoreNavigation();
+            throw err;
+        }
     });
 
     QUnit.test('detected applications are logged with source and item identifier', assert =>
