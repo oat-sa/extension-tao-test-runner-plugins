@@ -698,7 +698,6 @@ define([
                 }
 
                 integrationStarted = true;
-                recordEvent('started');
                 recordDeliveryExecutionResumeTrace();
 
                 ldb.validateMinVersion().catch(err => {
